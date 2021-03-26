@@ -6,7 +6,7 @@ import kohgylw.kiftd.ui.module.ServerUiModule;
 /**
  * @author Administrator
  */
-public class Out
+public final class Out
 {
     private static boolean uiModel;
 
