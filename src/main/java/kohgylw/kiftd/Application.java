@@ -40,7 +40,8 @@ public class Application
         {
             try
             {
-                UiLauncher.build();// 以界面模式启动kiftd。
+                // 以界面模式启动kiftd。
+                UiLauncher.build();
             }
             catch (Exception e)
             {
