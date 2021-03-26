@@ -1,4 +1,4 @@
-package kohgylw.kiftd.server.configation;
+package kohgylw.kiftd.server.config;
 
 import org.springframework.web.servlet.resource.*;
 

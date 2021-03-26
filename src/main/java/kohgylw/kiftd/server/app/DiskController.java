@@ -1,7 +1,7 @@
 package kohgylw.kiftd.server.app;
 
 import kohgylw.kiftd.printer.Out;
-import kohgylw.kiftd.server.configation.MVC;
+import kohgylw.kiftd.server.config.MVC;
 import kohgylw.kiftd.server.util.ConfigureReader;
 import org.apache.catalina.Context;
 import org.apache.catalina.connector.Connector;

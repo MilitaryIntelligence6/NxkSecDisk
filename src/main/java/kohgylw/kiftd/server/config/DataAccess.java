@@ -1,4 +1,4 @@
-package kohgylw.kiftd.server.configation;
+package kohgylw.kiftd.server.config;
 
 import kohgylw.kiftd.server.util.ConfigureReader;
 import org.mybatis.spring.SqlSessionFactoryBean;
