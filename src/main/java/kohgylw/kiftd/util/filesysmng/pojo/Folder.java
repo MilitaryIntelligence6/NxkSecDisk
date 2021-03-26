@@ -1,4 +1,4 @@
-package kohgylw.kiftd.util.filesystemmanager.pojo;
+package kohgylw.kiftd.util.filesysmng.pojo;
 
 public class Folder extends kohgylw.kiftd.server.model.Folder{
 	

@@ -10,7 +10,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableModel;
 
 import kohgylw.kiftd.server.model.Node;
-import kohgylw.kiftd.util.filesystemmanager.pojo.Folder;
+import kohgylw.kiftd.util.filesysmng.pojo.Folder;
 
 /**
  * 

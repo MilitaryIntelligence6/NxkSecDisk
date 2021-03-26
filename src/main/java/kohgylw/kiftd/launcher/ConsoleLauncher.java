@@ -7,9 +7,9 @@ import kohgylw.kiftd.server.exception.FoldersTotalOutOfLimitException;
 import kohgylw.kiftd.server.model.Node;
 import kohgylw.kiftd.server.util.ConfigureReader;
 import kohgylw.kiftd.server.util.FileNodeUtil;
-import kohgylw.kiftd.util.filesystemmanager.FileSystemManager;
-import kohgylw.kiftd.util.filesystemmanager.pojo.Folder;
-import kohgylw.kiftd.util.filesystemmanager.pojo.FolderView;
+import kohgylw.kiftd.util.filesysmng.FileSystemManager;
+import kohgylw.kiftd.util.filesysmng.pojo.Folder;
+import kohgylw.kiftd.util.filesysmng.pojo.FolderView;
 
 import java.io.File;
 import java.sql.SQLException;

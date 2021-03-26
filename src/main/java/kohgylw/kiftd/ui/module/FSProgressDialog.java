@@ -12,7 +12,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 
-import kohgylw.kiftd.util.filesystemmanager.FileSystemManager;
+import kohgylw.kiftd.util.filesysmng.FileSystemManager;
 
 public class FSProgressDialog extends DiskDynamicWindow
 {

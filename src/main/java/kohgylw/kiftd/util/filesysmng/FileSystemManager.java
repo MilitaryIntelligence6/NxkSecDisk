@@ -1,4 +1,4 @@
-package kohgylw.kiftd.util.filesystemmanager;
+package kohgylw.kiftd.util.filesysmng;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -27,8 +27,8 @@ import kohgylw.kiftd.server.pojo.ExtendStores;
 import kohgylw.kiftd.server.util.ConfigureReader;
 import kohgylw.kiftd.server.util.FileNodeUtil;
 import kohgylw.kiftd.server.util.ServerTimeUtil;
-import kohgylw.kiftd.util.filesystemmanager.pojo.Folder;
-import kohgylw.kiftd.util.filesystemmanager.pojo.FolderView;
+import kohgylw.kiftd.util.filesysmng.pojo.Folder;
+import kohgylw.kiftd.util.filesysmng.pojo.FolderView;
 
 /**
  * 
@@ -133,7 +133,7 @@ public class FileSystemManager {
 	 * 由文件系统得到ID代表的文件视图。
 	 * </p>
 	 * 
-	 * @see kohgylw.kiftd.util.filesystemmanager.pojo.FolderView
+	 * @see kohgylw.kiftd.util.filesysmng.pojo.FolderView
 	 * @author 青阳龙野(kohgylw)
 	 * @param folderId
 	 *            java.lang.String 文件夹ID
