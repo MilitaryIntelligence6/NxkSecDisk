@@ -2,7 +2,7 @@ package kohgylw.kiftd.launcher;
 
 import com.formdev.flatlaf.FlatDarculaLaf;
 import kohgylw.kiftd.printer.Out;
-import kohgylw.kiftd.server.ctl.DiskCtl;
+import kohgylw.kiftd.server.app.DiskController;
 import kohgylw.kiftd.server.enumeration.LogLevel;
 import kohgylw.kiftd.server.enumeration.VCLevel;
 import kohgylw.kiftd.server.pojo.ExtendStores;
@@ -40,7 +40,7 @@ public class UiLauncher
         Out.putModel(true);
         final ServerUiModule ui = ServerUiModule.getInstance();
         // 服务器控制层，用于连接UI与服务器内核;
-        DiskCtl ctl = new DiskCtl();
+        DiskController ctl = new DiskController();
         ServerUiModule.setStartServer(() -> ctl.start());
         ServerUiModule.setOnCloseServer(() -> ctl.stop());
         ServerUiModule.setGetServerTime(() -> ServerTimeUtil.getServerTime());
