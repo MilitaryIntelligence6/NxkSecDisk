@@ -30,7 +30,8 @@ import com.lowagie.text.pdf.PdfWriter;
  * @version 1.0
  */
 @Component
-public class Txt2PDFUtil {
+public class TxtToPdfUtil
+{
 	
 	@Resource
 	private TxtCharsetGetter tcg;

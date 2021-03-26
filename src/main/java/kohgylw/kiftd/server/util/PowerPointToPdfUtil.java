@@ -45,7 +45,8 @@ import kohgylw.kiftd.server.enumeration.PowerPointType;
  * @version 1.0
  */
 @Component
-public class PowerPoint2PDFUtil {
+public class PowerPointToPdfUtil
+{
 	
 	/**
 	 * 

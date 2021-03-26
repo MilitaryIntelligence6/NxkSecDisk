@@ -11,7 +11,7 @@ import com.lowagie.text.FontFactoryImp;
  * @author 青阳龙野(kohgylw)
  * @version 1.0
  */
-public class Docx2PDFFontFactory extends FontFactoryImp{
+public class DocxToPdfFontFactory extends FontFactoryImp{
 	
 	//指定各种系统可能的字体存放路径，并定义程序内置字体存放路径
 	@Override

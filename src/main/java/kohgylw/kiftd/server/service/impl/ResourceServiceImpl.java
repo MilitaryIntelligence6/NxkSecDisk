@@ -29,13 +29,13 @@ public class ResourceServiceImpl implements ResourceService
     @Resource
     private LogUtil logUtil;
     @Resource
-    private Docx2PDFUtil d2pu;
+    private DocxToPdfUtil d2pu;
     @Resource
-    private Txt2PDFUtil t2pu;
+    private TxtToPdfUtil t2pu;
     @Resource
     private VideoTranscodeUtil vtu;
     @Resource
-    private PowerPoint2PDFUtil p2pu;
+    private PowerPointToPdfUtil p2pu;
     @Resource
     private FolderUtil fu;
     @Resource

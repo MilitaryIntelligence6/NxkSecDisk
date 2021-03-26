@@ -7,7 +7,7 @@
 	<version>1.0.35-RELEASE</version>
 	<packaging>jar</packaging>
 
-	<name>kiftd</name>
+	<name>NxkSecDisk</name>
 	<url>https://kohgylw.gitee.io</url>
 
 	<properties>

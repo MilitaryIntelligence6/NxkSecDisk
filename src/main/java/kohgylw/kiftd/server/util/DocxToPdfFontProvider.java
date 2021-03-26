@@ -16,7 +16,7 @@ public class DocxToPdfFontProvider extends AbstractFontRegistry
 
     private DocxToPdfFontProvider()
     {
-        FontFactory.setFontImp(new Docx2PDFFontFactory());
+        FontFactory.setFontImp(new DocxToPdfFontFactory());
     }
 
     @Override

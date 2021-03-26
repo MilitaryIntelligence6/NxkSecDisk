@@ -24,7 +24,8 @@ import org.springframework.stereotype.Component;
  * @version 1.0
  */
 @Component
-public class Docx2PDFUtil {
+public class DocxToPdfUtil
+{
 	
 	/**
 	 * 
