@@ -101,9 +101,9 @@ public class ServerUiModule extends DiskDynamicWindow
             ServerUiModule.window.setIconImage(
                     ImageIO.read(this.getClass().getResourceAsStream("/icon/icon.png")));
         }
-        catch (NullPointerException | IOException ex)
+        catch (NullPointerException | IOException e)
         {
-            ex.printStackTrace();
+            e.printStackTrace();
         }
         if (SystemTray.isSupported())
         {
