@@ -1,6 +1,5 @@
 package edu.swufe.nxksecdisk.server.util;
 
-import edu.swufe.nxksecdisk.constant.EnumString;
 import edu.swufe.nxksecdisk.printer.Out;
 import edu.swufe.nxksecdisk.server.enumeration.LogLevel;
 import edu.swufe.nxksecdisk.server.mapper.FolderMapper;
@@ -42,7 +41,7 @@ public class LogUtil
     private IpAddrGetter ipAddrGetter;
 
     @Resource
-    private FileBlockUtil fbu;
+    private FileBlockUtil fileBlockUtil;
 
     private ExecutorService writerThread;
 
@@ -91,8 +90,11 @@ public class LogUtil
             for (int i = 0; i < stackTraceArray.length && i < 10; i++)
             {
                 StackTraceElement ste = stackTraceArray[i];
-                exceptionInfo.append("\r\n	at " + ste.getClassName() + "." + ste.getMethodName() + "("
-                        + ste.getFileName() + ":" + ste.getLineNumber() + ")");
+                exceptionInfo.append(String.format("\r\n\tat %s.%s(%s:%d)",
+                        ste.getClassName(),
+                        ste.getMethodName(),
+                        ste.getFileName(),
+                        ste.getLineNumber()));
             }
             if (stackTraceArray.length > 10)
             {
@@ -600,7 +602,7 @@ public class LogUtil
                     Node f = nodeMapper.queryById(fid);
                     if (f != null)
                     {
-                        content.append(">File [" + fbu.getNodePath(f) + "]\r\n");
+                        content.append(">File [" + fileBlockUtil.getNodePath(f) + "]\r\n");
                     }
                 }
                 for (String ffid : fidList)

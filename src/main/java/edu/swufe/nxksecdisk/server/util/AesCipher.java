@@ -24,7 +24,9 @@ public class AesCipher
      * 所用到的加密算法类型;
      */
     private static final String CIPHER_TYPE = "AES";
+
     private Base64.Encoder encoder;
+
     private Base64.Decoder decoder;
 
     public AesCipher()

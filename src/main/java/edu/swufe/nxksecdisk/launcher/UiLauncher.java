@@ -1,12 +1,12 @@
 package edu.swufe.nxksecdisk.launcher;
 
 import com.formdev.flatlaf.FlatDarculaLaf;
-import edu.swufe.nxksecdisk.server.app.DiskController;
+import edu.swufe.nxksecdisk.server.app.DiskApplication;
 import edu.swufe.nxksecdisk.server.util.ConfigureReader;
 import edu.swufe.nxksecdisk.ui.pojo.FileSystemPath;
 import edu.swufe.nxksecdisk.printer.Out;
 import edu.swufe.nxksecdisk.server.enumeration.LogLevel;
-import edu.swufe.nxksecdisk.server.enumeration.VCLevel;
+import edu.swufe.nxksecdisk.server.enumeration.VcLevel;
 import edu.swufe.nxksecdisk.server.pojo.ExtendStores;
 import edu.swufe.nxksecdisk.server.util.ServerTimeUtil;
 import edu.swufe.nxksecdisk.ui.callback.GetServerStatus;
@@ -27,7 +27,6 @@ import java.util.List;
  */
 public class UiLauncher
 {
-
     private volatile static UiLauncher instance;
 
     /**
@@ -40,9 +39,9 @@ public class UiLauncher
         Out.putModel(true);
         final ServerUiModule ui = ServerUiModule.getInstance();
         // 服务器控制层，用于连接UI与服务器内核;
-        DiskController ctl = new DiskController();
-        ServerUiModule.setStartServer(() -> ctl.start());
-        ServerUiModule.setOnCloseServer(() -> ctl.stop());
+        DiskApplication application = new DiskApplication();
+        ServerUiModule.setStartServer(() -> application.start());
+        ServerUiModule.setOnCloseServer(() -> application.stop());
         ServerUiModule.setGetServerTime(() -> ServerTimeUtil.getServerTime());
         ServerUiModule.setGetServerStatus(new GetServerStatus()
         {
@@ -50,7 +49,7 @@ public class UiLauncher
             public boolean getServerStatus()
             {
                 // TODO 自动生成的方法存根
-                return ctl.started();
+                return application.started();
             }
 
             @Override
@@ -96,7 +95,7 @@ public class UiLauncher
             }
 
             @Override
-            public VCLevel getVCLevel()
+            public VcLevel getVCLevel()
             {
                 // TODO 自动生成的方法存根
                 return ConfigureReader.getInstance().getVCLevel();
@@ -125,7 +124,7 @@ public class UiLauncher
             }
 
             @Override
-            public VCLevel getInitVCLevel()
+            public VcLevel getInitVCLevel()
             {
                 // TODO 自动生成的方法存根
                 return ConfigureReader.getInstance().getInitVCLevel();

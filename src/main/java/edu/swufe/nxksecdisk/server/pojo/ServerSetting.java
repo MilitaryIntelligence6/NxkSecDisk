@@ -1,7 +1,7 @@
 package edu.swufe.nxksecdisk.server.pojo;
 
 import edu.swufe.nxksecdisk.server.enumeration.LogLevel;
-import edu.swufe.nxksecdisk.server.enumeration.VCLevel;
+import edu.swufe.nxksecdisk.server.enumeration.VcLevel;
 
 import java.util.List;
 
@@ -9,7 +9,7 @@ public class ServerSetting
 {
     private boolean mustLogin;
 
-    private VCLevel vc;
+    private VcLevel vc;
 
     private int buffSize;
 
@@ -75,12 +75,12 @@ public class ServerSetting
         this.fsPath = fsPath;
     }
 
-    public VCLevel getVc()
+    public VcLevel getVc()
     {
         return this.vc;
     }
 
-    public void setVc(VCLevel vc)
+    public void setVc(VcLevel vc)
     {
         this.vc = vc;
     }

@@ -3,7 +3,7 @@ package edu.swufe.nxksecdisk.ui.callback;
 import java.util.List;
 
 import edu.swufe.nxksecdisk.server.enumeration.LogLevel;
-import edu.swufe.nxksecdisk.server.enumeration.VCLevel;
+import edu.swufe.nxksecdisk.server.enumeration.VcLevel;
 import edu.swufe.nxksecdisk.ui.pojo.FileSystemPath;
 
 public interface GetServerStatus
@@ -24,9 +24,9 @@ public interface GetServerStatus
     
     LogLevel getInitLogLevel();
     
-    VCLevel getVCLevel();
+    VcLevel getVCLevel();
     
-    VCLevel getInitVCLevel();
+    VcLevel getInitVCLevel();
     
     String getFileSystemPath();
     

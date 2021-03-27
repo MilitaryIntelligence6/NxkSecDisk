@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 
 /**
  * 转为在线资源打造的控制器，针对在线播放等功能的适配;
+ *
  * @author Administrator
  */
 @Controller
@@ -38,12 +39,13 @@ public class ResourceController
         resourceService.requireResource(fileId, request, response);
     }
 
-	/**
-	 * 以PDF格式获取word预览视图;
-	 * @param fileId
-	 * @param request
-	 * @param response
-	 */
+    /**
+     * 以PDF格式获取word预览视图;
+     *
+     * @param fileId
+     * @param request
+     * @param response
+     */
     @RequestMapping("/getWordView/{fileId}")
     public void getWordView(@PathVariable("fileId") String fileId, HttpServletRequest request,
                             HttpServletResponse response)
@@ -51,12 +53,13 @@ public class ResourceController
         resourceService.getWordView(fileId, request, response);
     }
 
-	/**
-	 * 以PDF格式获取TXT预览视图;
-	 * @param fileId
-	 * @param request
-	 * @param response
-	 */
+    /**
+     * 以PDF格式获取TXT预览视图;
+     *
+     * @param fileId
+     * @param request
+     * @param response
+     */
     @RequestMapping("/getTxtView/{fileId}")
     public void getTxtView(@PathVariable("fileId") String fileId, HttpServletRequest request,
                            HttpServletResponse response)
@@ -64,12 +67,13 @@ public class ResourceController
         resourceService.getTxtView(fileId, request, response);
     }
 
-	/**
-	 * 以PDF格式获取PPT预览视图;
-	 * @param fileId
-	 * @param request
-	 * @param response
-	 */
+    /**
+     * 以PDF格式获取PPT预览视图;
+     *
+     * @param fileId
+     * @param request
+     * @param response
+     */
     @RequestMapping("/getPPTView/{fileId}")
     public void getPPTView(@PathVariable("fileId") String fileId, HttpServletRequest request,
                            HttpServletResponse response)
@@ -77,12 +81,13 @@ public class ResourceController
         resourceService.getPPTView(fileId, request, response);
     }
 
-	/**
-	 * 得到UTF-8编码格式的LRC歌词（文本）流;
-	 * @param fileId
-	 * @param request
-	 * @param response
-	 */
+    /**
+     * 得到UTF-8编码格式的LRC歌词（文本）流;
+     *
+     * @param fileId
+     * @param request
+     * @param response
+     */
     @RequestMapping("/getLRContext/{fileId}")
     public void getLRContext(@PathVariable("fileId") String fileId, HttpServletRequest request,
                              HttpServletResponse response)
@@ -90,35 +95,38 @@ public class ResourceController
         resourceService.getLRContextByUTF8(fileId, request, response);
     }
 
-	/**
-	 * 获取视频转码状态，如指定视频未开始转码则开始，如已经开始则返回进度，如已经完成则返回FIN;
-	 * @param request
-	 * @return
-	 */
-	@RequestMapping("/getVideoTranscodeStatus.ajax")
+    /**
+     * 获取视频转码状态，如指定视频未开始转码则开始，如已经开始则返回进度，如已经完成则返回FIN;
+     *
+     * @param request
+     * @return
+     */
+    @RequestMapping("/getVideoTranscodeStatus.ajax")
     public @ResponseBody
     String getVideoTranscodeStatus(HttpServletRequest request)
     {
         return resourceService.getVideoTranscodeStatus(request);
     }
 
-	/**
-	 * 获取公告新的的MD5，如果没有公告信息，则返回null;
-	 * @return
-	 */
-	@RequestMapping("/getNoticeMD5.ajax")
+    /**
+     * 获取公告新的的MD5，如果没有公告信息，则返回null;
+     *
+     * @return
+     */
+    @RequestMapping("/getNoticeMD5.ajax")
     public @ResponseBody
     String getNoticeMD5()
     {
         return resourceService.requireNoticeMD5();
     }
 
-	/**
-	 * 获取公告信息的HTML文本流;
-	 * @param request
-	 * @param response
-	 */
-	@RequestMapping("/getNoticeContext.do")
+    /**
+     * 获取公告信息的HTML文本流;
+     *
+     * @param request
+     * @param response
+     */
+    @RequestMapping("/getNoticeContext.do")
     public void getNoticeContext(HttpServletRequest request, HttpServletResponse response)
     {
         resourceService.getNoticeContext(request, response);

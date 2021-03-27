@@ -17,7 +17,6 @@ import java.util.Properties;
  */
 public class DiskDynamicWindow
 {
-
     /**
      * 原始（基准）屏幕分辨率-长度
      */
@@ -53,7 +52,9 @@ public class DiskDynamicWindow
      */
     protected Dimension fileChooserSize;
 
-    // 允许通过初始化配置文件动态修改分辨率
+    /**
+     * 允许通过初始化配置文件动态修改分辨率;
+     */
     public DiskDynamicWindow()
     {
         // 得到conf目录，此处未使用ConfigureReader获得是因为界面的初始化要在最前。
@@ -91,7 +92,7 @@ public class DiskDynamicWindow
         }
         catch (Exception e1)
         {
-
+            e1.printStackTrace();
         }
         if (proportion < 1.0)
         {
@@ -165,5 +166,4 @@ public class DiskDynamicWindow
             UIManager.put(item + ".font", f);
         }
     }
-
 }

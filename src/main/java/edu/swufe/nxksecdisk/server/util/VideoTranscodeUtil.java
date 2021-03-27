@@ -27,9 +27,9 @@ import java.util.Map;
 @Component
 public class VideoTranscodeUtil
 {
-	/**
-	 * 转码设定;
-	 */
+    /**
+     * 转码设定;
+     */
     private EncodingAttributes encodingAttributes;
 
     @Resource

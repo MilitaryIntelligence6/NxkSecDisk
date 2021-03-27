@@ -19,8 +19,13 @@ import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+/**
+ * @author Administrator
+ */
 public class ServerUiModule extends DiskDynamicWindow
 {
+    private static ServerUiModule instance;
+
     protected static JFrame window;
 
     private static SystemTray tray;
@@ -28,8 +33,6 @@ public class ServerUiModule extends DiskDynamicWindow
     private static TrayIcon trayIcon;
 
     private static JTextArea out;
-
-    private static ServerUiModule instance;
 
     private static SettingWindow settingWindow;
 
@@ -549,11 +552,17 @@ public class ServerUiModule extends DiskDynamicWindow
 
     public static ServerUiModule getInstance() throws Exception
     {
-        if (ServerUiModule.instance == null)
+        if (instance == null)
         {
-            ServerUiModule.instance = new ServerUiModule();
+            synchronized (ServerUiModule.class)
+            {
+                if (instance == null)
+                {
+                    instance = new ServerUiModule();
+                }
+            }
         }
-        return ServerUiModule.instance;
+        return instance;
     }
 
     public static void setStartServer(final OnStartServer ss)

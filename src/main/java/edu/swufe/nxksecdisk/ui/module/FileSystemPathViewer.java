@@ -60,7 +60,7 @@ public class FileSystemPathViewer extends DiskDynamicWindow
     /**
      *  该窗口的唯一实例
      */
-    private static FileSystemPathViewer fsv;
+    private static FileSystemPathViewer instance;
 
     /**
      *  当前显示的视图
@@ -380,11 +380,17 @@ public class FileSystemPathViewer extends DiskDynamicWindow
      */
     public static FileSystemPathViewer getInstance()
     {
-        if (fsv == null)
+        if (instance == null)
         {
-            fsv = new FileSystemPathViewer();
+            synchronized (FileSystemPathViewer.class)
+            {
+                if (instance == null)
+                {
+                    instance = new FileSystemPathViewer();
+                }
+            }
         }
-        return fsv;
+        return instance;
     }
 
     // 锁定全部按钮避免重复操作

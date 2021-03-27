@@ -24,15 +24,15 @@ import java.io.*;
 @Component
 public class NoticeUtil
 {
-	/**
-	 * 公告信息的md5值，如未生成则返回null;
-	 */
+    /**
+     * 公告信息的md5值，如未生成则返回null;
+     */
     private String md5;
 
-	/**
-	 * markdown解析器的参数设置;
-	 */
-	private MutableDataHolder options;
+    /**
+     * markdown解析器的参数设置;
+     */
+    private MutableDataHolder options;
 
     /**
      * 程序主目录中的公告文件名称

@@ -2,7 +2,7 @@ package edu.swufe.nxksecdisk.ui.module;
 
 import edu.swufe.nxksecdisk.printer.Out;
 import edu.swufe.nxksecdisk.server.enumeration.LogLevel;
-import edu.swufe.nxksecdisk.server.enumeration.VCLevel;
+import edu.swufe.nxksecdisk.server.enumeration.VcLevel;
 import edu.swufe.nxksecdisk.server.pojo.ExtendStores;
 import edu.swufe.nxksecdisk.server.pojo.ServerSetting;
 import edu.swufe.nxksecdisk.ui.callback.GetServerStatus;
@@ -30,6 +30,8 @@ import java.util.List;
  */
 public class SettingWindow extends DiskDynamicWindow
 {
+    private static SettingWindow instance;
+
     protected static JDialog window;
 
     private static JTextField portInput;
@@ -55,8 +57,6 @@ public class SettingWindow extends DiskDynamicWindow
     protected static File chooserPath;
 
     protected static List<FileSystemPath> extendStores;
-
-    private static SettingWindow settingWindow;
 
     private static final String ML_OPEN = "是(YES)";
 
@@ -84,7 +84,7 @@ public class SettingWindow extends DiskDynamicWindow
 
     private SettingWindow()
     {
-		// 全局字体设置;
+        // 全局字体设置;
         setUIFont();
         // 窗口主体相关设置
         (SettingWindow.window = new JDialog(ServerUiModule.window, "kiftd-设置")).setModal(true);
@@ -288,17 +288,17 @@ public class SettingWindow extends DiskDynamicWindow
                                 {
                                     case 0:
                                     {
-                                        ss.setVc(VCLevel.STANDARD);
+                                        ss.setVc(VcLevel.STANDARD);
                                         break;
                                     }
                                     case 1:
                                     {
-                                        ss.setVc(VCLevel.SIMPLIFIED);
+                                        ss.setVc(VcLevel.SIMPLIFIED);
                                         break;
                                     }
                                     case 2:
                                     {
-                                        ss.setVc(VCLevel.CLOSE);
+                                        ss.setVc(VcLevel.CLOSE);
                                         break;
                                     }
                                     default:
@@ -480,10 +480,16 @@ public class SettingWindow extends DiskDynamicWindow
 
     protected static SettingWindow getInstance()
     {
-        if (SettingWindow.settingWindow == null)
+        if (instance == null)
         {
-            SettingWindow.settingWindow = new SettingWindow();
+            synchronized (SettingWindow.class)
+            {
+                if (instance == null)
+                {
+                    instance = new SettingWindow();
+                }
+            }
         }
-        return SettingWindow.settingWindow;
+        return instance;
     }
 }

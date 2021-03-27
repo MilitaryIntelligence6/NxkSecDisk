@@ -1,5 +1,7 @@
 package edu.swufe.nxksecdisk.server.util;
 
+import edu.swufe.nxksecdisk.constant.EnumString;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedOutputStream;
@@ -41,13 +43,20 @@ public class RangeFileStreamWriter
     protected int writeRangeFileStream(HttpServletRequest request, HttpServletResponse response, File fo, String fname,
                                        String contentType, long maxRate, String eTag, boolean isAttachment)
     {
-        long fileLength = fo.length();// 文件总大小
-        long startOffset = 0; // 起始偏移量
-        boolean hasEnd = false;// 请求区间是否存在结束标识
-        long endOffset = 0; // 结束偏移量
-        long contentLength = 0; // 响应体长度
-        String rangeBytes = "";// 请求中的Range参数
-        int status = HttpServletResponse.SC_OK;// 初始响应码为200
+        // 文件总大小;
+        long fileLength = fo.length();
+        // 起始偏移量
+        long startOffset = 0;
+        // 请求区间是否存在结束标识;
+        boolean hasEnd = false;
+        // 结束偏移量;
+        long endOffset = 0;
+        // 响应体长度;
+        long contentLength = 0;
+        // 请求中的Range参数;
+        String rangeBytes = EnumString.EMPTY.value();
+        // 初始响应码为200;
+        int status = HttpServletResponse.SC_OK;
         // 检查是否有可用的缓存
         String lastModified = ServerTimeUtil.getLastModifiedFormBlock(fo);
         String ifModifiedSince = request.getHeader("If-Modified-Since");
@@ -82,14 +91,16 @@ public class RangeFileStreamWriter
         if (ifUnmodifiedSince != null && !(ifUnmodifiedSince.trim().equals(lastModified)))
         {
             status = HttpServletResponse.SC_PRECONDITION_FAILED;
-            response.setStatus(status);// 412
+            // 412;
+            response.setStatus(status);
             return status;
         }
         String ifMatch = request.getHeader("If-Match");
         if (ifMatch != null && !(ifMatch.trim().equals(eTag)))
         {
             status = HttpServletResponse.SC_PRECONDITION_FAILED;
-            response.setStatus(status);// 412
+            // 412;
+            response.setStatus(status);
             return status;
         }
         // 设置请求头，基于kiftd文件系统推荐使用application/octet-stream
@@ -99,8 +110,10 @@ public class RangeFileStreamWriter
         // 设置Content-Disposition信息
         if (isAttachment)
         {
-            response.setHeader("Content-Disposition", "attachment; filename=\"" + EncodeUtil.getFileNameByUTF8(fname)
-                    + "\"; filename*=utf-8''" + EncodeUtil.getFileNameByUTF8(fname));
+            response.setHeader("Content-Disposition",
+                    String.format("attachment; filename=\"%s\"; filename*=utf-8''%s",
+                            EncodeUtil.getFileNameByUTF8(fname),
+                            EncodeUtil.getFileNameByUTF8(fname)));
         }
         else
         {
@@ -151,10 +164,13 @@ public class RangeFileStreamWriter
             response.setHeader("Content-Range", contentRange);
         }
         else
-        { // 从开始进行下载
-            contentLength = fileLength; // 客户端要求全文下载
+        {
+            // 从开始进行下载
+            // 客户端要求全文下载;
+            contentLength = fileLength;
         }
-        response.setHeader("Content-Length", "" + contentLength);// 设置请求体长度
+        // 设置请求体长度;
+        response.setHeader("Content-Length", "" + contentLength);
         // 写出缓冲
         byte[] buf = new byte[ConfigureReader.getInstance().getBuffSize()];
         // 读取文件并写处至输出流
@@ -177,7 +193,8 @@ public class RangeFileStreamWriter
             {
                 // 有结束偏移量时，将其从起始偏移量开始写至指定偏移量结束。
                 int n = 0;
-                long readLength = 0;// 写出量，用于确定结束位置
+                // 写出量，用于确定结束位置;
+                long readLength = 0;
                 while (readLength < contentLength)
                 {
                     n = raf.read(buf);
@@ -197,6 +214,7 @@ public class RangeFileStreamWriter
         }
         catch (IllegalArgumentException e)
         {
+            e.printStackTrace();
             status = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
             try
             {
@@ -204,6 +222,7 @@ public class RangeFileStreamWriter
             }
             catch (IOException e1)
             {
+                e1.printStackTrace();
             }
             return status;
         }

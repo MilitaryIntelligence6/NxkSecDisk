@@ -1,7 +1,7 @@
 package edu.swufe.nxksecdisk.server.service.impl;
 
 import com.google.gson.Gson;
-import edu.swufe.nxksecdisk.server.enumeration.VCLevel;
+import edu.swufe.nxksecdisk.server.enumeration.VcLevel;
 import edu.swufe.nxksecdisk.server.pojo.ChangePasswordInfoPojo;
 import edu.swufe.nxksecdisk.server.pojo.LoginInfoPojo;
 import edu.swufe.nxksecdisk.server.pojo.PublicKeyInfo;
@@ -51,7 +51,7 @@ public class AccountServiceImpl implements AccountService
     private CharsetEncoder iso88591Encoder;
     {
         iso88591Encoder = Charset.forName("ISO-8859-1").newEncoder();
-        if (!ConfigureReader.getInstance().getVCLevel().equals(VCLevel.CLOSE))
+        if (!ConfigureReader.getInstance().getVCLevel().equals(VcLevel.CLOSE))
         {
             int line = 0;
             int oval = 0;
@@ -99,7 +99,7 @@ public class AccountServiceImpl implements AccountService
                 return "accountnotfound";
             }
             // 如果验证码开启且该账户已被关注，则要求提供验证码
-            if (!ConfigureReader.getInstance().getVCLevel().equals(VCLevel.CLOSE))
+            if (!ConfigureReader.getInstance().getVCLevel().equals(VcLevel.CLOSE))
             {
                 synchronized (focusAccount)
                 {
@@ -121,7 +121,7 @@ public class AccountServiceImpl implements AccountService
             {
                 session.setAttribute("ACCOUNT", (Object) accountId);
                 // 如果该账户输入正确且是一个被关注的账户，则解除该账户的关注，释放空间
-                if (!ConfigureReader.getInstance().getVCLevel().equals(VCLevel.CLOSE))
+                if (!ConfigureReader.getInstance().getVCLevel().equals(VcLevel.CLOSE))
                 {
                     synchronized (focusAccount)
                     {
@@ -133,7 +133,7 @@ public class AccountServiceImpl implements AccountService
             // 如果账户密码不匹配，则将该账户加入到关注账户集合，避免对方进一步破解
             synchronized (focusAccount)
             {
-                if (!ConfigureReader.getInstance().getVCLevel().equals(VCLevel.CLOSE))
+                if (!ConfigureReader.getInstance().getVCLevel().equals(VcLevel.CLOSE))
                 {
                     focusAccount.add(accountId);
                 }
@@ -166,7 +166,7 @@ public class AccountServiceImpl implements AccountService
     {
         try
         {
-            if (ConfigureReader.getInstance().getVCLevel().equals(VCLevel.CLOSE))
+            if (ConfigureReader.getInstance().getVCLevel().equals(VcLevel.CLOSE))
             {
                 response.sendError(404);
             }
@@ -234,7 +234,7 @@ public class AccountServiceImpl implements AccountService
                 return "error";
             }
             // 如果验证码开启且该账户已被关注，则要求提供验证码
-            if (!ConfigureReader.getInstance().getVCLevel().equals(VCLevel.CLOSE))
+            if (!ConfigureReader.getInstance().getVCLevel().equals(VcLevel.CLOSE))
             {
                 synchronized (focusAccount)
                 {
@@ -254,7 +254,7 @@ public class AccountServiceImpl implements AccountService
             if (ConfigureReader.getInstance().checkAccountPwd(account, info.getOldPwd()))
             {
                 // 如果该账户输入正确且是一个被关注的账户，则解除该账户的关注，释放空间
-                if (!ConfigureReader.getInstance().getVCLevel().equals(VCLevel.CLOSE))
+                if (!ConfigureReader.getInstance().getVCLevel().equals(VcLevel.CLOSE))
                 {
                     synchronized (focusAccount)
                     {
@@ -279,7 +279,7 @@ public class AccountServiceImpl implements AccountService
                 // 如果账户密码不匹配，则将该账户加入到关注账户集合，避免对方进一步破解
                 synchronized (focusAccount)
                 {
-                    if (!ConfigureReader.getInstance().getVCLevel().equals(VCLevel.CLOSE))
+                    if (!ConfigureReader.getInstance().getVCLevel().equals(VcLevel.CLOSE))
                     {
                         focusAccount.add(account);
                     }
@@ -316,7 +316,7 @@ public class AccountServiceImpl implements AccountService
         }
         // 如果开启了验证码则必须输入
         String reqVerCode = request.getParameter("vercode");
-        if (!ConfigureReader.getInstance().getVCLevel().equals(VCLevel.CLOSE))
+        if (!ConfigureReader.getInstance().getVCLevel().equals(VcLevel.CLOSE))
         {
             String trueVerCode = (String) session.getAttribute("VERCODE");
             session.removeAttribute("VERCODE");// 确保一个验证码只会生效一次，无论对错

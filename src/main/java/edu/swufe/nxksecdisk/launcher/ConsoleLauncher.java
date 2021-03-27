@@ -1,6 +1,6 @@
 package edu.swufe.nxksecdisk.launcher;
 
-import edu.swufe.nxksecdisk.server.app.DiskController;
+import edu.swufe.nxksecdisk.server.app.DiskApplication;
 import edu.swufe.nxksecdisk.server.exception.FilesTotalOutOfLimitException;
 import edu.swufe.nxksecdisk.server.exception.FoldersTotalOutOfLimitException;
 import edu.swufe.nxksecdisk.server.util.ConfigureReader;
@@ -32,7 +32,7 @@ public class ConsoleLauncher
 {
     private volatile static ConsoleLauncher instance;
 
-    private static DiskController ctl;
+    private static DiskApplication ctl;
 
     private static String commandTips;
 
@@ -47,7 +47,7 @@ public class ConsoleLauncher
     private ConsoleLauncher()
     {
         Out.putModel(false);
-        ConsoleLauncher.ctl = new DiskController();
+        ConsoleLauncher.ctl = new DiskApplication();
         worker = Executors.newSingleThreadExecutor();
         ConsoleLauncher.commandTips = "kiftd:您可以输入以下指令以控制服务器：\r\n-start 启动服务器\r\n-stop 停止服务器\r\n-exit 停止服务器并退出应用\r\n-restart 重启服务器\r\n-files 文件管理\r\n-status 查看服务器状态\r\n-help 显示帮助文本";
         ConsoleLauncher.fsCommandTips = "kiftd files:您可以输入以下指令进行文件管理：\r\nls 显示当前文件夹内容\r\ncd {“文件夹名称” 或 “--文件夹序号”} 进入指定文件夹（示例：“cd foo” 或 “cd --1”，如需返回上一级请输入“cd ../”）\r\nimport {要导入的本地文件（必须使用完整路径）} 将本地文件或文件夹导入至此\r\nexport {“目标名称” 或 “--目标序号”（省略该项则导出当前文件夹的全部内容）} {要导出至本地的路径（必须使用完整路径）} 将指定文件或文件夹导出本地\r\nrm {“文件夹名称” 或 “--文件夹序号”} 删除指定文件或文件夹\r\nexit 退出文件管理并返回kiftd控制台\r\nhelp 显示帮助文本";
@@ -409,7 +409,7 @@ public class ConsoleLauncher
      */
     private void getFolderView(String fid) throws SQLException
     {
-        currentFolder = FileSystemManager.getInstance().getFolderView(fid);
+        currentFolder = FileSystemManager.getInstance().requireFolderView(fid);
     }
 
     /**
@@ -425,7 +425,7 @@ public class ConsoleLauncher
             {
                 System.out.println("警告：文件夹列表长度超过最大限值，只能显示前" + Integer.MAX_VALUE + "行。");
             }
-            currentFolder = FileSystemManager.getInstance().getFolderView(folderId);
+            currentFolder = FileSystemManager.getInstance().requireFolderView(folderId);
         }
         catch (SQLException e)
         {
@@ -456,7 +456,7 @@ public class ConsoleLauncher
     {
         try
         {
-            currentFolder = FileSystemManager.getInstance().getFolderView(currentFolder.getCurrent().getFolderId());
+            currentFolder = FileSystemManager.getInstance().requireFolderView(currentFolder.getCurrent().getFolderId());
             String fid = getSelectFolderId(fname);
             if (fid != null)
             {
@@ -1025,7 +1025,7 @@ public class ConsoleLauncher
         ProgressListener pl = null;
         try
         {
-            currentFolder = FileSystemManager.getInstance().getFolderView(currentFolder.getCurrent().getFolderId());
+            currentFolder = FileSystemManager.getInstance().requireFolderView(currentFolder.getCurrent().getFolderId());
         }
         catch (SQLException e2)
         {
@@ -1168,7 +1168,7 @@ public class ConsoleLauncher
                 {
                     try
                     {
-                        currentFolder = FileSystemManager.getInstance().getFolderView("root");
+                        currentFolder = FileSystemManager.getInstance().requireFolderView("root");
                     }
                     catch (SQLException e1)
                     {

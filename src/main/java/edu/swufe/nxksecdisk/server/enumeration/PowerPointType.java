@@ -9,11 +9,11 @@ package edu.swufe.nxksecdisk.server.enumeration;
  */
 public enum PowerPointType
 {
-	/**
-	 * ppt;
-	 */
+    /**
+     * ppt;
+     */
     PPT,
 
-	PPTX,
-	;
+    PPTX,
+    ;
 }

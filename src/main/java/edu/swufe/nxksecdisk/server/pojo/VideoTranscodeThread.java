@@ -44,18 +44,18 @@ public class VideoTranscodeThread
                         ea, new EncoderProgressListener()
                         {
                             @Override
-							public void sourceInfo(MultimediaInfo arg0)
+                            public void sourceInfo(MultimediaInfo arg0)
                             {
                             }
 
                             @Override
-							public void progress(int arg0)
+                            public void progress(int arg0)
                             {
                                 progress = String.format("%s", arg0 / 10.00);
                             }
 
                             @Override
-							public void message(String arg0)
+                            public void message(String arg0)
                             {
                             }
                         });

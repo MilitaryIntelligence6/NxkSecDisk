@@ -36,13 +36,13 @@ public class DocxToPdfFontProvider extends AbstractFontRegistry
     {
         if (instance == null)
         {
-			synchronized (DocxToPdfFontProvider.class)
-			{
-				if (instance == null)
-				{
-					instance = new DocxToPdfFontProvider();
-				}
-			}
+            synchronized (DocxToPdfFontProvider.class)
+            {
+                if (instance == null)
+                {
+                    instance = new DocxToPdfFontProvider();
+                }
+            }
         }
         return instance;
     }

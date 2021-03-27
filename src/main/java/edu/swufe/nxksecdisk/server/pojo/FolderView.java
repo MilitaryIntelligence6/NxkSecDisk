@@ -41,20 +41,20 @@ public class FolderView
 
     private boolean enableFfmpeg;
 
-	/**
-	 * 文件夹列表查询偏移量;
-	 */
-	private long foldersOffset;
+    /**
+     * 文件夹列表查询偏移量;
+     */
+    private long foldersOffset;
 
-	/**
-	 * 文件列表查询偏移量;
-	 */
+    /**
+     * 文件列表查询偏移量;
+     */
     private long filesOffset;
 
-	/**
-	 * 查询步长;
-	 */
-	private int selectStep;
+    /**
+     * 查询步长;
+     */
+    private int selectStep;
 
     public Folder getFolder()
     {

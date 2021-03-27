@@ -3,7 +3,7 @@ package edu.swufe.nxksecdisk.server.util;
 import edu.swufe.nxksecdisk.printer.Out;
 import edu.swufe.nxksecdisk.server.enumeration.AccountAuth;
 import edu.swufe.nxksecdisk.server.enumeration.LogLevel;
-import edu.swufe.nxksecdisk.server.enumeration.VCLevel;
+import edu.swufe.nxksecdisk.server.enumeration.VcLevel;
 import edu.swufe.nxksecdisk.server.model.Folder;
 import edu.swufe.nxksecdisk.server.pojo.ExtendStores;
 import edu.swufe.nxksecdisk.server.pojo.ServerSetting;
@@ -670,7 +670,7 @@ public class ConfigureReader
      * @return kohgylw.kiftd.server.enumeration.VCLevel 验证码等级
      * @author 青阳龙野(kohgylw)
      */
-    public VCLevel getVCLevel()
+    public VcLevel getVCLevel()
     {
         if (this.vc == null)
         {
@@ -681,15 +681,15 @@ public class ConfigureReader
         {
             case "STANDARD":
             {
-                return VCLevel.STANDARD;
+                return VcLevel.STANDARD;
             }
             case "SIMP":
             {
-                return VCLevel.SIMPLIFIED;
+                return VcLevel.SIMPLIFIED;
             }
             case "CLOSE":
             {
-                return VCLevel.CLOSE;
+                return VcLevel.CLOSE;
             }
             default:
             {
@@ -698,25 +698,25 @@ public class ConfigureReader
         }
     }
 
-    public VCLevel getInitVCLevel()
+    public VcLevel getInitVCLevel()
     {
         if (serverp != null && serverp.getProperty("VC.level") != null)
         {
             switch (serverp.getProperty("VC.level"))
             {
                 case "STANDARD":
-                    return VCLevel.STANDARD;
+                    return VcLevel.STANDARD;
                 case "SIMP":
-                    return VCLevel.SIMPLIFIED;
+                    return VcLevel.SIMPLIFIED;
                 case "CLOSE":
-                    return VCLevel.CLOSE;
+                    return VcLevel.CLOSE;
                 default:
-                    return VCLevel.STANDARD;
+                    return VcLevel.STANDARD;
             }
         }
         else
         {
-            return VCLevel.STANDARD;
+            return VcLevel.STANDARD;
         }
     }
 

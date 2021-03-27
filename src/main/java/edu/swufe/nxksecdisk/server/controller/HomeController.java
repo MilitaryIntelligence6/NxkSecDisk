@@ -74,12 +74,13 @@ public class HomeController
         return this.accountService.checkLoginRequest(request, session);
     }
 
-	/**
-	 * 获取一个新验证码并存入请求者的Session中;
-	 * @param request
-	 * @param response
-	 * @param session
-	 */
+    /**
+     * 获取一个新验证码并存入请求者的Session中;
+     *
+     * @param request
+     * @param response
+     * @param session
+     */
     @RequestMapping({"/getNewVerCode.do"})
     public void getNewVerCode(final HttpServletRequest request, final HttpServletResponse response,
                               final HttpSession session)
@@ -87,12 +88,13 @@ public class HomeController
         accountService.getNewLoginVerCode(request, response, session);
     }
 
-	/**
-	 * 修改密码;
-	 * @param request
-	 * @return
-	 */
-	@RequestMapping(value = {"/doChangePassword.ajax"}, produces = {CHARSET_BY_AJAX})
+    /**
+     * 修改密码;
+     *
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = {"/doChangePassword.ajax"}, produces = {CHARSET_BY_AJAX})
     @ResponseBody
     public String doChangePassword(final HttpServletRequest request)
     {

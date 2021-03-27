@@ -32,15 +32,15 @@ import org.springframework.http.HttpStatus;
  */
 @SpringBootApplication
 @Import({Mvc.class})
-public class DiskController
+public class DiskApplication
 {
     private static ApplicationContext context;
     private static boolean run;
 
-	/**
-	 * 这里负责设置一些系统参数;
-	 */
-	static
+    /**
+     * 这里负责设置一些系统参数;
+     */
+    static
     {
         // 简化SpringBoot框架本身的日志信息输出，避免控制台信息杂乱影响操作
         System.setProperty("logging.level.root", "ERROR");
@@ -59,7 +59,7 @@ public class DiskController
     {
         Out.println("正在初始化服务器设置...");
         final String[] args = new String[0];
-        if (!DiskController.run)
+        if (!DiskApplication.run)
         {
             ConfigureReader.getInstance().reTestServerPropertiesAndEffect();// 启动服务器前重新检查各项设置并加载
             if (ConfigureReader.getInstance().getPropertiesStatus() == 0)
@@ -67,12 +67,12 @@ public class DiskController
                 try
                 {
                     Out.println("正在开启服务器引擎...");
-                    SpringApplication springApplication = new SpringApplication(DiskController.class);
+                    SpringApplication springApplication = new SpringApplication(DiskApplication.class);
                     springApplication.setBannerMode(Banner.Mode.OFF);// 关闭自定义标志输出，简化日志信息
-                    DiskController.context = springApplication.run(args);
-                    DiskController.run = (DiskController.context != null);
+                    DiskApplication.context = springApplication.run(args);
+                    DiskApplication.run = (DiskApplication.context != null);
                     Out.println("服务器引擎已启动。");
-                    return DiskController.run;
+                    return DiskApplication.run;
                 }
                 catch (Exception e)
                 {
@@ -98,14 +98,14 @@ public class DiskController
     public boolean stop()
     {
         Out.println("正在关闭服务器...");
-        if (DiskController.context != null)
+        if (DiskApplication.context != null)
         {
             Out.println("正在终止服务器引擎...");
             try
             {
-                DiskController.run = (SpringApplication.exit(DiskController.context, new ExitCodeGenerator[0]) != 0);
+                DiskApplication.run = (SpringApplication.exit(DiskApplication.context, new ExitCodeGenerator[0]) != 0);
                 Out.println("服务器引擎已终止。");
-                return !DiskController.run;
+                return !DiskApplication.run;
             }
             catch (Exception e)
             {
@@ -127,12 +127,12 @@ public class DiskController
      */
     public boolean started()
     {
-        return DiskController.run;
+        return DiskApplication.run;
     }
 
     static
     {
-        DiskController.run = false;
+        DiskApplication.run = false;
     }
 
     /**
