@@ -17,26 +17,35 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 
+/**
+ * @author Administrator
+ */
 @Service
 public class FileChainServiceImpl extends RangeFileStreamWriter implements FileChainService
 {
+    @Resource
+    private NodeMapper nodeMapper;
 
     @Resource
-    private NodeMapper nm;
+    private FolderMapper folderMapper;
+
     @Resource
-    private FolderMapper flm;
+    private FileBlockUtil fileBlockUtil;
+
     @Resource
-    private FileBlockUtil fbu;
+    private ContentTypeMap contentTypeMap;
+
     @Resource
-    private ContentTypeMap ctm;
-    @Resource
-    private LogUtil lu;
+    private LogUtil logUtil;
+
     @Resource
     private AesCipher cipher;
+
     @Resource
-    private PropertiesMapper pm;
+    private PropertiesMapper propertiesMapper;
+
     @Resource
-    private FolderUtil fu;
+    private FolderUtil folderUtil;
 
     @Override
     public void getResourceByChainKey(HttpServletRequest request, HttpServletResponse response)
@@ -48,16 +57,16 @@ public class FileChainServiceImpl extends RangeFileStreamWriter implements FileC
             // 权限凭证有效性并确认其对应的资源
             if (ckey != null)
             {
-                Property keyProp = pm.selectByKey("chain_aes_key");
+                Property keyProp = propertiesMapper.selectByKey("chain_aes_key");
                 if (keyProp != null)
                 {
                     try
                     {
                         String fid = cipher.decrypt(keyProp.getPropertyValue(), ckey);
-                        Node f = this.nm.queryById(fid);
+                        Node f = this.nodeMapper.queryById(fid);
                         if (f != null)
                         {
-                            File target = this.fbu.getFileFromBlocks(f);
+                            File target = this.fileBlockUtil.getFileFromBlocks(f);
                             if (target != null && target.isFile())
                             {
                                 String fileName = f.getFileName();
@@ -68,12 +77,12 @@ public class FileChainServiceImpl extends RangeFileStreamWriter implements FileC
                                 }
                                 String range = request.getHeader("Range");
                                 int status = writeRangeFileStream(request, response, target, f.getFileName(),
-                                        ctm.getContentType(suffix), ConfigureReader.getInstance().getDownloadMaxRate(null),
-                                        fbu.getETag(target), false);
+                                        contentTypeMap.getContentType(suffix), ConfigureReader.getInstance().getDownloadMaxRate(null),
+                                        fileBlockUtil.getETag(target), false);
                                 if (status == HttpServletResponse.SC_OK
                                         || (range != null && range.startsWith("bytes=0-")))
                                 {
-                                    this.lu.writeChainEvent(request, f);
+                                    this.logUtil.writeChainEvent(request, f);
                                 }
                                 return;
                             }
@@ -82,7 +91,7 @@ public class FileChainServiceImpl extends RangeFileStreamWriter implements FileC
                     }
                     catch (Exception e)
                     {
-                        lu.writeException(e);
+                        logUtil.writeException(e);
                         statusCode = 500;
                     }
                 }
@@ -112,26 +121,26 @@ public class FileChainServiceImpl extends RangeFileStreamWriter implements FileC
             String account = (String) request.getSession().getAttribute("ACCOUNT");
             if (fid != null)
             {
-                final Node f = this.nm.queryById(fid);
+                final Node f = this.nodeMapper.queryById(fid);
                 if (f != null)
                 {
                     if (ConfigureReader.getInstance().authorized(account, AccountAuth.DOWNLOAD_FILES,
-                            fu.getAllFoldersId(f.getFileParentFolder())))
+                            folderUtil.getAllFoldersId(f.getFileParentFolder())))
                     {
-                        Folder folder = flm.queryById(f.getFileParentFolder());
+                        Folder folder = folderMapper.queryById(f.getFileParentFolder());
                         if (ConfigureReader.getInstance().accessFolder(folder, account))
                         {
                             // 将指定的fid加密为ckey并返回。
                             try
                             {
-                                Property keyProp = pm.selectByKey("chain_aes_key");
+                                Property keyProp = propertiesMapper.selectByKey("chain_aes_key");
                                 if (keyProp == null)
                                 {// 如果没有生成过永久性AES密钥，则先生成再加密
                                     String aesKey = cipher.generateRandomKey();
                                     Property chainAESKey = new Property();
                                     chainAESKey.setPropertyKey("chain_aes_key");
                                     chainAESKey.setPropertyValue(aesKey);
-                                    if (pm.insert(chainAESKey) > 0)
+                                    if (propertiesMapper.insert(chainAESKey) > 0)
                                     {
                                         return cipher.encrypt(aesKey, fid);
                                     }
@@ -143,7 +152,7 @@ public class FileChainServiceImpl extends RangeFileStreamWriter implements FileC
                             }
                             catch (Exception e)
                             {
-                                lu.writeException(e);
+                                logUtil.writeException(e);
                             }
                         }
                     }

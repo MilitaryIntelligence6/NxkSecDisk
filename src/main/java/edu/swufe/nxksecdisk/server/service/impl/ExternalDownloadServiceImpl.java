@@ -25,20 +25,26 @@ import java.util.UUID;
 public class ExternalDownloadServiceImpl extends RangeFileStreamWriter implements ExternalDownloadService
 {
     private static final String CONTENT_TYPE = "application/octet-stream";
+
     /**
      * 凭证池，用于存储生成好的下载凭证;
      */
     private static Map<String, String> downloadKeyMap = new HashMap<>();
+
     @Resource
-    private NodeMapper nm;
+    private NodeMapper nodeMapper;
+
     @Resource
-    private LogUtil lu;
+    private LogUtil logUtil;
+
     @Resource
-    private FileBlockUtil fbu;
+    private FileBlockUtil fileBlockUtil;
+
     @Resource
-    private FolderUtil fu;
+    private FolderUtil folderUtil;
+
     @Resource
-    private FolderMapper fm;
+    private FolderMapper folderMapper;
 
     @Override
     public String getDownloadKey(HttpServletRequest request)
@@ -49,19 +55,19 @@ public class ExternalDownloadServiceImpl extends RangeFileStreamWriter implement
         final String fileId = request.getParameter("fId");
         if (fileId != null)
         {
-            final Node f = this.nm.queryById(fileId);
+            final Node f = this.nodeMapper.queryById(fileId);
             if (f != null)
             {
                 // 权限检查
                 if (ConfigureReader.getInstance().authorized(account, AccountAuth.DOWNLOAD_FILES,
-                        fu.getAllFoldersId(f.getFileParentFolder()))
-                        && ConfigureReader.getInstance().accessFolder(fm.queryById(f.getFileParentFolder()), account))
+                        folderUtil.getAllFoldersId(f.getFileParentFolder()))
+                        && ConfigureReader.getInstance().accessFolder(folderMapper.queryById(f.getFileParentFolder()), account))
                 {
                     // 获取凭证
                     synchronized (downloadKeyMap)
                     {
                         // 查找该资源是否已经生成了一个凭证，如有，则直接使用，否则，新生成一个加入到凭证表。
-                        this.lu.writeShareFileURLEvent(request, f);
+                        this.logUtil.writeShareFileURLEvent(request, f);
                         if (downloadKeyMap.containsValue(f.getFileId()))
                         {
                             Entry<String, String> k = downloadKeyMap.entrySet().parallelStream()
@@ -96,18 +102,18 @@ public class ExternalDownloadServiceImpl extends RangeFileStreamWriter implement
             }
             if (fId != null)
             {
-                Node f = this.nm.queryById(fId);
+                Node f = this.nodeMapper.queryById(fId);
                 if (f != null)
                 {
-                    File target = this.fbu.getFileFromBlocks(f);
+                    File target = this.fileBlockUtil.getFileFromBlocks(f);
                     if (target != null && target.isFile())
                     {
                         String range = request.getHeader("Range");
                         int status = writeRangeFileStream(request, response, target, f.getFileName(), CONTENT_TYPE,
-                                ConfigureReader.getInstance().getDownloadMaxRate(null), fbu.getETag(target), true);
+                                ConfigureReader.getInstance().getDownloadMaxRate(null), fileBlockUtil.getETag(target), true);
                         if (status == HttpServletResponse.SC_OK || (range != null && range.startsWith("bytes=0-")))
                         {
-                            this.lu.writeDownloadFileByKeyEvent(request, f);
+                            this.logUtil.writeDownloadFileByKeyEvent(request, f);
                         }
                         return;
                     }

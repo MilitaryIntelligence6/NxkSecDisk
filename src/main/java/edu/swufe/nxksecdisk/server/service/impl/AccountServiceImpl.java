@@ -21,6 +21,9 @@ import java.nio.charset.CharsetEncoder;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * @author Administrator
+ */
 @Service
 public class AccountServiceImpl implements AccountService
 {
@@ -39,10 +42,10 @@ public class AccountServiceImpl implements AccountService
     @Resource
     private Gson gson;
     private VerificationCodeFactory vcf;
-    private CharsetEncoder ios88591Encoder;
+    private CharsetEncoder iso88591Encoder;
 
     {
-        ios88591Encoder = Charset.forName("ISO-8859-1").newEncoder();
+        iso88591Encoder = Charset.forName("ISO-8859-1").newEncoder();
         if (!ConfigureReader.getInstance().getVCLevel().equals(VCLevel.CLOSE))
         {
             int line = 0;
@@ -256,7 +259,7 @@ public class AccountServiceImpl implements AccountService
                 String newPassword = info.getNewPwd();
                 // 新密码合法性检查
                 if (newPassword != null && newPassword.length() >= 3 && newPassword.length() <= 32
-                        && ios88591Encoder.canEncode(newPassword))
+                        && iso88591Encoder.canEncode(newPassword))
                 {
                     if (ConfigureReader.getInstance().changePassword(account, newPassword))
                     {
@@ -336,12 +339,12 @@ public class AccountServiceImpl implements AccountService
             String password = info.getPwd();
             // 新账户和密码的合法性检查
             if (account != null && account.length() >= 3 && account.length() <= 32
-                    && ios88591Encoder.canEncode(account))
+                    && iso88591Encoder.canEncode(account))
             {
                 if (account.indexOf("=") < 0 && account.indexOf(":") < 0 && account.indexOf("#") != 0)
                 {
                     if (password != null && password.length() >= 3 && password.length() <= 32
-                            && ios88591Encoder.canEncode(password))
+                            && iso88591Encoder.canEncode(password))
                     {
                         if (ConfigureReader.getInstance().createNewAccount(account, password))
                         {
