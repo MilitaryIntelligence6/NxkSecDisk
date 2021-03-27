@@ -30,7 +30,7 @@ import org.springframework.context.annotation.*;
 @ComponentScan({ "edu.swufe.nxksecdisk.server.controller", "edu.swufe.nxksecdisk.server.service.impl", "edu.swufe.nxksecdisk.server.util" })
 @ServletComponentScan({ "edu.swufe.nxksecdisk.server.listener", "edu.swufe.nxksecdisk.server.filter" })
 @Import({ DataAccess.class })
-public class MVC extends ResourceHttpRequestHandler implements WebMvcConfigurer {
+public class Mvc extends ResourceHttpRequestHandler implements WebMvcConfigurer {
 
 	/**
 	 * 启用DefaultServlet用以处理可直接请求的静态资源;

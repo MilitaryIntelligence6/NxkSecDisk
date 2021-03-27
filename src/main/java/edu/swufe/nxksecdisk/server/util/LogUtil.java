@@ -1,5 +1,6 @@
 package edu.swufe.nxksecdisk.server.util;
 
+import edu.swufe.nxksecdisk.constant.EnumString;
 import edu.swufe.nxksecdisk.printer.Out;
 import edu.swufe.nxksecdisk.server.enumeration.LogLevel;
 import edu.swufe.nxksecdisk.server.mapper.FolderMapper;
@@ -56,19 +57,19 @@ public class LogUtil
     public LogUtil()
     {
         sep = File.separator;
-        logs = ConfigureReader.getInstance().getPath() + sep + "logs";
+        logs = String.format("%s%slogs", ConfigureReader.getInstance().getPath(), sep);
         writerThread = Executors.newSingleThreadExecutor();
-        File l = new File(logs);
-        if (!l.exists())
+        File logFile = new File(logs);
+        if (!logFile.exists())
         {
-            l.mkdir();
+            logFile.mkdir();
         }
         else
         {
-            if (!l.isDirectory())
+            if (!logFile.isDirectory())
             {
-                l.delete();
-                l.mkdir();
+                logFile.delete();
+                logFile.mkdir();
             }
         }
     }
@@ -86,14 +87,14 @@ public class LogUtil
         if (ConfigureReader.getInstance().inspectLogLevel(LogLevel.RUNTIME_EXCEPTION))
         {
             StringBuffer exceptionInfo = new StringBuffer(e.toString());
-            StackTraceElement[] stes = e.getStackTrace();
-            for (int i = 0; i < stes.length && i < 10; i++)
+            StackTraceElement[] stackTraceArray = e.getStackTrace();
+            for (int i = 0; i < stackTraceArray.length && i < 10; i++)
             {
-                StackTraceElement ste = stes[i];
+                StackTraceElement ste = stackTraceArray[i];
                 exceptionInfo.append("\r\n	at " + ste.getClassName() + "." + ste.getMethodName() + "("
                         + ste.getFileName() + ":" + ste.getLineNumber() + ")");
             }
-            if (stes.length > 10)
+            if (stackTraceArray.length > 10)
             {
                 exceptionInfo.append("\r\n......");
             }
@@ -116,18 +117,24 @@ public class LogUtil
             {
                 account = "Anonymous";
             }
-            String a = account;// 方便下方使用终态操作
+            // 方便下方使用终态操作;
+            String a = account;
             String ip = ipAddrGetter.getIpAddr(request);
             writerThread.execute(() ->
             {
                 List<Folder> l = folderUtil.getParentList(f.getFolderId());
-                String pl = new String();
+                StringBuilder pl = new StringBuilder();
                 for (Folder i : l)
                 {
-                    pl = pl + i.getFolderName() + "/";
+                    pl.append(i.getFolderName()).append("/");
                 }
-                String content = ">IP [" + ip + "]\r\n>ACCOUNT [" + a + "]\r\n>OPERATE [Create new folder]\r\n>PATH ["
-                        + pl + "]\r\n>NAME [" + f.getFolderName() + "],CONSTRAINT [" + f.getFolderConstraint() + "]";
+                String content = String.format(
+                        ">IP [%s]\r\n>ACCOUNT [%s]\r\n>OPERATE [Create new folder]\r\n>PATH [%s]\r\n>NAME [%s],CONSTRAINT [%d]",
+                        ip,
+                        a,
+                        pl.toString(),
+                        f.getFolderName(),
+                        f.getFolderConstraint());
                 writeToLog("Event", content);
             });
         }
@@ -153,14 +160,20 @@ public class LogUtil
             writerThread.execute(() ->
             {
                 List<Folder> l = folderUtil.getParentList(f.getFolderId());
-                String pl = new String();
+                StringBuilder pl = new StringBuilder();
                 for (Folder i : l)
                 {
-                    pl = pl + i.getFolderName() + "/";
+                    pl.append(i.getFolderName()).append("/");
                 }
-                String content = ">IP [" + ip + "]\r\n>ACCOUNT [" + a + "]\r\n>OPERATE [Edit folder]\r\n>PATH [" + pl
-                        + "]\r\n>NAME [" + f.getFolderName() + "]->[" + newName + "],CONSTRAINT ["
-                        + f.getFolderConstraint() + "]->[" + newConstraint + "]";
+                String content = String.format(
+                        ">IP [%s]\r\n>ACCOUNT [%s]\r\n>OPERATE [Edit folder]\r\n>PATH [%s]\r\n>NAME [%s]->[%s],CONSTRAINT [%d]->[%s]",
+                        ip,
+                        a,
+                        pl.toString(),
+                        f.getFolderName(),
+                        newName,
+                        f.getFolderConstraint(),
+                        newConstraint);
                 writeToLog("Event", content);
             });
         }
@@ -185,13 +198,17 @@ public class LogUtil
             String ip = ipAddrGetter.getIpAddr(request);
             writerThread.execute(() ->
             {
-                String pl = new String();
+                StringBuilder pl = new StringBuilder();
                 for (Folder i : l)
                 {
-                    pl = pl + i.getFolderName() + "/";
+                    pl.append(i.getFolderName()).append("/");
                 }
-                String content = ">IP [" + ip + "]\r\n>ACCOUNT [" + a + "]\r\n>OPERATE [Delete folder]\r\n>PATH [" + pl
-                        + "]\r\n>NAME [" + f.getFolderName() + "]";
+                String content = String.format(
+                        ">IP [%s]\r\n>ACCOUNT [%s]\r\n>OPERATE [Delete folder]\r\n>PATH [%s]\r\n>NAME [%s]",
+                        ip,
+                        a,
+                        pl.toString(),
+                        f.getFolderName());
                 writeToLog("Event", content);
             });
         }
@@ -218,13 +235,18 @@ public class LogUtil
             {
                 Folder folder = folderMapper.queryById(f.getFileParentFolder());
                 List<Folder> l = folderUtil.getParentList(folder.getFolderId());
-                String pl = new String();
+                StringBuilder pl = new StringBuilder();
                 for (Folder i : l)
                 {
-                    pl = pl + i.getFolderName() + "/";
+                    pl.append(i.getFolderName()).append("/");
                 }
-                String content = ">IP [" + ip + "]\r\n>ACCOUNT [" + a + "]\r\n>OPERATE [Delete file]\r\n>PATH [" + pl
-                        + folder.getFolderName() + "]\r\n>NAME [" + f.getFileName() + "]";
+                String content = String.format(
+                        ">IP [%s]\r\n>ACCOUNT [%s]\r\n>OPERATE [Delete file]\r\n>PATH [%s%s]\r\n>NAME [%s]",
+                        ip,
+                        a,
+                        pl.toString(),
+                        folder.getFolderName(),
+                        f.getFileName());
                 writeToLog("Event", content);
             });
         }
@@ -254,13 +276,18 @@ public class LogUtil
                     return;
                 }
                 List<Folder> l = folderUtil.getParentList(folder.getFolderId());
-                String pl = new String();
+                StringBuilder pl = new StringBuilder();
                 for (Folder i : l)
                 {
-                    pl = pl + i.getFolderName() + "/";
+                    pl.append(i.getFolderName()).append("/");
                 }
-                String content = ">IP [" + ip + "]\r\n>ACCOUNT [" + a + "]\r\n>OPERATE [Upload file]\r\n>PATH [" + pl
-                        + folder.getFolderName() + "]\r\n>NAME [" + f.getFileName() + "]";
+                String content = String.format(
+                        ">IP [%s]\r\n>ACCOUNT [%s]\r\n>OPERATE [Upload file]\r\n>PATH [%s%s]\r\n>NAME [%s]",
+                        ip,
+                        a,
+                        pl.toString(),
+                        folder.getFolderName(),
+                        f.getFileName());
                 writeToLog("Event", content);
             });
         }
@@ -285,13 +312,18 @@ public class LogUtil
             {
                 Folder folder = folderMapper.queryById(f.getFileParentFolder());
                 List<Folder> l = folderUtil.getParentList(folder.getFolderId());
-                String pl = new String();
+                StringBuilder pl = new StringBuilder();
                 for (Folder i : l)
                 {
-                    pl = pl + i.getFolderName() + "/";
+                    pl.append(i.getFolderName()).append("/");
                 }
-                String content = ">IP [" + ip + "]\r\n>ACCOUNT [" + a + "]\r\n>OPERATE [Download file]\r\n>PATH [" + pl
-                        + folder.getFolderName() + "]\r\n>NAME [" + f.getFileName() + "]";
+                String content = String.format(
+                        ">IP [%s]\r\n>ACCOUNT [%s]\r\n>OPERATE [Download file]\r\n>PATH [%s%s]\r\n>NAME [%s]",
+                        ip,
+                        a,
+                        pl.toString(),
+                        folder.getFolderName(),
+                        f.getFileName());
                 writeToLog("Event", content);
             });
         }
@@ -312,13 +344,17 @@ public class LogUtil
             {
                 Folder folder = folderMapper.queryById(f.getFileParentFolder());
                 List<Folder> l = folderUtil.getParentList(folder.getFolderId());
-                String pl = new String();
+                StringBuilder pl = new StringBuilder();
                 for (Folder i : l)
                 {
-                    pl = pl + i.getFolderName() + "/";
+                    pl.append(i.getFolderName()).append("/");
                 }
-                String content = ">IP [" + ip + "]\r\n>OPERATE [Request Chain]\r\n>PATH [" + pl + folder.getFolderName()
-                        + "]\r\n>NAME [" + f.getFileName() + "]";
+                String content = String.format(
+                        ">IP [%s]\r\n>OPERATE [Request Chain]\r\n>PATH [%s%s]\r\n>NAME [%s]",
+                        ip,
+                        pl.toString(),
+                        folder.getFolderName(),
+                        f.getFileName());
                 writeToLog("Event", content);
             });
         }
@@ -342,13 +378,17 @@ public class LogUtil
             {
                 Folder folder = folderMapper.queryById(f.getFileParentFolder());
                 List<Folder> l = folderUtil.getParentList(folder.getFolderId());
-                String pl = new String();
+                StringBuilder pl = new StringBuilder();
                 for (Folder i : l)
                 {
-                    pl = pl + i.getFolderName() + "/";
+                    pl.append(i.getFolderName()).append("/");
                 }
-                String content = ">IP [" + ip + "]\r\n>OPERATE [Download file By Shared URL]\r\n>PATH [" + pl
-                        + folder.getFolderName() + "]\r\n>NAME [" + f.getFileName() + "]";
+                String content = String.format(
+                        ">IP [%s]\r\n>OPERATE [Download file By Shared URL]\r\n>PATH [%s%s]\r\n>NAME [%s]",
+                        ip,
+                        pl,
+                        folder.getFolderName(),
+                        f.getFileName());
                 writeToLog("Event", content);
             });
         }
@@ -377,14 +417,18 @@ public class LogUtil
             {
                 Folder folder = folderMapper.queryById(f.getFileParentFolder());
                 List<Folder> l = folderUtil.getParentList(folder.getFolderId());
-                String pl = new String();
+                StringBuilder pl = new StringBuilder();
                 for (Folder i : l)
                 {
-                    pl = pl + i.getFolderName() + "/";
+                    pl.append(i.getFolderName()).append("/");
                 }
-                String content = ">IP [" + ip + "]\r\n>ACCOUNT [" + a
-                        + "]\r\n>OPERATE [Share Download file URL]\r\n>PATH [" + pl + folder.getFolderName()
-                        + "]\r\n>NAME [" + f.getFileName() + "]";
+                String content = String.format(
+                        ">IP [%s]\r\n>ACCOUNT [%s]\r\n>OPERATE [Share Download file URL]\r\n>PATH [%s%s]\r\n>NAME [%s]",
+                        ip,
+                        a,
+                        pl,
+                        folder.getFolderName(),
+                        f.getFileName());
                 writeToLog("Event", content);
             });
         }
@@ -411,13 +455,18 @@ public class LogUtil
             {
                 Folder folder = folderMapper.queryById(f.getFileParentFolder());
                 List<Folder> l = folderUtil.getParentList(folder.getFolderId());
-                String pl = new String();
+                StringBuilder pl = new StringBuilder();
                 for (Folder i : l)
                 {
-                    pl = pl + i.getFolderName() + "/";
+                    pl.append(i.getFolderName()).append("/");
                 }
-                String content = ">IP [" + ip + "]\r\n>ACCOUNT [" + a + "]\r\n>OPERATE [Rename file]\r\n>PATH [" + pl
-                        + folder.getFolderName() + "]\r\n>NAME [" + f.getFileName() + "]->[" + newName + "]";
+                String content = String.format(">IP [%s]\r\n>ACCOUNT [%s]\r\n>OPERATE [Rename file]\r\n>PATH [%s%s]\r\n>NAME [%s]->[%s]",
+                        ip,
+                        a,
+                        pl,
+                        folder.getFolderName(),
+                        f.getFileName(),
+                        newName);
                 writeToLog("Event", content);
             });
         }
@@ -447,9 +496,12 @@ public class LogUtil
             String a = account;
             writerThread.execute(() ->
             {
-                String content = ">IP [" + ip + "]\r\n>ACCOUNT [" + a + "]\r\n>OPERATE ["
-                        + (isCopy ? "Copy file" : "Move file") + "]\r\n>FROM [" + originPath + "]\r\n>TO   ["
-                        + finalPath + "]";
+                String content = String.format(">IP [%s]\r\n>ACCOUNT [%s]\r\n>OPERATE [%s]\r\n>FROM [%s]\r\n>TO   [%s]",
+                        ip,
+                        a,
+                        isCopy ? "Copy file" : "Move file",
+                        originPath,
+                        finalPath);
                 writeToLog("Event", content);
             });
         }
@@ -479,9 +531,12 @@ public class LogUtil
             String a = account;
             writerThread.execute(() ->
             {
-                String content = ">IP [" + ip + "]\r\n>ACCOUNT [" + a + "]\r\n>OPERATE ["
-                        + (isCopy ? "Copy Folder" : "Move Folder") + "]\r\n>FROM [" + originPath + "]\r\n>TO   ["
-                        + finalPath + "]";
+                String content = String.format(">IP [%s]\r\n>ACCOUNT [%s]\r\n>OPERATE [%s]\r\n>FROM [%s]\r\n>TO   [%s]",
+                        ip,
+                        a,
+                        isCopy ? "Copy Folder" : "Move Folder",
+                        originPath,
+                        finalPath);
                 writeToLog("Event", content);
             });
         }
@@ -491,8 +546,8 @@ public class LogUtil
     private void writeToLog(String type, String content)
     {
         String t = ServerTimeUtil.accurateToLogName();
-        String finalContent = "\r\n\r\nTIME:\r\n" + ServerTimeUtil.accurateToSecond() + "\r\nTYPE:\r\n" + type
-                + "\r\nCONTENT:\r\n" + content;
+        String finalContent = String.format("\r\n\r\nTIME:\r\n%s\r\nTYPE:\r\n%s\r\nCONTENT:\r\n%s",
+                ServerTimeUtil.accurateToSecond(), type, content);
         try
         {
             if (t.equals(logName) && writer != null)
@@ -515,7 +570,7 @@ public class LogUtil
         }
         catch (Exception e1)
         {
-			Out.println(String.format("KohgylwIFT:[Log]Cannt write to file,message:%s", e1.getMessage()));
+            Out.println(String.format("KohgylwIFT:[Log]Cannt write to file,message:%s", e1.getMessage()));
         }
     }
 

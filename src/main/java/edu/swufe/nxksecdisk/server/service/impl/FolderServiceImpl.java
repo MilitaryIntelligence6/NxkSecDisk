@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -289,7 +290,7 @@ public class FolderServiceImpl implements FolderService
         }
         final Folder[] repeatFolders = this.fm.queryByParentId(parentId).parallelStream()
                 .filter((f) -> f.getFolderName()
-                        .equals(new String(folderName.getBytes(Charset.forName("UTF-8")), Charset.forName("UTF-8"))))
+                        .equals(folderName))
                 .toArray(Folder[]::new);
         for (Folder rf : repeatFolders)
         {

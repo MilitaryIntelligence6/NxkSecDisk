@@ -1,7 +1,7 @@
 package edu.swufe.nxksecdisk.server.app;
 
 import edu.swufe.nxksecdisk.printer.Out;
-import edu.swufe.nxksecdisk.server.config.MVC;
+import edu.swufe.nxksecdisk.server.config.Mvc;
 import edu.swufe.nxksecdisk.server.util.ConfigureReader;
 import org.apache.catalina.Context;
 import org.apache.catalina.connector.Connector;
@@ -31,7 +31,7 @@ import org.springframework.http.HttpStatus;
  * @version 1.0
  */
 @SpringBootApplication
-@Import({MVC.class})
+@Import({Mvc.class})
 public class DiskController
 {
     private static ApplicationContext context;
