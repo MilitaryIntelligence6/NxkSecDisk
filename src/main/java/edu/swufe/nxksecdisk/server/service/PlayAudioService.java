@@ -4,5 +4,5 @@ import javax.servlet.http.HttpServletRequest;
 
 public interface PlayAudioService
 {
-    String getAudioInfoListByJson(final HttpServletRequest request);
+    String requireAudioInfoListByJson(final HttpServletRequest request);
 }

@@ -12,7 +12,6 @@ import javax.servlet.http.HttpServletResponse;
  */
 public interface FileChainService
 {
-
     /**
      * <h2>根据文件ID获取其永久资源链接的ckey</h2>
      * <p>该方法用于获取加密的ckey，以便在使用资源链接时声明其指向的文件。</p>
@@ -21,7 +20,7 @@ public interface FileChainService
      * @return java.lang.String 获取的ckey，若获取失败则返回ERROR
      * @author 青阳龙野(kohgylw)
      */
-    public String getChainKeyByFid(HttpServletRequest request);
+    String getChainKeyByFid(HttpServletRequest request);
 
     /**
      * <h2>根据链接中的ckey返回对应的资源数据</h2>
@@ -31,6 +30,5 @@ public interface FileChainService
      * @param response javax.servlet.http.HttpServletResponse 响应对象
      * @author 青阳龙野(kohgylw)
      */
-    public void getResourceByChainKey(HttpServletRequest request, HttpServletResponse response);
-
+    void getResourceByChainKey(HttpServletRequest request, HttpServletResponse response);
 }

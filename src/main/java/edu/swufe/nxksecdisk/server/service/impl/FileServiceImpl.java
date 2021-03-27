@@ -37,32 +37,32 @@ import java.util.*;
 public class FileServiceImpl extends RangeFileStreamWriter implements FileService
 {
     /**
-     *  文件夹数量超限标识
+     * 文件夹数量超限标识
      */
     private static final String FOLDERS_TOTAL_OUT_OF_LIMIT = "foldersTotalOutOfLimit";
 
     /**
-     *  文件数量超限标识
+     * 文件数量超限标识
      */
     private static final String FILES_TOTAL_OUT_OF_LIMIT = "filesTotalOutOfLimit";
 
     /**
-     *  参数错误标识
+     * 参数错误标识
      */
     private static final String ERROR_PARAMETER = "errorParameter";
 
     /**
-     *  权限错误标识
+     * 权限错误标识
      */
     private static final String NO_AUTHORIZED = "noAuthorized";
 
     /**
-     *  上传成功标识
+     * 上传成功标识
      */
     private static final String UPLOAD_SUCCESS = "uploadsuccess";
 
     /**
-     *  上传失败标识
+     * 上传失败标识
      */
     private static final String UPLOAD_ERROR = "uploaderror";
 
@@ -84,13 +84,14 @@ public class FileServiceImpl extends RangeFileStreamWriter implements FileServic
     private FileBlockUtil fileBlockUtil;
 
     @Resource
-    private FolderUtil folderUtil
-            ;
+    private FolderUtil folderUtil;
+
     @Resource
     private IpAddrGetter ipAddrGetter;
 
     /**
      * 检查上传文件列表的实现（上传文件的前置操作）;
+     *
      * @param request
      * @param response
      * @return
@@ -184,7 +185,13 @@ public class FileServiceImpl extends RangeFileStreamWriter implements FileServic
         return gson.toJson(cufr);// 以JSON格式写回该结果
     }
 
-    // 格式化存储体积，便于返回上传文件体积的检查提示信息（如果传入0，则会直接返回错误提示信息，将该提示信息发送至前端即可）。
+    /**
+     * 格式化存储体积，便于返回上传文件体积的检查提示信息
+     * （如果传入0，则会直接返回错误提示信息，将该提示信息发送至前端即可）;
+     *
+     * @param size
+     * @return
+     */
     private String formatMaxUploadFileSize(long size)
     {
         double result = (double) size;
@@ -211,7 +218,14 @@ public class FileServiceImpl extends RangeFileStreamWriter implements FileServic
         return String.format("%.1f", result) + " " + unit;
     }
 
-    // 执行上传操作，接收文件并存入文件节点
+    /**
+     * 执行上传操作，接收文件并存入文件节点;
+     *
+     * @param request
+     * @param response
+     * @param file
+     * @return
+     */
     @Override
     public String doUploadFile(final HttpServletRequest request, final HttpServletResponse response,
                                final MultipartFile file)
@@ -373,7 +387,12 @@ public class FileServiceImpl extends RangeFileStreamWriter implements FileServic
         }
     }
 
-    // 删除单个文件
+    /**
+     * 删除单个文件;
+     *
+     * @param request
+     * @return
+     */
     @Override
     public String deleteFile(final HttpServletRequest request)
     {
@@ -411,7 +430,12 @@ public class FileServiceImpl extends RangeFileStreamWriter implements FileServic
         return "cannotDeleteFile";
     }
 
-    // 普通下载：下载单个文件
+    /**
+     * 普通下载：下载单个文件;
+     *
+     * @param request
+     * @param response
+     */
     @Override
     public void doDownloadFile(final HttpServletRequest request, final HttpServletResponse response)
     {
@@ -460,7 +484,12 @@ public class FileServiceImpl extends RangeFileStreamWriter implements FileServic
         }
     }
 
-    // 重命名文件
+    /**
+     * 重命名文件;
+     *
+     * @param request
+     * @return
+     */
     @Override
     public String doRenameFile(final HttpServletRequest request)
     {
@@ -513,7 +542,12 @@ public class FileServiceImpl extends RangeFileStreamWriter implements FileServic
         return "renameFileSuccess";
     }
 
-    // 删除所有选中文件和文件夹
+    /**
+     * 删除所有选中文件和文件夹;
+     *
+     * @param request
+     * @return
+     */
     @Override
     public String deleteCheckedFiles(final HttpServletRequest request)
     {
@@ -604,7 +638,12 @@ public class FileServiceImpl extends RangeFileStreamWriter implements FileServic
         }
     }
 
-    // 打包下载功能：前置——压缩要打包下载的文件
+    /**
+     * 打包下载功能：前置——压缩要打包下载的文件
+     *
+     * @param request
+     * @return
+     */
     @Override
     public String downloadCheckedFiles(final HttpServletRequest request)
     {
@@ -726,7 +765,13 @@ public class FileServiceImpl extends RangeFileStreamWriter implements FileServic
         return "0";
     }
 
-    // 用于迭代获得全部文件夹内的文件ID（方便预测耗时）
+    /**
+     * 用于迭代获得全部文件夹内的文件ID（方便预测耗时）;
+     *
+     * @param account
+     * @param fid
+     * @param idList
+     */
     private void countFolderFilesId(String account, String fid, List<String> idList)
     {
         Folder f = folderMapper.queryById(fid);
@@ -749,19 +794,37 @@ public class FileServiceImpl extends RangeFileStreamWriter implements FileServic
         }
     }
 
-    // 执行移动文件操作
+    /**
+     * 执行移动文件操作;
+     *
+     * @param request javax.servlet.http.HttpServletRequest 请求对象，应包含：
+     *                <ul>
+     *                <li>strIdList 涉及的文件ID数组，JSON格式</li>
+     *                <li>strFidList 涉及的文件夹ID数组，JSON格式</li>
+     *                <li>strOptMap 对冲突文件的处理方式列表（若存在），JSON格式</li>
+     *                <li>locationpath 目标文件夹ID</li>
+     *                <li>method 决定是移动还是复制，仅当传入“COPY”时为复制模式</li>
+     *                </ul>
+     * @return
+     */
     @Override
     public String doMoveFiles(HttpServletRequest request)
     {
         // 先获得必要的操作参数
-        final String strIdList = request.getParameter("strIdList");// 涉及的文件ID列表
-        final String strFidList = request.getParameter("strFidList");// 涉及的文件夹ID列表
-        final String strOptMap = request.getParameter("strOptMap");// 冲突文件或文件夹的处理列表（若存在）
-        final String locationpath = request.getParameter("locationpath");// 目标文件夹ID
+        // 涉及的文件ID列表;
+        final String strIdList = request.getParameter("strIdList");
+        // 涉及的文件夹ID列表;
+        final String strFidList = request.getParameter("strFidList");
+        // 冲突文件或文件夹的处理列表（若存在）;
+        final String strOptMap = request.getParameter("strOptMap");
+        // 目标文件夹ID;
+        final String locationpath = request.getParameter("locationpath");
         // 操作方式，仅当传入“COPY”时才会作为复制执行，否则均按移动处理
         final String method = request.getParameter("method");
-        boolean isCopy = "COPY".equals(method);// 是否为复制模式
-        final String account = (String) request.getSession().getAttribute("ACCOUNT");// 操作账户
+        // 是否为复制模式;
+        boolean isCopy = "COPY".equals(method);
+        // 操作账户;
+        final String account = (String) request.getSession().getAttribute("ACCOUNT");
         // 先检查目标文件夹的合法性
         Folder targetFolder = folderMapper.queryById(locationpath);
         if (targetFolder == null)
@@ -795,12 +858,14 @@ public class FileServiceImpl extends RangeFileStreamWriter implements FileServic
                 // 先对涉及的原节点进行合法性检查
                 if (id == null || id.length() <= 0)
                 {
-                    return ERROR_PARAMETER;// 文件节点的ID格式不正确
+                    // 文件节点的ID格式不正确;
+                    return ERROR_PARAMETER;
                 }
                 final Node node = this.nodeMapper.queryById(id);
                 if (node == null)
                 {
-                    return ERROR_PARAMETER;// 该文件节点不存在
+                    // 该文件节点不存在;
+                    return ERROR_PARAMETER;
                 }
                 // 目标路径检查
                 // 在移动模式下，如果原节点已经在目标文件夹中了，则直接跳过它
@@ -812,12 +877,14 @@ public class FileServiceImpl extends RangeFileStreamWriter implements FileServic
                 // 权限检查
                 if (!ConfigureReader.getInstance().accessFolder(folderMapper.queryById(node.getFileParentFolder()), account))
                 {
-                    return NO_AUTHORIZED;// 无权访问节点所在的文件夹
+                    // 无权访问节点所在的文件夹;
+                    return NO_AUTHORIZED;
                 }
                 if (!ConfigureReader.getInstance().authorized(account, AccountAuth.MOVE_FILES,
                         folderUtil.getAllFoldersId(node.getFileParentFolder())))
                 {
-                    return NO_AUTHORIZED;// 无操作权限
+                    // 无操作权限;
+                    return NO_AUTHORIZED;
                 }
                 // 记录原始的文件路径，便于执行后记录日志
                 String originPath = fileBlockUtil.getNodePath(node);
@@ -840,7 +907,8 @@ public class FileServiceImpl extends RangeFileStreamWriter implements FileServic
                             if (!ConfigureReader.getInstance().authorized(account, AccountAuth.DELETE_FILE_OR_FOLDER,
                                     folderUtil.getAllFoldersId(locationpath)))
                             {
-                                return NO_AUTHORIZED;// 无删除权限不能执行
+                                // 无删除权限不能执行;
+                                return NO_AUTHORIZED;
                             }
                             // 得到冲突节点
                             Node n = nodeMapper.queryByParentFolderId(locationpath).parallelStream()
@@ -1013,6 +1081,7 @@ public class FileServiceImpl extends RangeFileStreamWriter implements FileServic
                     switch (optMap.get(fid))
                     {
                         case "cover":
+                        {
                             // 覆盖，需要额外的“删除”权限
                             if (!ConfigureReader.getInstance().authorized(account, AccountAuth.DELETE_FILE_OR_FOLDER,
                                     folderUtil.getAllFoldersId(locationpath)))
@@ -1071,7 +1140,9 @@ public class FileServiceImpl extends RangeFileStreamWriter implements FileServic
                             }
                             // 上述操作没从正常的位置break，则说明操作出错，返回错误提示
                             return "cannotMoveFiles";
+                        }
                         case "both":
+                        {
                             // 保留两者，需要先判断移动后是否会导致目标文件夹的文件列表超限
                             if (folderMapper.countByParentId(locationpath) >= FileNodeUtil.MAXIMUM_NUM_OF_SINGLE_FOLDER)
                             {
@@ -1117,12 +1188,17 @@ public class FileServiceImpl extends RangeFileStreamWriter implements FileServic
                             }
                             // 保留两者成功，继续后面的操作
                             break;
+                        }
                         case "skip":
+                        {
                             // 跳过，无需进行任何操作
                             break;
+                        }
                         default:
+                        {
                             // 意外的应对声明，终止操作
                             return ERROR_PARAMETER;
+                        }
                     }
                     // 冲突情况处理完成
                 }
@@ -1187,7 +1263,17 @@ public class FileServiceImpl extends RangeFileStreamWriter implements FileServic
         }
     }
 
-    // 移动文件前的确认检查（可视作移动的前置操作）
+    /**
+     * 移动文件前的确认检查（可视作移动的前置操作）;
+     * @param request javax.servlet.http.HttpServletRequest 请求对象，应包含：
+     *                <ul>
+     *                <li>strIdList 涉及的文件ID数组，JSON格式</li>
+     *                <li>strFidList 涉及的文件夹ID数组，JSON格式</li>
+     *                <li>locationpath 目标文件夹ID</li>
+     *                <li>method 决定是移动还是复制，仅当传入“COPY”时为复制模式</li>
+     *                </ul>
+     * @return
+     */
     @Override
     public String confirmMoveFiles(HttpServletRequest request)
     {
@@ -1326,7 +1412,11 @@ public class FileServiceImpl extends RangeFileStreamWriter implements FileServic
         return NO_AUTHORIZED;
     }
 
-    // 上传文件夹的先行检查
+    /**
+     * 上传文件夹的先行检查;
+     * @param request javax.servlet.http.HttpServletRequest 请求对象
+     * @return
+     */
     @Override
     public String checkImportFolder(HttpServletRequest request)
     {
@@ -1417,7 +1507,12 @@ public class FileServiceImpl extends RangeFileStreamWriter implements FileServic
         }
     }
 
-    // 执行文件夹上传逻辑
+    /**
+     * 执行文件夹上传逻辑;
+     * @param request javax.servlet.http.HttpServletRequest 请求对象
+     * @param file    org.springframework.web.multipart.MultipartFile 上传文件的封装对象
+     * @return
+     */
     @Override
     public String doImportFolder(HttpServletRequest request, MultipartFile file)
     {
@@ -1618,5 +1713,4 @@ public class FileServiceImpl extends RangeFileStreamWriter implements FileServic
         }
         return null;
     }
-
 }

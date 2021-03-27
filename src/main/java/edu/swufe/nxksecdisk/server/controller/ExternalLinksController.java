@@ -24,30 +24,31 @@ import javax.servlet.http.HttpServletResponse;
 public class ExternalLinksController
 {
     /**
-     * //分享下载链接的相关处理;
+     * 分享下载链接的相关处理;
      */
     @Resource
-    private ExternalDownloadService eds;
+    private ExternalDownloadService downloadService;
+
     @Resource
-    private FileChainService fcs;
+    private FileChainService fileChainService;
 
     @RequestMapping("/getDownloadKey.ajax")
     public @ResponseBody
     String getDownloadKey(HttpServletRequest request)
     {
-        return eds.getDownloadKey(request);
+        return downloadService.getDownloadKey(request);
     }
 
     @RequestMapping("/downloadFileByKey/{fileName}")
     public void downloadFileByKey(HttpServletRequest request, HttpServletResponse response)
     {
-        eds.downloadFileByKey(request, response);
+        downloadService.downloadFileByKey(request, response);
     }
 
     @RequestMapping("/chain/{fileName}")
     public void chain(HttpServletRequest request, HttpServletResponse response)
     {
-        fcs.getResourceByChainKey(request, response);
+        fileChainService.getResourceByChainKey(request, response);
     }
 
 }

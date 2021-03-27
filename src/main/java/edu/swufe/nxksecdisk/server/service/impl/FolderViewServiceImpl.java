@@ -27,15 +27,19 @@ public class FolderViewServiceImpl implements FolderViewService
     private static int SELECT_STEP = 256;// 每次查询的文件或文件夹的最大限额，即查询步进长度
 
     @Resource
-    private FolderUtil fu;
+    private FolderUtil folderUtil;
+
     @Resource
-    private FolderMapper fm;
+    private FolderMapper folderMapper;
+
     @Resource
-    private NodeMapper flm;
+    private NodeMapper nodeMapper;
+
     @Resource
     private Gson gson;
+
     @Resource
-    private DiskFfmpegLocator kfl;
+    private DiskFfmpegLocator diskFfmpegLocator;
 
     @Override
     public String getFolderViewToJson(final String fid, final HttpSession session, final HttpServletRequest request)
@@ -45,29 +49,34 @@ public class FolderViewServiceImpl implements FolderViewService
         {
             return "ERROR";
         }
-        Folder vf = this.fm.queryById(fid);
+        Folder vf = this.folderMapper.queryById(fid);
         if (vf == null)
         {
-            return "NOT_FOUND";// 如果用户请求一个不存在的文件夹，则返回“NOT_FOUND”，令页面回到ROOT视图
+            // 如果用户请求一个不存在的文件夹，则返回“NOT_FOUND”，令页面回到ROOT视图;
+            return "NOT_FOUND";
         }
         final String account = (String) session.getAttribute("ACCOUNT");
         // 检查访问文件夹视图请求是否合法
         if (!ConfigureReader.getInstance().accessFolder(vf, account))
         {
-            return "notAccess";// 如无访问权限则直接返回该字段，令页面回到ROOT视图。
+            // 如无访问权限则直接返回该字段，令页面回到ROOT视图;
+            return "notAccess";
         }
         final FolderView fv = new FolderView();
-        fv.setSelectStep(SELECT_STEP);// 返回查询步长
+        // 返回查询步长;
+        fv.setSelectStep(SELECT_STEP);
         fv.setFolder(vf);
-        fv.setParentList(this.fu.getParentList(fid));
-        long foldersOffset = this.fm.countByParentId(fid);// 第一波文件夹数据按照最后的记录作为查询偏移量
+        fv.setParentList(this.folderUtil.getParentList(fid));
+        // 第一波文件夹数据按照最后的记录作为查询偏移量;
+        long foldersOffset = this.folderMapper.countByParentId(fid);
         fv.setFoldersOffset(foldersOffset);
         Map<String, Object> keyMap1 = new HashMap<>();
         keyMap1.put("pid", fid);
         long fOffset = foldersOffset - SELECT_STEP;
-        keyMap1.put("offset", fOffset > 0L ? fOffset : 0L);// 进行查询
+        // 进行查询;
+        keyMap1.put("offset", fOffset > 0L ? fOffset : 0L);
         keyMap1.put("rows", SELECT_STEP);
-        List<Folder> folders = this.fm.queryByParentIdSection(keyMap1);
+        List<Folder> folders = this.folderMapper.queryByParentIdSection(keyMap1);
         List<Folder> fs = new LinkedList<>();
         for (Folder f : folders)
         {
@@ -77,14 +86,15 @@ public class FolderViewServiceImpl implements FolderViewService
             }
         }
         fv.setFolderList(fs);
-        long filesOffset = this.flm.countByParentFolderId(fid);// 文件的查询逻辑与文件夹基本相同
+        // 文件的查询逻辑与文件夹基本相同;
+        long filesOffset = this.nodeMapper.countByParentFolderId(fid);
         fv.setFilesOffset(filesOffset);
         Map<String, Object> keyMap2 = new HashMap<>();
         keyMap2.put("pfid", fid);
         long fiOffset = filesOffset - SELECT_STEP;
         keyMap2.put("offset", fiOffset > 0L ? fiOffset : 0L);
         keyMap2.put("rows", SELECT_STEP);
-        fv.setFileList(this.flm.queryByParentFolderIdSection(keyMap2));
+        fv.setFileList(this.nodeMapper.queryByParentFolderIdSection(keyMap2));
         if (account != null)
         {
             fv.setAccount(account);
@@ -106,41 +116,42 @@ public class FolderViewServiceImpl implements FolderViewService
             fv.setAllowSignUp("false");
         }
         final List<String> authList = new ArrayList<String>();
-        if (cr.authorized(account, AccountAuth.UPLOAD_FILES, fu.getAllFoldersId(fid)))
+        if (cr.authorized(account, AccountAuth.UPLOAD_FILES, folderUtil.getAllFoldersId(fid)))
         {
             authList.add("U");
         }
-        if (cr.authorized(account, AccountAuth.CREATE_NEW_FOLDER, fu.getAllFoldersId(fid)))
+        if (cr.authorized(account, AccountAuth.CREATE_NEW_FOLDER, folderUtil.getAllFoldersId(fid)))
         {
             authList.add("C");
         }
-        if (cr.authorized(account, AccountAuth.DELETE_FILE_OR_FOLDER, fu.getAllFoldersId(fid)))
+        if (cr.authorized(account, AccountAuth.DELETE_FILE_OR_FOLDER, folderUtil.getAllFoldersId(fid)))
         {
             authList.add("D");
         }
-        if (cr.authorized(account, AccountAuth.RENAME_FILE_OR_FOLDER, fu.getAllFoldersId(fid)))
+        if (cr.authorized(account, AccountAuth.RENAME_FILE_OR_FOLDER, folderUtil.getAllFoldersId(fid)))
         {
             authList.add("R");
         }
-        if (cr.authorized(account, AccountAuth.DOWNLOAD_FILES, fu.getAllFoldersId(fid)))
+        if (cr.authorized(account, AccountAuth.DOWNLOAD_FILES, folderUtil.getAllFoldersId(fid)))
         {
             authList.add("L");
             if (cr.isOpenFileChain())
             {
-                fv.setShowFileChain("true");// 显示永久资源链接
+                // 显示永久资源链接;
+                fv.setShowFileChain("true");
             }
             else
             {
                 fv.setShowFileChain("false");
             }
         }
-        if (cr.authorized(account, AccountAuth.MOVE_FILES, fu.getAllFoldersId(fid)))
+        if (cr.authorized(account, AccountAuth.MOVE_FILES, folderUtil.getAllFoldersId(fid)))
         {
             authList.add("M");
         }
         fv.setAuthList(authList);
         fv.setPublishTime(ServerTimeUtil.accurateToMinute());
-        fv.setEnableFfmpeg(kfl.isEnableFFmpeg());
+        fv.setEnableFfmpeg(diskFfmpegLocator.isEnableFFmpeg());
         fv.setEnableDownloadZip(ConfigureReader.getInstance().isEnableDownloadByZip());
         return gson.toJson(fv);
     }
@@ -160,12 +171,13 @@ public class FolderViewServiceImpl implements FolderViewService
         {
             return getFolderViewToJson(fid, request.getSession(), request);
         }
-        Folder vf = this.fm.queryById(fid);
+        Folder vf = this.folderMapper.queryById(fid);
         final String account = (String) request.getSession().getAttribute("ACCOUNT");
         // 检查访问文件夹视图请求是否合法
         if (!ConfigureReader.getInstance().accessFolder(vf, account))
         {
-            return "notAccess";// 如无访问权限则直接返回该字段，令页面回到ROOT视图。
+            // 如无访问权限则直接返回该字段，令页面回到ROOT视图;
+            return "notAccess";
         }
         final SearchView sv = new SearchView();
         // 先准备搜索视图的文件夹信息
@@ -178,7 +190,7 @@ public class FolderViewServiceImpl implements FolderViewService
         sf.setFolderConstraint(vf.getFolderConstraint());// 其访问等级也与搜索路径一致
         sv.setFolder(sf);// 搜索视图的文件夹信息已经准备就绪
         // 设置上级路径为搜索路径
-        List<Folder> pl = this.fu.getParentList(fid);
+        List<Folder> pl = this.folderUtil.getParentList(fid);
         pl.add(vf);
         sv.setParentList(pl);
         // 设置所有搜索到的文件夹和文件，该方法迭查找：
@@ -207,12 +219,13 @@ public class FolderViewServiceImpl implements FolderViewService
         // 设置操作权限，对于搜索视图而言，只能进行下载操作（因为是虚拟的）
         final List<String> authList = new ArrayList<String>();
         // 搜索结果只接受“下载”操作
-        if (cr.authorized(account, AccountAuth.DOWNLOAD_FILES, fu.getAllFoldersId(fid)))
+        if (cr.authorized(account, AccountAuth.DOWNLOAD_FILES, folderUtil.getAllFoldersId(fid)))
         {
             authList.add("L");
             if (cr.isOpenFileChain())
             {
-                sv.setShowFileChain("true");// 显示永久资源链接
+                // 显示永久资源链接;
+                sv.setShowFileChain("true");
             }
             else
             {
@@ -227,15 +240,23 @@ public class FolderViewServiceImpl implements FolderViewService
         // 设置查询字段
         sv.setKeyWorld(keyWorld);
         // 返回公告MD5
-        sv.setEnableFfmpeg(kfl.isEnableFFmpeg());
+        sv.setEnableFfmpeg(diskFfmpegLocator.isEnableFFmpeg());
         sv.setEnableDownloadZip(ConfigureReader.getInstance().isEnableDownloadByZip());
         return gson.toJson(sv);
     }
 
-    // 迭代查找所有匹配项，参数分别是：从哪找、找啥、谁要找、添加的前缀是啥（便于分辨不同路径下的同名文件）、找到的文件放哪、找到的文件夹放哪
+    /**
+     * 迭代查找所有匹配项，
+     * 参数分别是：从哪找、找啥、谁要找、添加的前缀是啥（便于分辨不同路径下的同名文件）、找到的文件放哪、找到的文件夹放哪;
+     * @param fid
+     * @param key
+     * @param account
+     * @param ns
+     * @param fs
+     */
     private void sreachFilesAndFolders(String fid, String key, String account, List<Node> ns, List<Folder> fs)
     {
-        for (Folder f : this.fm.queryByParentId(fid))
+        for (Folder f : this.folderMapper.queryByParentId(fid))
         {
             if (ConfigureReader.getInstance().accessFolder(f, account))
             {
@@ -247,7 +268,7 @@ public class FolderViewServiceImpl implements FolderViewService
                 sreachFilesAndFolders(f.getFolderId(), key, account, ns, fs);
             }
         }
-        for (Node n : this.flm.queryByParentFolderId(fid))
+        for (Node n : this.nodeMapper.queryByParentFolderId(fid))
         {
             if (n.getFileName().indexOf(key) >= 0)
             {
@@ -267,16 +288,18 @@ public class FolderViewServiceImpl implements FolderViewService
         {
             return "ERROR";
         }
-        Folder vf = this.fm.queryById(fid);
+        Folder vf = this.folderMapper.queryById(fid);
         if (vf == null)
         {
-            return "NOT_FOUND";// 如果用户请求一个不存在的文件夹，则返回“NOT_FOUND”，令页面回到ROOT视图
+            // 如果用户请求一个不存在的文件夹，则返回“NOT_FOUND”，令页面回到ROOT视图;
+            return "NOT_FOUND";
         }
         final String account = (String) request.getSession().getAttribute("ACCOUNT");
         // 检查访问文件夹视图请求是否合法
         if (!ConfigureReader.getInstance().accessFolder(vf, account))
         {
-            return "notAccess";// 如无访问权限则直接返回该字段，令页面回到ROOT视图。
+            // 如无访问权限则直接返回该字段，令页面回到ROOT视图;
+            return "notAccess";
         }
         final RemainingFolderView fv = new RemainingFolderView();
         if (foldersOffset != null)
@@ -291,7 +314,7 @@ public class FolderViewServiceImpl implements FolderViewService
                     long nfOffset = newFoldersOffset - SELECT_STEP;
                     keyMap1.put("offset", nfOffset > 0L ? nfOffset : 0L);
                     keyMap1.put("rows", nfOffset > 0L ? SELECT_STEP : newFoldersOffset);
-                    List<Folder> folders = this.fm.queryByParentIdSection(keyMap1);
+                    List<Folder> folders = this.folderMapper.queryByParentIdSection(keyMap1);
                     List<Folder> fs = new LinkedList<>();
                     for (Folder f : folders)
                     {
@@ -320,7 +343,7 @@ public class FolderViewServiceImpl implements FolderViewService
                     long nfiOffset = newFilesOffset - SELECT_STEP;
                     keyMap2.put("offset", nfiOffset > 0L ? nfiOffset : 0L);
                     keyMap2.put("rows", nfiOffset > 0L ? SELECT_STEP : newFilesOffset);
-                    fv.setFileList(this.flm.queryByParentFolderIdSection(keyMap2));
+                    fv.setFileList(this.nodeMapper.queryByParentFolderIdSection(keyMap2));
                 }
             }
             catch (NumberFormatException e)

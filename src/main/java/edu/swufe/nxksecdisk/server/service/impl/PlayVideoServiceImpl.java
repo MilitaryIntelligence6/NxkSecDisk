@@ -16,37 +16,46 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 
+/**
+ * @author Administrator
+ */
 @Service
 public class PlayVideoServiceImpl implements PlayVideoService
 {
     @Resource
-    private NodeMapper fm;
+    private NodeMapper nodeMapper;
+
     @Resource
     private Gson gson;
+
     @Resource
-    private FileBlockUtil fbu;
+    private FileBlockUtil fileBlockUtil;
+
     @Resource
     private LogUtil logUtil;
+
     @Resource
-    private FolderMapper flm;
+    private FolderMapper folderMapper;
+
     @Resource
-    private FolderUtil fu;
+    private FolderUtil folderUtil;
+
     @Resource
-    private DiskFfmpegLocator kfl;
+    private DiskFfmpegLocator diskFfmpegLocator;
 
     private VideoInfo foundVideo(final HttpServletRequest request)
     {
         final String fileId = request.getParameter("fileId");
         if (fileId != null && fileId.length() > 0)
         {
-            final Node f = this.fm.queryById(fileId);
+            final Node f = this.nodeMapper.queryById(fileId);
             final VideoInfo vi = new VideoInfo(f);
             if (f != null)
             {
                 final String account = (String) request.getSession().getAttribute("ACCOUNT");
                 if (ConfigureReader.getInstance().authorized(account, AccountAuth.DOWNLOAD_FILES,
-                        fu.getAllFoldersId(f.getFileParentFolder()))
-                        && ConfigureReader.getInstance().accessFolder(flm.queryById(f.getFileParentFolder()), account))
+                        folderUtil.getAllFoldersId(f.getFileParentFolder()))
+                        && ConfigureReader.getInstance().accessFolder(folderMapper.queryById(f.getFileParentFolder()), account))
                 {
                     final String fileName = f.getFileName();
                     // 检查视频格式
@@ -54,15 +63,15 @@ public class PlayVideoServiceImpl implements PlayVideoService
                     switch (suffix)
                     {
                         case "mp4":
-                            if (kfl.getFFMPEGExecutablePath() != null)
+                            if (diskFfmpegLocator.getFFMPEGExecutablePath() != null)
                             {
                                 // 因此对于mp4后缀的视频，进一步检查其编码是否为h264，如果是，则允许直接播放
-                                File target = fbu.getFileFromBlocks(f);
+                                File target = fileBlockUtil.getFileFromBlocks(f);
                                 if (target == null || !target.isFile())
                                 {
                                     return null;
                                 }
-                                MultimediaObject mo = new MultimediaObject(target, kfl);
+                                MultimediaObject mo = new MultimediaObject(target, diskFfmpegLocator);
                                 try
                                 {
                                     if (mo.getInfo().getVideo().getDecoder().indexOf("h264") >= 0)
@@ -81,7 +90,8 @@ public class PlayVideoServiceImpl implements PlayVideoService
                             }
                             else
                             {
-                                vi.setNeedEncode("N");// 如果禁用了ffmpeg，那么怎么都不需要转码
+                                // 如果禁用了ffmpeg，那么怎么都不需要转码;
+                                vi.setNeedEncode("N");
                             }
                             return vi;
                         case "mkv":
@@ -90,7 +100,7 @@ public class PlayVideoServiceImpl implements PlayVideoService
                         case "avi":
                         case "wmv":
                         case "flv":
-                            if (kfl.getFFMPEGExecutablePath() != null)
+                            if (diskFfmpegLocator.getFFMPEGExecutablePath() != null)
                             {
                                 vi.setNeedEncode("Y");
                             }

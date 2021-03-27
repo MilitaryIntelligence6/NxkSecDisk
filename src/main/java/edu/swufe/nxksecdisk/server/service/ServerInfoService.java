@@ -2,7 +2,7 @@ package edu.swufe.nxksecdisk.server.service;
 
 public interface ServerInfoService
 {
-    String getOSName();
+    String requireOsName();
 
-    String getServerTime();
+    String requireServerTime();
 }

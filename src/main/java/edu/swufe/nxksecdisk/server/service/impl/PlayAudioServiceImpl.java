@@ -20,36 +20,36 @@ import java.util.List;
 public class PlayAudioServiceImpl implements PlayAudioService
 {
     @Resource
-    private NodeMapper fm;
+    private NodeMapper nodeMapper;
 
     @Resource
-    private AudioInfoUtil aiu;
+    private AudioInfoUtil audioInfoUtil;
 
     @Resource
     private Gson gson;
 
     @Resource
-    private FolderUtil fu;
+    private FolderUtil folderUtil;
 
     @Resource
-    private FolderMapper flm;
+    private FolderMapper folderMapper;
 
     private AudioInfoList foundAudios(final HttpServletRequest request)
     {
         final String fileId = request.getParameter("fileId");
         if (fileId != null && fileId.length() > 0)
         {
-            Node targetNode = fm.queryById(fileId);
+            Node targetNode = nodeMapper.queryById(fileId);
             if (targetNode != null)
             {
                 final String account = (String) request.getSession().getAttribute("ACCOUNT");
                 if (ConfigureReader.getInstance().authorized(account, AccountAuth.DOWNLOAD_FILES,
-                        fu.getAllFoldersId(targetNode.getFileParentFolder()))
-                        && ConfigureReader.getInstance().accessFolder(flm.queryById(targetNode.getFileParentFolder()),
+                        folderUtil.getAllFoldersId(targetNode.getFileParentFolder()))
+                        && ConfigureReader.getInstance().accessFolder(folderMapper.queryById(targetNode.getFileParentFolder()),
                         account))
                 {
-                    final List<Node> blocks = (List<Node>) this.fm.queryBySomeFolder(fileId);
-                    return this.aiu.transformToAudioInfoList(blocks, fileId);
+                    final List<Node> blocks = (List<Node>) this.nodeMapper.queryBySomeFolder(fileId);
+                    return this.audioInfoUtil.transformToAudioInfoList(blocks, fileId);
                 }
             }
         }
@@ -67,7 +67,7 @@ public class PlayAudioServiceImpl implements PlayAudioService
      * @author kohgylw
      */
     @Override
-    public String getAudioInfoListByJson(final HttpServletRequest request)
+    public String requireAudioInfoListByJson(final HttpServletRequest request)
     {
         final AudioInfoList ail = this.foundAudios(request);
         if (ail != null)

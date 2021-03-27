@@ -31,19 +31,24 @@ public class AccountServiceImpl implements AccountService
      * 登录密钥有效期;
      */
     private static final long TIME_OUT = 30000L;
+
     /**
      * 关注账户，当任意一个账户登录失败后将加入至该集合中，登录成功则移除。登录集合中的账户必须进行验证码验证;
      */
     private static final Set<String> focusAccount = new HashSet<>();
+
     @Resource
-    private RsaKeyUtil ku;
+    private RsaKeyUtil rsaKeyUtil;
+
     @Resource
-    private LogUtil lu;
+    private LogUtil logUtil;
+
     @Resource
     private Gson gson;
-    private VerificationCodeFactory vcf;
-    private CharsetEncoder iso88591Encoder;
 
+    private VerificationCodeFactory verificationCodeFactory;
+
+    private CharsetEncoder iso88591Encoder;
     {
         iso88591Encoder = Charset.forName("ISO-8859-1").newEncoder();
         if (!ConfigureReader.getInstance().getVCLevel().equals(VCLevel.CLOSE))
@@ -70,7 +75,7 @@ public class AccountServiceImpl implements AccountService
                 }
             }
             // 验证码生成工厂，包含了一些不太容易误认的字符
-            vcf = new VerificationCodeFactory(45, line, oval, 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'j', 'k', 'm',
+            verificationCodeFactory = new VerificationCodeFactory(45, line, oval, 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'j', 'k', 'm',
                     'n', 'p', 'q', 'r', 's', 't', 'w', 'x', 'y', 'z', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B',
                     'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'W', 'X', 'Y', 'Z');
         }
@@ -82,7 +87,7 @@ public class AccountServiceImpl implements AccountService
         final String encrypted = request.getParameter("encrypted");
         try
         {
-            final String loginInfoStr = RsaDecryptUtil.dncryption(encrypted, ku.getPrivateKey());
+            final String loginInfoStr = RsaDecryptUtil.dncryption(encrypted, rsaKeyUtil.getPrivateKey());
             final LoginInfoPojo info = gson.fromJson(loginInfoStr.replaceAll("\\\\", "\\\\\\\\"), LoginInfoPojo.class);
             if (System.currentTimeMillis() - Long.parseLong(info.getTime()) > TIME_OUT)
             {
@@ -151,7 +156,7 @@ public class AccountServiceImpl implements AccountService
     public String getPublicKey()
     {
         PublicKeyInfo pki = new PublicKeyInfo();
-        pki.setPublicKey(ku.getPublicKey());
+        pki.setPublicKey(rsaKeyUtil.getPublicKey());
         pki.setTime(System.currentTimeMillis());
         return gson.toJson(pki);
     }
@@ -167,7 +172,7 @@ public class AccountServiceImpl implements AccountService
             }
             else
             {
-                VerificationCode vc = vcf.next(4);
+                VerificationCode vc = verificationCodeFactory.next(4);
                 session.setAttribute("VERCODE", vc.getCode());
                 response.setContentType("image/png");
                 OutputStream out = response.getOutputStream();
@@ -221,7 +226,7 @@ public class AccountServiceImpl implements AccountService
         final String encrypted = request.getParameter("encrypted");
         try
         {
-            final String changePasswordInfoStr = RsaDecryptUtil.dncryption(encrypted, ku.getPrivateKey());
+            final String changePasswordInfoStr = RsaDecryptUtil.dncryption(encrypted, rsaKeyUtil.getPrivateKey());
             final ChangePasswordInfoPojo info = gson.fromJson(changePasswordInfoStr.replaceAll("\\\\", "\\\\\\\\"),
                     ChangePasswordInfoPojo.class);
             if (System.currentTimeMillis() - Long.parseLong(info.getTime()) > TIME_OUT)
@@ -263,7 +268,7 @@ public class AccountServiceImpl implements AccountService
                 {
                     if (ConfigureReader.getInstance().changePassword(account, newPassword))
                     {
-                        lu.writeChangePasswordEvent(request, account, newPassword);
+                        logUtil.writeChangePasswordEvent(request, account, newPassword);
                         return "success";
                     }
                 }
@@ -284,7 +289,7 @@ public class AccountServiceImpl implements AccountService
         }
         catch (Exception e)
         {
-            lu.writeException(e);
+            logUtil.writeException(e);
             return "cannotchangepwd";
         }
     }
@@ -324,7 +329,7 @@ public class AccountServiceImpl implements AccountService
         final String encrypted = request.getParameter("encrypted");
         try
         {
-            final String signUpInfoStr = RsaDecryptUtil.dncryption(encrypted, ku.getPrivateKey());
+            final String signUpInfoStr = RsaDecryptUtil.dncryption(encrypted, rsaKeyUtil.getPrivateKey());
             final SignUpInfoPojo info = gson.fromJson(signUpInfoStr.replaceAll("\\\\", "\\\\\\\\"),
                     SignUpInfoPojo.class);
             if (System.currentTimeMillis() - Long.parseLong(info.getTime()) > TIME_OUT)
@@ -348,7 +353,7 @@ public class AccountServiceImpl implements AccountService
                     {
                         if (ConfigureReader.getInstance().createNewAccount(account, password))
                         {
-                            lu.writeSignUpEvent(request, account, password);
+                            logUtil.writeSignUpEvent(request, account, password);
                             session.setAttribute("ACCOUNT", account);
                             return "success";
                         }
@@ -374,7 +379,7 @@ public class AccountServiceImpl implements AccountService
         }
         catch (Exception e)
         {
-            lu.writeException(e);
+            logUtil.writeException(e);
             return "cannotsignup";
         }
     }

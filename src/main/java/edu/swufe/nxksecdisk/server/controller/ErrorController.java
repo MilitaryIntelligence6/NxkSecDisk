@@ -8,19 +8,23 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import javax.annotation.Resource;
 
+/**
+ * @author Administrator
+ */
 @ControllerAdvice
 public class ErrorController
 {
     @Resource
-    private FileBlockUtil fbu;
+    private FileBlockUtil fileBlockUtil;
+
     @Resource
-    private LogUtil lu;
+    private LogUtil logUtil;
 
     @ExceptionHandler({Exception.class})
     public void handleException(final Exception e)
     {
-        this.lu.writeException(e);
-        this.fbu.checkFileBlocks();
+        this.logUtil.writeException(e);
+        this.fileBlockUtil.checkFileBlocks();
         Out.println(String.format("处理请求时发生错误：\n\r------信息------\n\r%s\n\r------信息------",
 						e.getMessage()));
     }

@@ -14,13 +14,13 @@ import java.util.Date;
 public class ServerInfoServiceImpl implements ServerInfoService
 {
     @Override
-    public String getOSName()
+    public String requireOsName()
     {
         return System.getProperty("os.name");
     }
 
     @Override
-    public String getServerTime()
+    public String requireServerTime()
     {
         final Date d = new Date();
         final DateFormat df = new SimpleDateFormat("YYYY\u5e74MM\u6708dd\u65e5 hh:mm");

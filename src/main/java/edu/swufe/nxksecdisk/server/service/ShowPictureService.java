@@ -14,5 +14,5 @@ public interface ShowPictureService
      * @param request HttpServletRequest 请求对象，应包含文件块路径fp，该方法会根据其大小自动判定压缩率。
      * @author 青阳龙野(kohgylw)
      */
-    void getCondensedPicture(final HttpServletRequest request, final HttpServletResponse response);
+    void requireCondensedPicture(final HttpServletRequest request, final HttpServletResponse response);
 }

@@ -24,21 +24,29 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @author Administrator
+ */
 @Service
 public class ShowPictureServiceImpl implements ShowPictureService
 {
     @Resource
-    private NodeMapper fm;
+    private NodeMapper nodeMapper;
+
     @Resource
     private Gson gson;
+
     @Resource
-    private FileBlockUtil fbu;
+    private FileBlockUtil fileBlockUtil;
+
     @Resource
-    private FolderUtil fu;
+    private FolderUtil folderUtil;
+
     @Resource
-    private FolderMapper flm;
+    private FolderMapper folderMapper;
+
     @Resource
-    private LogUtil lu;
+    private LogUtil logUtil;
 
     /**
      * <h2>获取所有同级目录下的图片并封装为PictureViewList对象</h2>
@@ -57,14 +65,14 @@ public class ShowPictureServiceImpl implements ShowPictureService
         if (fileId != null && fileId.length() > 0)
         {
             final String account = (String) request.getSession().getAttribute("ACCOUNT");
-            Node p = fm.queryById(fileId);
+            Node p = nodeMapper.queryById(fileId);
             if (p != null)
             {
                 if (ConfigureReader.getInstance().authorized(account, AccountAuth.DOWNLOAD_FILES,
-                        fu.getAllFoldersId(p.getFileParentFolder()))
-                        && ConfigureReader.getInstance().accessFolder(flm.queryById(p.getFileParentFolder()), account))
+                        folderUtil.getAllFoldersId(p.getFileParentFolder()))
+                        && ConfigureReader.getInstance().accessFolder(folderMapper.queryById(p.getFileParentFolder()), account))
                 {
-                    final List<Node> nodes = this.fm.queryBySomeFolder(fileId);
+                    final List<Node> nodes = this.nodeMapper.queryBySomeFolder(fileId);
                     final List<PictureInfo> pictureViewList = new ArrayList<>();
                     int index = 0;
                     for (final Node n : nodes)
@@ -82,8 +90,9 @@ public class ShowPictureServiceImpl implements ShowPictureService
                                 PictureInfo pi = new PictureInfo();
                                 pi.setFileName(fileName);
                                 int pSize = Integer.parseInt(n.getFileSize());
-                                File block = fbu.getFileFromBlocks(n);
-                                long lastModified = block.lastModified();// 尽可能地让覆盖后的图片也能立即更新
+                                File block = fileBlockUtil.getFileFromBlocks(n);
+                                // 尽可能地让覆盖后的图片也能立即更新;
+                                long lastModified = block.lastModified();
                                 if (pSize > 1 && !suffix.equals("gif"))
                                 {
                                     pi.setUrl("homeController/showCondensedPicture.do?fileId=" + n.getFileId()
@@ -96,7 +105,8 @@ public class ShowPictureServiceImpl implements ShowPictureService
                                 pictureViewList.add(pi);
                                 if (n.getFileId().equals(fileId))
                                 {
-                                    index = pictureViewList.size() - 1;// 如果是正要预览的图片，记录位置
+                                    // 如果是正要预览的图片，记录位置;
+                                    index = pictureViewList.size() - 1;
                                 }
                                 break;
                             default:
@@ -124,22 +134,22 @@ public class ShowPictureServiceImpl implements ShowPictureService
     }
 
     @Override
-    public void getCondensedPicture(final HttpServletRequest request, final HttpServletResponse response)
+    public void requireCondensedPicture(final HttpServletRequest request, final HttpServletResponse response)
     {
         // TODO 自动生成的方法存根
         String fileId = request.getParameter("fileId");
         String account = (String) request.getSession().getAttribute("ACCOUNT");
         if (fileId != null)
         {
-            Node node = fm.queryById(fileId);
+            Node node = nodeMapper.queryById(fileId);
             if (node != null)
             {
                 if (ConfigureReader.getInstance().authorized(account, AccountAuth.DOWNLOAD_FILES,
-                        fu.getAllFoldersId(node.getFileParentFolder()))
-                        && ConfigureReader.getInstance().accessFolder(flm.queryById(node.getFileParentFolder()),
+                        folderUtil.getAllFoldersId(node.getFileParentFolder()))
+                        && ConfigureReader.getInstance().accessFolder(folderMapper.queryById(node.getFileParentFolder()),
                         account))
                 {
-                    File pBlock = fbu.getFileFromBlocks(node);
+                    File pBlock = fileBlockUtil.getFileFromBlocks(node);
                     if (pBlock != null && pBlock.exists())
                     {
                         try
@@ -171,7 +181,7 @@ public class ShowPictureServiceImpl implements ShowPictureService
                             }
                             catch (IOException e1)
                             {
-                                lu.writeException(e1);
+                                logUtil.writeException(e1);
                             }
                         }
                     }

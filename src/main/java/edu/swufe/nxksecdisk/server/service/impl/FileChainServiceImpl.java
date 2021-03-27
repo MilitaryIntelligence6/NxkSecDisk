@@ -108,7 +108,7 @@ public class FileChainServiceImpl extends RangeFileStreamWriter implements FileC
         }
         catch (IOException e)
         {
-
+            e.printStackTrace();
         }
     }
 
@@ -161,5 +161,4 @@ public class FileChainServiceImpl extends RangeFileStreamWriter implements FileC
         }
         return "ERROR";
     }
-
 }

@@ -15,7 +15,6 @@ import javax.servlet.http.HttpSession;
  */
 public interface FolderViewService
 {
-
     /**
      * <h2>根据主键获取文件夹视图</h2>
      * <p>由请求主键返回该文件夹的视图并以JSON格式封装，用于前端页面显示。</p>

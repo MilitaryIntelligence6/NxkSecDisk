@@ -25,44 +25,53 @@ import javax.servlet.http.HttpSession;
 public class HomeController
 {
     private static final String CHARSET_BY_AJAX = "text/html; charset=utf-8";
+
     @Resource
-    private ServerInfoService si;
+    private ServerInfoService serverInfoService;
+
     @Resource
-    private AccountService as;
+    private AccountService accountService;
+
     @Resource
-    private FolderViewService fvs;
+    private FolderViewService folderViewService;
+
     @Resource
-    private FolderService fs;
+    private FolderService folderService;
+
     @Resource
-    private FileService fis;
+    private FileService fileService;
+
     @Resource
-    private PlayVideoService pvs;
+    private PlayVideoService playVideoService;
+
     @Resource
-    private ShowPictureService sps;
+    private ShowPictureService showPictureService;
+
     @Resource
-    private PlayAudioService pas;
+    private PlayAudioService playAudioService;
+
     @Resource
-    private FileChainService fcs;
+    private FileChainService fileChainService;
 
     @RequestMapping({"/getServerOS.ajax"})
     @ResponseBody
     public String getServerOS()
     {
-        return this.si.getOSName();
+        return this.serverInfoService.requireOsName();
     }
 
     @RequestMapping(value = {"/getPublicKey.ajax"}, produces = {CHARSET_BY_AJAX})
     @ResponseBody
     public String getPublicKey()
     {
-        return this.as.getPublicKey();
+        return this.accountService.getPublicKey();
     }
 
     @RequestMapping({"/doLogin.ajax"})
     @ResponseBody
     public String doLogin(final HttpServletRequest request, final HttpSession session)
     {
-        return this.as.checkLoginRequest(request, session);
+        return this.accountService.checkLoginRequest(request, session);
     }
 
 	/**
@@ -75,7 +84,7 @@ public class HomeController
     public void getNewVerCode(final HttpServletRequest request, final HttpServletResponse response,
                               final HttpSession session)
     {
-        as.getNewLoginVerCode(request, response, session);
+        accountService.getNewLoginVerCode(request, response, session);
     }
 
 	/**
@@ -87,28 +96,28 @@ public class HomeController
     @ResponseBody
     public String doChangePassword(final HttpServletRequest request)
     {
-        return as.changePassword(request);
+        return accountService.changePassword(request);
     }
 
     @RequestMapping(value = {"/getFolderView.ajax"}, produces = {CHARSET_BY_AJAX})
     @ResponseBody
     public String getFolderView(final String fid, final HttpSession session, final HttpServletRequest request)
     {
-        return fvs.getFolderViewToJson(fid, session, request);
+        return folderViewService.getFolderViewToJson(fid, session, request);
     }
 
     @RequestMapping(value = {"/getRemainingFolderView.ajax"}, produces = {CHARSET_BY_AJAX})
     @ResponseBody
     public String getRemainingFolderView(final HttpServletRequest request)
     {
-        return fvs.getRemainingFolderViewToJson(request);
+        return folderViewService.getRemainingFolderViewToJson(request);
     }
 
     @RequestMapping({"/doLogout.ajax"})
     public @ResponseBody
     String doLogout(final HttpSession session)
     {
-        this.as.logout(session);
+        this.accountService.logout(session);
         return "SUCCESS";
     }
 
@@ -116,21 +125,21 @@ public class HomeController
     @ResponseBody
     public String newFolder(final HttpServletRequest request)
     {
-        return this.fs.newFolder(request);
+        return this.folderService.newFolder(request);
     }
 
     @RequestMapping({"/deleteFolder.ajax"})
     @ResponseBody
     public String deleteFolder(final HttpServletRequest request)
     {
-        return this.fs.deleteFolder(request);
+        return this.folderService.deleteFolder(request);
     }
 
     @RequestMapping({"/renameFolder.ajax"})
     @ResponseBody
     public String renameFolder(final HttpServletRequest request)
     {
-        return this.fs.renameFolder(request);
+        return this.folderService.renameFolder(request);
     }
 
     @RequestMapping(value = {"/douploadFile.ajax"}, produces = {CHARSET_BY_AJAX})
@@ -138,14 +147,14 @@ public class HomeController
     public String douploadFile(final HttpServletRequest request, final HttpServletResponse response,
                                final MultipartFile file)
     {
-        return this.fis.doUploadFile(request, response, file);
+        return this.fileService.doUploadFile(request, response, file);
     }
 
     @RequestMapping(value = {"/checkUploadFile.ajax"}, produces = {CHARSET_BY_AJAX})
     @ResponseBody
     public String checkUploadFile(final HttpServletRequest request, final HttpServletResponse response)
     {
-        return this.fis.checkUploadFile(request, response);
+        return this.fileService.checkUploadFile(request, response);
     }
 
     // 上传文件夹的前置检查流程
@@ -153,7 +162,7 @@ public class HomeController
     @ResponseBody
     public String checkImportFolder(final HttpServletRequest request)
     {
-        return this.fis.checkImportFolder(request);
+        return this.fileService.checkImportFolder(request);
     }
 
     // 执行文件夹上传操作
@@ -161,7 +170,7 @@ public class HomeController
     @ResponseBody
     public String doImportFolder(final HttpServletRequest request, final MultipartFile file)
     {
-        return fis.doImportFolder(request, file);
+        return fileService.doImportFolder(request, file);
     }
 
     // 上传文件夹时，若存在同名文件夹并选择覆盖，则应先执行该方法，执行成功后再上传新的文件夹
@@ -169,7 +178,7 @@ public class HomeController
     @ResponseBody
     public String deleteFolderByName(final HttpServletRequest request)
     {
-        return fs.deleteFolderByName(request);
+        return folderService.deleteFolderByName(request);
     }
 
     // 上传文件夹时，若存在同名文件夹并选择保留两者，则应先执行该方法，执行成功后使用返回的新文件夹名进行上传
@@ -177,34 +186,34 @@ public class HomeController
     @ResponseBody
     public String createNewFolderByName(final HttpServletRequest request)
     {
-        return fs.createNewFolderByName(request);
+        return folderService.createNewFolderByName(request);
     }
 
     @RequestMapping({"/deleteFile.ajax"})
     @ResponseBody
     public String deleteFile(final HttpServletRequest request)
     {
-        return this.fis.deleteFile(request);
+        return this.fileService.deleteFile(request);
     }
 
     @RequestMapping({"/downloadFile.do"})
     public void downloadFile(final HttpServletRequest request, final HttpServletResponse response)
     {
-        this.fis.doDownloadFile(request, response);
+        this.fileService.doDownloadFile(request, response);
     }
 
     @RequestMapping({"/renameFile.ajax"})
     @ResponseBody
     public String renameFile(final HttpServletRequest request)
     {
-        return this.fis.doRenameFile(request);
+        return this.fileService.doRenameFile(request);
     }
 
     @RequestMapping(value = {"/playVideo.ajax"}, produces = {CHARSET_BY_AJAX})
     @ResponseBody
     public String playVideo(final HttpServletRequest request, final HttpServletResponse response)
     {
-        return this.pvs.parsePlayVideoJson(request);
+        return this.playVideoService.parsePlayVideoJson(request);
     }
 
     /**
@@ -221,7 +230,7 @@ public class HomeController
     @ResponseBody
     public String getPrePicture(final HttpServletRequest request)
     {
-        return this.sps.getPreviewPictureJson(request);
+        return this.showPictureService.getPreviewPictureJson(request);
     }
 
     /**
@@ -237,42 +246,42 @@ public class HomeController
     @RequestMapping({"/showCondensedPicture.do"})
     public void showCondensedPicture(final HttpServletRequest request, final HttpServletResponse response)
     {
-        sps.getCondensedPicture(request, response);
+        showPictureService.requireCondensedPicture(request, response);
     }
 
     @RequestMapping({"/deleteCheckedFiles.ajax"})
     @ResponseBody
     public String deleteCheckedFiles(final HttpServletRequest request)
     {
-        return this.fis.deleteCheckedFiles(request);
+        return this.fileService.deleteCheckedFiles(request);
     }
 
     @RequestMapping({"/getPackTime.ajax"})
     @ResponseBody
     public String getPackTime(final HttpServletRequest request)
     {
-        return this.fis.getPackTime(request);
+        return this.fileService.getPackTime(request);
     }
 
     @RequestMapping({"/downloadCheckedFiles.ajax"})
     @ResponseBody
     public String downloadCheckedFiles(final HttpServletRequest request)
     {
-        return this.fis.downloadCheckedFiles(request);
+        return this.fileService.downloadCheckedFiles(request);
     }
 
     @RequestMapping({"/downloadCheckedFilesZip.do"})
     public void downloadCheckedFilesZip(final HttpServletRequest request, final HttpServletResponse response)
             throws Exception
     {
-        this.fis.downloadCheckedFilesZip(request, response);
+        this.fileService.downloadCheckedFilesZip(request, response);
     }
 
     @RequestMapping(value = {"/playAudios.ajax"}, produces = {CHARSET_BY_AJAX})
     @ResponseBody
     public String playAudios(final HttpServletRequest request)
     {
-        return this.pas.getAudioInfoListByJson(request);
+        return this.playAudioService.requireAudioInfoListByJson(request);
     }
 
     /**
@@ -287,7 +296,7 @@ public class HomeController
     @ResponseBody
     public String confirmMoveFiles(final HttpServletRequest request)
     {
-        return fis.confirmMoveFiles(request);
+        return fileService.confirmMoveFiles(request);
     }
 
     /**
@@ -302,7 +311,7 @@ public class HomeController
     @ResponseBody
     public String moveCheckedFiles(final HttpServletRequest request)
     {
-        return fis.doMoveFiles(request);
+        return fileService.doMoveFiles(request);
     }
 
     /**
@@ -317,7 +326,7 @@ public class HomeController
     @ResponseBody
     public String sreachInCompletePath(final HttpServletRequest request)
     {
-        return fvs.getSreachViewToJson(request);
+        return folderViewService.getSreachViewToJson(request);
     }
 
     /**
@@ -333,7 +342,7 @@ public class HomeController
     @ResponseBody
     public String pong(final HttpServletRequest request)
     {
-        return as.doPong(request);
+        return accountService.doPong(request);
     }
 
     // 询问是否开启自由注册新账户功能
@@ -341,7 +350,7 @@ public class HomeController
     @ResponseBody
     public String askForAllowSignUpOrNot(final HttpServletRequest request)
     {
-        return as.isAllowSignUp();
+        return accountService.isAllowSignUp();
     }
 
     // 处理注册新账户请求
@@ -349,7 +358,7 @@ public class HomeController
     @ResponseBody
     public String doSigUp(final HttpServletRequest request)
     {
-        return as.doSignUp(request);
+        return accountService.doSignUp(request);
     }
 
     // 获取永久资源链接的对应ckey
@@ -357,6 +366,6 @@ public class HomeController
     @ResponseBody
     public String getFileChainKey(final HttpServletRequest request)
     {
-        return fcs.getChainKeyByFid(request);
+        return fileChainService.getChainKeyByFid(request);
     }
 }

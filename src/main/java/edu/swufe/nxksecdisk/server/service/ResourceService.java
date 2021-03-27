@@ -14,7 +14,6 @@ import javax.servlet.http.HttpServletResponse;
  */
 public interface ResourceService
 {
-
     /**
      * <h2>获取无需格式转化的流资源</h2>
      * <p>
@@ -26,7 +25,7 @@ public interface ResourceService
      * @param response javax.servlet.http.HttpServletResponse 响应对象
      * @author 青阳龙野(kohgylw)
      */
-    public void getResource(String fid, HttpServletRequest request, HttpServletResponse response);
+    void requireResource(String fid, HttpServletRequest request, HttpServletResponse response);
 
     /**
      * <h2>获取Word资源，以PDF流格式写回</h2>
@@ -39,7 +38,7 @@ public interface ResourceService
      * @param response javax.servlet.http.HttpServletResponse 响应对象
      * @author 青阳龙野(kohgylw)
      */
-    public void getWordView(String fileId, HttpServletRequest request, HttpServletResponse response);
+    void getWordView(String fileId, HttpServletRequest request, HttpServletResponse response);
 
     /**
      * <h2>获取TXT资源，以PDF流格式写回</h2>
@@ -52,7 +51,7 @@ public interface ResourceService
      * @param response javax.servlet.http.HttpServletResponse 响应对象
      * @author 青阳龙野(kohgylw)
      */
-    public void getTxtView(String fileId, HttpServletRequest request, HttpServletResponse response);
+    void getTxtView(String fileId, HttpServletRequest request, HttpServletResponse response);
 
     /**
      * <h2>获取PPT资源，以PDF流格式写回</h2>
@@ -65,7 +64,7 @@ public interface ResourceService
      * @param response javax.servlet.http.HttpServletResponse 响应对象
      * @author 青阳龙野(kohgylw)
      */
-    public void getPPTView(String fileId, HttpServletRequest request, HttpServletResponse response);
+    void getPPTView(String fileId, HttpServletRequest request, HttpServletResponse response);
 
     /**
      * <h2>获取视频解码状态</h2>
@@ -77,7 +76,7 @@ public interface ResourceService
      * @return java.lang.String 转码状态，若为FIN则代表转码完毕可直接播放，否则为百分制的进度，例如“1.2”代表完成了1.2%。
      * @author 青阳龙野(kohgylw)
      */
-    public String getVideoTranscodeStatus(HttpServletRequest request);
+    String getVideoTranscodeStatus(HttpServletRequest request);
 
     /**
      * <h2>获取LRC文本内容</h2>
@@ -90,7 +89,7 @@ public interface ResourceService
      * @param response javax.servlet.http.HttpServletResponse 响应对象
      * @author 青阳龙野(kohgylw)
      */
-    public void getLRContextByUTF8(String fileId, HttpServletRequest request, HttpServletResponse response);
+    void getLRContextByUTF8(String fileId, HttpServletRequest request, HttpServletResponse response);
 
     /**
      * <h2>获取公告信息的MD5</h2>
@@ -101,7 +100,7 @@ public interface ResourceService
      * @return java.lang.String 公告信息的md5值，无公告时返回null。
      * @author 青阳龙野(kohgylw)
      */
-    public String getNoticeMD5();
+    String requireNoticeMD5();
 
     /**
      * <h2>获取公告信息的HTML内容</h2>
@@ -113,6 +112,5 @@ public interface ResourceService
      * @param response javax.servlet.http.HttpServletResponse 响应对象
      * @author 青阳龙野(kohgylw)
      */
-    public void getNoticeContext(HttpServletRequest request, HttpServletResponse response);
-
+    void getNoticeContext(HttpServletRequest request, HttpServletResponse response);
 }

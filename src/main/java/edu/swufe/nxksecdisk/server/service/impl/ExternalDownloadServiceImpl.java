@@ -122,13 +122,12 @@ public class ExternalDownloadServiceImpl extends RangeFileStreamWriter implement
         }
         try
         {
-            //  处理无法下载的资源
+            // 处理无法下载的资源
             response.sendError(404);
         }
         catch (IOException e)
         {
-
+            e.printStackTrace();
         }
     }
-
 }

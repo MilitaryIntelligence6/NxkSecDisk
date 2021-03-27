@@ -17,56 +17,80 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 
-//资源服务类，所有处理非下载流请求的工作均在此完成
+/**
+ * 资源服务类，所有处理非下载流请求的工作均在此完成
+ * @author Administrator
+ */
 @Service
 public class ResourceServiceImpl implements ResourceService
 {
+    /**
+     * 资源缓存的寿命30分钟，正好对应账户的自动注销时间;
+     */
+    private static final long RESOURCE_CACHE_MAX_AGE = 1800L;
 
-    private static final long RESOURCE_CACHE_MAX_AGE = 1800L;// 资源缓存的寿命30分钟，正好对应账户的自动注销时间
     @Resource
-    private NodeMapper nm;
+    private NodeMapper nodeMapper;
+
     @Resource
-    private FileBlockUtil fbu;
+    private FileBlockUtil fileBlockUtil;
+
     @Resource
     private LogUtil logUtil;
-    @Resource
-    private DocxToPdfUtil d2pu;
-    @Resource
-    private TxtToPdfUtil t2pu;
-    @Resource
-    private VideoTranscodeUtil vtu;
-    @Resource
-    private PowerPointToPdfUtil p2pu;
-    @Resource
-    private FolderUtil fu;
-    @Resource
-    private FolderMapper fm;
-    @Resource
-    private TxtCharsetGetter tcg;
-    @Resource
-    private NoticeUtil nu;
-    @Resource
-    private ContentTypeMap ctm;
-    @Resource
-    private DiskFfmpegLocator kfl;
-    @Resource
-    private IpAddrGetter idg;
 
-    // 提供资源的输出流，原理与下载相同，但是个别细节有区别
+    @Resource
+    private DocxToPdfUtil docxToPdfUtil;
+
+    @Resource
+    private TxtToPdfUtil txtToPdfUtil;
+
+    @Resource
+    private VideoTranscodeUtil videoTranscodeUtil;
+
+    @Resource
+    private PowerPointToPdfUtil pptToPdfUtil;
+
+    @Resource
+    private FolderUtil folderUtil;
+
+    @Resource
+    private FolderMapper folderMapper;
+
+    @Resource
+    private TxtCharsetGetter txtCharsetGetter;
+
+    @Resource
+    private NoticeUtil noticeUtil;
+
+    @Resource
+    private ContentTypeMap contentTypeMap;
+
+    @Resource
+    private DiskFfmpegLocator diskFfmpegLocator;
+
+    @Resource
+    private IpAddrGetter ipAddrGetter;
+
+    /**
+     * 提供资源的输出流，原理与下载相同，但是个别细节有区别;
+     * @param fid      java.lang.String 目标资源的fid，用于指定文件节点
+     * @param request  javax.servlet.http.HttpServletRequest 请求对象
+     * @param response javax.servlet.http.HttpServletResponse 响应对象
+     */
     @Override
-    public void getResource(String fid, HttpServletRequest request, HttpServletResponse response)
+    public void requireResource(String fid, HttpServletRequest request, HttpServletResponse response)
     {
         final String account = (String) request.getSession().getAttribute("ACCOUNT");
         if (fid != null)
         {
-            Node n = nm.queryById(fid);
+            Node n = nodeMapper.queryById(fid);
             if (n != null)
             {
                 if (ConfigureReader.getInstance().authorized(account, AccountAuth.DOWNLOAD_FILES,
-                        fu.getAllFoldersId(n.getFileParentFolder()))
-                        && ConfigureReader.getInstance().accessFolder(fm.queryById(n.getFileParentFolder()), account))
+                        folderUtil.getAllFoldersId(n.getFileParentFolder()))
+                        && ConfigureReader.getInstance().accessFolder(folderMapper.queryById(n.getFileParentFolder()), account))
                 {
-                    File file = fbu.getFileFromBlocks(n);
+                    File file = fileBlockUtil.getFileFromBlocks(n);
                     if (file != null && file.isFile())
                     {
                         String suffix = "";
@@ -74,7 +98,7 @@ public class ResourceServiceImpl implements ResourceService
                         {
                             suffix = n.getFileName().substring(n.getFileName().lastIndexOf(".")).trim().toLowerCase();
                         }
-                        String contentType = ctm.getContentType(suffix);
+                        String contentType = contentTypeMap.getContentType(suffix);
                         switch (suffix)
                         {
                             case ".mp4":
@@ -84,7 +108,7 @@ public class ResourceServiceImpl implements ResourceService
                             case ".wmv":
                             case ".mkv":
                             case ".flv":
-                                if (kfl.getFFMPEGExecutablePath() != null)
+                                if (diskFfmpegLocator.getFFMPEGExecutablePath() != null)
                                 {
                                     contentType = "video/mp4";
                                     synchronized (VideoTranscodeUtil.videoTranscodeThreads)
@@ -95,14 +119,17 @@ public class ResourceServiceImpl implements ResourceService
                                             File f = new File(ConfigureReader.getInstance().getTemporaryfilePath(),
                                                     vtt.getOutputFileName());
                                             if (f.isFile() && vtt.getProgress().equals("FIN"))
-                                            {// 判断是否转码成功
-                                                file = f;// 成功，则播放它
+                                            {
+                                                // 判断是否转码成功
+                                                // 成功，则播放它;
+                                                file = f;
                                             }
                                             else
                                             {
                                                 try
                                                 {
-                                                    response.sendError(500);// 否则，返回处理失败
+                                                    // 否则，返回处理失败;
+                                                    response.sendError(500);
                                                 }
                                                 catch (IOException e)
                                                 {
@@ -116,7 +143,7 @@ public class ResourceServiceImpl implements ResourceService
                             default:
                                 break;
                         }
-                        String ip = idg.getIpAddr(request);
+                        String ip = ipAddrGetter.getIpAddr(request);
                         String range = request.getHeader("Range");
                         int status = sendResource(file, n.getFileName(), contentType, request, response);
                         if (status == HttpServletResponse.SC_OK || (range != null && range.startsWith("bytes=0-")))
@@ -127,7 +154,8 @@ public class ResourceServiceImpl implements ResourceService
                     }
                 }
                 else
-                {// 处理资源未被授权的问题
+                {
+                    // 处理资源未被授权的问题
                     try
                     {
                         response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
@@ -140,7 +168,7 @@ public class ResourceServiceImpl implements ResourceService
         }
         try
         {
-            //  处理无法下载的资源
+            // 处理无法下载的资源
             response.sendError(404);
         }
         catch (IOException e)
@@ -173,7 +201,7 @@ public class ResourceServiceImpl implements ResourceService
             long contentLength = randomFile.length();
             final String lastModified = ServerTimeUtil.getLastModifiedFormBlock(resource);
             // 如果请求中包含了对本地缓存的过期判定参数，则执行过期判定
-            final String eTag = this.fbu.getETag(resource);
+            final String eTag = this.fileBlockUtil.getETag(resource);
             final String ifModifiedSince = request.getHeader("If-Modified-Since");
             final String ifNoneMatch = request.getHeader("If-None-Match");
             if (ifModifiedSince != null || ifNoneMatch != null)
@@ -183,7 +211,8 @@ public class ResourceServiceImpl implements ResourceService
                     if (ifNoneMatch.trim().equals(eTag))
                     {
                         status = HttpServletResponse.SC_NOT_MODIFIED;
-                        response.setStatus(status);// 304
+                        // 304;
+                        response.setStatus(status);
                         return status;
                     }
                 }
@@ -192,7 +221,8 @@ public class ResourceServiceImpl implements ResourceService
                     if (ifModifiedSince.trim().equals(lastModified))
                     {
                         status = HttpServletResponse.SC_NOT_MODIFIED;
-                        response.setStatus(status);// 304
+                        // 304
+                        response.setStatus(status);
                         return status;
                     }
                 }
@@ -202,14 +232,16 @@ public class ResourceServiceImpl implements ResourceService
             if (ifUnmodifiedSince != null && !(ifUnmodifiedSince.trim().equals(lastModified)))
             {
                 status = HttpServletResponse.SC_PRECONDITION_FAILED;
-                response.setStatus(status);// 412
+                // 412;
+                response.setStatus(status);
                 return status;
             }
             String ifMatch = request.getHeader("If-Match");
             if (ifMatch != null && !(ifMatch.trim().equals(eTag)))
             {
                 status = HttpServletResponse.SC_PRECONDITION_FAILED;
-                response.setStatus(status);// 412
+                // 412;
+                response.setStatus(status);
                 return status;
             }
             // 如果缓存过期或无缓存，则按请求参数返回数据
@@ -236,7 +268,7 @@ public class ResourceServiceImpl implements ResourceService
             byte[] buffer = new byte[ConfigureReader.getInstance().getBuffSize()];
             response.setContentType(contentType);
             response.setHeader("Accept-Ranges", "bytes");
-            response.setHeader("ETag", this.fbu.getETag(resource));
+            response.setHeader("ETag", this.fileBlockUtil.getETag(resource));
             response.setHeader("Last-Modified", ServerTimeUtil.getLastModifiedFormBlock(resource));
             response.setHeader("Cache-Control", "max-age=" + RESOURCE_CACHE_MAX_AGE);
             // 第一次请求只返回content length来让客户端请求多次实际数据
@@ -246,7 +278,8 @@ public class ResourceServiceImpl implements ResourceService
             {
                 // 以后的多次以断点续传的方式来返回视频数据
                 status = HttpServletResponse.SC_PARTIAL_CONTENT;
-                response.setStatus(status);// 206
+                // 206;
+                response.setStatus(status);
                 long requestStart = 0, requestEnd = 0;
                 String[] ranges = range.split("=");
                 if (ranges.length > 1)
@@ -308,7 +341,12 @@ public class ResourceServiceImpl implements ResourceService
         }
     }
 
-    // 对word的预览实现
+    /**
+     * 对docx的预览实现
+     * @param fileId   java.lang.String 要读取的文件节点ID
+     * @param request  javax.servlet.http.HttpServletRequest 请求对象
+     * @param response javax.servlet.http.HttpServletResponse 响应对象
+     */
     @Override
     public void getWordView(String fileId, HttpServletRequest request, HttpServletResponse response)
     {
@@ -316,14 +354,14 @@ public class ResourceServiceImpl implements ResourceService
         // 权限检查
         if (fileId != null)
         {
-            Node n = nm.queryById(fileId);
+            Node n = nodeMapper.queryById(fileId);
             if (n != null)
             {
                 if (ConfigureReader.getInstance().authorized(account, AccountAuth.DOWNLOAD_FILES,
-                        fu.getAllFoldersId(n.getFileParentFolder()))
-                        && ConfigureReader.getInstance().accessFolder(fm.queryById(n.getFileParentFolder()), account))
+                        folderUtil.getAllFoldersId(n.getFileParentFolder()))
+                        && ConfigureReader.getInstance().accessFolder(folderMapper.queryById(n.getFileParentFolder()), account))
                 {
-                    File file = fbu.getFileFromBlocks(n);
+                    File file = fileBlockUtil.getFileFromBlocks(n);
                     if (file != null && file.isFile())
                     {
                         // 后缀检查
@@ -334,13 +372,13 @@ public class ResourceServiceImpl implements ResourceService
                         }
                         if (".docx".equals(suffix))
                         {
-                            String contentType = ctm.getContentType(".pdf");
+                            String contentType = contentTypeMap.getContentType(".pdf");
                             response.setContentType(contentType);
-                            String ip = idg.getIpAddr(request);
+                            String ip = ipAddrGetter.getIpAddr(request);
                             // 执行转换并写出输出流
                             try
                             {
-                                d2pu.convertPdf(new FileInputStream(file), response.getOutputStream());
+                                docxToPdfUtil.convertPdf(new FileInputStream(file), response.getOutputStream());
                                 logUtil.writeDownloadFileEvent(account, ip, n);
                                 return;
                             }
@@ -366,7 +404,12 @@ public class ResourceServiceImpl implements ResourceService
         }
     }
 
-    // 对TXT预览的实现
+    /**
+     * 对TXT预览的实现;
+     * @param fileId   java.lang.String 要读取的文件节点ID
+     * @param request  javax.servlet.http.HttpServletRequest 请求对象
+     * @param response javax.servlet.http.HttpServletResponse 响应对象
+     */
     @Override
     public void getTxtView(String fileId, HttpServletRequest request, HttpServletResponse response)
     {
@@ -374,14 +417,14 @@ public class ResourceServiceImpl implements ResourceService
         // 权限检查
         if (fileId != null)
         {
-            Node n = nm.queryById(fileId);
+            Node n = nodeMapper.queryById(fileId);
             if (n != null)
             {
                 if (ConfigureReader.getInstance().authorized(account, AccountAuth.DOWNLOAD_FILES,
-                        fu.getAllFoldersId(n.getFileParentFolder()))
-                        && ConfigureReader.getInstance().accessFolder(fm.queryById(n.getFileParentFolder()), account))
+                        folderUtil.getAllFoldersId(n.getFileParentFolder()))
+                        && ConfigureReader.getInstance().accessFolder(folderMapper.queryById(n.getFileParentFolder()), account))
                 {
-                    File file = fbu.getFileFromBlocks(n);
+                    File file = fileBlockUtil.getFileFromBlocks(n);
                     if (file != null && file.isFile())
                     {
                         // 后缀检查
@@ -392,13 +435,13 @@ public class ResourceServiceImpl implements ResourceService
                         }
                         if (".txt".equals(suffix))
                         {
-                            String contentType = ctm.getContentType(".pdf");
+                            String contentType = contentTypeMap.getContentType(".pdf");
                             response.setContentType(contentType);
-                            String ip = idg.getIpAddr(request);
+                            String ip = ipAddrGetter.getIpAddr(request);
                             // 执行转换并写出输出流
                             try
                             {
-                                t2pu.convertPdf(file, response.getOutputStream());
+                                txtToPdfUtil.convertPdf(file, response.getOutputStream());
                                 logUtil.writeDownloadFileEvent(account, ip, n);
                                 return;
                             }
@@ -424,14 +467,14 @@ public class ResourceServiceImpl implements ResourceService
     @Override
     public String getVideoTranscodeStatus(HttpServletRequest request)
     {
-        if (kfl.getFFMPEGExecutablePath() != null)
+        if (diskFfmpegLocator.getFFMPEGExecutablePath() != null)
         {
             String fId = request.getParameter("fileId");
             if (fId != null)
             {
                 try
                 {
-                    return vtu.getTranscodeProcess(fId);
+                    return videoTranscodeUtil.getTranscodeProcess(fId);
                 }
                 catch (Exception e)
                 {
@@ -443,7 +486,12 @@ public class ResourceServiceImpl implements ResourceService
         return "ERROR";
     }
 
-    // 对PPT预览的实现
+    /**
+     * 对PPT预览的实现;
+     * @param fileId   java.lang.String 要读取的文件节点ID
+     * @param request  javax.servlet.http.HttpServletRequest 请求对象
+     * @param response javax.servlet.http.HttpServletResponse 响应对象
+     */
     @Override
     public void getPPTView(String fileId, HttpServletRequest request, HttpServletResponse response)
     {
@@ -451,14 +499,14 @@ public class ResourceServiceImpl implements ResourceService
         // 权限检查
         if (fileId != null)
         {
-            Node n = nm.queryById(fileId);
+            Node n = nodeMapper.queryById(fileId);
             if (n != null)
             {
                 if (ConfigureReader.getInstance().authorized(account, AccountAuth.DOWNLOAD_FILES,
-                        fu.getAllFoldersId(n.getFileParentFolder()))
-                        && ConfigureReader.getInstance().accessFolder(fm.queryById(n.getFileParentFolder()), account))
+                        folderUtil.getAllFoldersId(n.getFileParentFolder()))
+                        && ConfigureReader.getInstance().accessFolder(folderMapper.queryById(n.getFileParentFolder()), account))
                 {
-                    File file = fbu.getFileFromBlocks(n);
+                    File file = fileBlockUtil.getFileFromBlocks(n);
                     if (file != null && file.isFile())
                     {
                         // 后缀检查
@@ -471,13 +519,13 @@ public class ResourceServiceImpl implements ResourceService
                         {
                             case ".ppt":
                             case ".pptx":
-                                String contentType = ctm.getContentType(".pdf");
+                                String contentType = contentTypeMap.getContentType(".pdf");
                                 response.setContentType(contentType);
-                                String ip = idg.getIpAddr(request);
+                                String ip = ipAddrGetter.getIpAddr(request);
                                 // 执行转换并写出输出流
                                 try
                                 {
-                                    p2pu.convertPdf(new FileInputStream(file), response.getOutputStream(),
+                                    pptToPdfUtil.convertPdf(new FileInputStream(file), response.getOutputStream(),
                                             ".ppt".equals(suffix) ? PowerPointType.PPT : PowerPointType.PPTX);
                                     logUtil.writeDownloadFileEvent(account, ip, n);
                                     return;
@@ -512,18 +560,18 @@ public class ResourceServiceImpl implements ResourceService
     public void getLRContextByUTF8(String fileId, HttpServletRequest request, HttpServletResponse response)
     {
         final String account = (String) request.getSession().getAttribute("ACCOUNT");
-        final String ip = idg.getIpAddr(request);
+        final String ip = ipAddrGetter.getIpAddr(request);
         // 权限检查
         if (fileId != null)
         {
-            Node n = nm.queryById(fileId);
+            Node n = nodeMapper.queryById(fileId);
             if (n != null)
             {
                 if (ConfigureReader.getInstance().authorized(account, AccountAuth.DOWNLOAD_FILES,
-                        fu.getAllFoldersId(n.getFileParentFolder()))
-                        && ConfigureReader.getInstance().accessFolder(fm.queryById(n.getFileParentFolder()), account))
+                        folderUtil.getAllFoldersId(n.getFileParentFolder()))
+                        && ConfigureReader.getInstance().accessFolder(folderMapper.queryById(n.getFileParentFolder()), account))
                 {
-                    File file = fbu.getFileFromBlocks(n);
+                    File file = fileBlockUtil.getFileFromBlocks(n);
                     if (file != null && file.isFile())
                     {
                         // 检查是否有可用缓存
@@ -535,7 +583,7 @@ public class ResourceServiceImpl implements ResourceService
                             return;
                         }
                         String ifNoneMatch = request.getHeader("If-None-Match");
-                        if (ifNoneMatch != null && ifNoneMatch.trim().equals(this.fbu.getETag(file)))
+                        if (ifNoneMatch != null && ifNoneMatch.trim().equals(this.fileBlockUtil.getETag(file)))
                         {
                             response.setStatus(304);
                             return;
@@ -552,13 +600,13 @@ public class ResourceServiceImpl implements ResourceService
                             String contentType = "text/plain";
                             response.setContentType(contentType);
                             response.setCharacterEncoding("UTF-8");
-                            response.setHeader("ETag", this.fbu.getETag(file));
+                            response.setHeader("ETag", this.fileBlockUtil.getETag(file));
                             response.setHeader("Last-Modified", ServerTimeUtil.getLastModifiedFormBlock(file));
                             response.setHeader("Cache-Control", "max-age=" + RESOURCE_CACHE_MAX_AGE);
                             // 执行转换并写出输出流
                             try
                             {
-                                String inputFileEncode = tcg.getTxtCharset(new FileInputStream(file));
+                                String inputFileEncode = txtCharsetGetter.getTxtCharset(new FileInputStream(file));
                                 BufferedReader bufferedReader = new BufferedReader(
                                         new InputStreamReader(new FileInputStream(file), inputFileEncode));
                                 BufferedWriter bufferedWriter = new BufferedWriter(
@@ -620,13 +668,14 @@ public class ResourceServiceImpl implements ResourceService
             }
             catch (IOException e)
             {
+                e.printStackTrace();
             }
         }
     }
 
     @Override
-    public String getNoticeMD5()
+    public String requireNoticeMD5()
     {
-        return nu.getMd5();
+        return noticeUtil.getMd5();
     }
 }
