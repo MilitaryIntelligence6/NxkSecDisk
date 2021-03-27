@@ -54,15 +54,16 @@ public class DataAccess
     public MapperScannerConfigurer mapperScannerConfigurer()
     {
         final MapperScannerConfigurer msf = new MapperScannerConfigurer();
-        msf.setBasePackage("kohgylw.kiftd.server.mapper");
+        msf.setBasePackage("edu.swufe.nxksecdisk.server.mapper");
         msf.setSqlSessionFactoryBeanName("sqlSessionFactory");
         return msf;
     }
 
     static
     {
-        final String mybatisResourceFolder = ConfigureReader.getInstance().getPath() + File.separator + "mybatisResource"
-                + File.separator;
+        final String mybatisResourceFolder = String.format("%s%smybatisResource%s",
+                ConfigureReader.getInstance().getPath(),
+                File.separator, File.separator);
         final String mapperFilesFolder = mybatisResourceFolder + "mapperXML" + File.separator;
         DataAccess.mapperFiles = new Resource[]{new FileSystemResource(mapperFilesFolder + "NodeMapper.xml"),
                 new FileSystemResource(mapperFilesFolder + "FolderMapper.xml"),

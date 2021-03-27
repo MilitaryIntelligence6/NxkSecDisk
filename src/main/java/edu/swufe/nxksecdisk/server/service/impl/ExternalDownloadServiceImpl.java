@@ -24,12 +24,11 @@ import java.util.UUID;
 @Service
 public class ExternalDownloadServiceImpl extends RangeFileStreamWriter implements ExternalDownloadService
 {
+    private static final String CONTENT_TYPE = "application/octet-stream";
     /**
      * 凭证池，用于存储生成好的下载凭证;
      */
     private static Map<String, String> downloadKeyMap = new HashMap<>();
-    private static final String CONTENT_TYPE = "application/octet-stream";
-
     @Resource
     private NodeMapper nm;
     @Resource

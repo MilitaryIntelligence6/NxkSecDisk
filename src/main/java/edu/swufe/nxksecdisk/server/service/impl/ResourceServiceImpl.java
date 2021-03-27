@@ -1,14 +1,14 @@
 package edu.swufe.nxksecdisk.server.service.impl;
 
-import edu.swufe.nxksecdisk.server.pojo.VideoTranscodeThread;
-import edu.swufe.nxksecdisk.server.util.*;
 import edu.swufe.nxksecdisk.printer.Out;
 import edu.swufe.nxksecdisk.server.enumeration.AccountAuth;
 import edu.swufe.nxksecdisk.server.enumeration.PowerPointType;
 import edu.swufe.nxksecdisk.server.mapper.FolderMapper;
 import edu.swufe.nxksecdisk.server.mapper.NodeMapper;
 import edu.swufe.nxksecdisk.server.model.Node;
+import edu.swufe.nxksecdisk.server.pojo.VideoTranscodeThread;
 import edu.swufe.nxksecdisk.server.service.ResourceService;
+import edu.swufe.nxksecdisk.server.util.*;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -22,6 +22,7 @@ import java.io.*;
 public class ResourceServiceImpl implements ResourceService
 {
 
+    private static final long RESOURCE_CACHE_MAX_AGE = 1800L;// 资源缓存的寿命30分钟，正好对应账户的自动注销时间
     @Resource
     private NodeMapper nm;
     @Resource
@@ -50,8 +51,6 @@ public class ResourceServiceImpl implements ResourceService
     private DiskFfmpegLocator kfl;
     @Resource
     private IpAddrGetter idg;
-
-    private static final long RESOURCE_CACHE_MAX_AGE = 1800L;// 资源缓存的寿命30分钟，正好对应账户的自动注销时间
 
     // 提供资源的输出流，原理与下载相同，但是个别细节有区别
     @Override

@@ -1,8 +1,14 @@
 package edu.swufe.nxksecdisk.server.mapper;
 
 import edu.swufe.nxksecdisk.server.model.Node;
+import org.apache.ibatis.annotations.Mapper;
+
 import java.util.*;
 
+/**
+ * @author Administrator
+ */
+@Mapper
 public interface NodeMapper {
 	/**
 	 * 

@@ -42,7 +42,7 @@ public class FileServiceImpl extends RangeFileStreamWriter implements FileServic
     private static final String NO_AUTHORIZED = "noAuthorized";// 权限错误标识
     private static final String UPLOADSUCCESS = "uploadsuccess";// 上传成功标识
     private static final String UPLOADERROR = "uploaderror";// 上传失败标识
-
+    private static final String CONTENT_TYPE = "application/octet-stream";
     @Resource
     private NodeMapper fm;
     @Resource
@@ -57,8 +57,6 @@ public class FileServiceImpl extends RangeFileStreamWriter implements FileServic
     private FolderUtil fu;
     @Resource
     private IpAddrGetter idg;
-
-    private static final String CONTENT_TYPE = "application/octet-stream";
 
     // 检查上传文件列表的实现（上传文件的前置操作）
     @Override
@@ -179,8 +177,8 @@ public class FileServiceImpl extends RangeFileStreamWriter implements FileServic
 
     // 执行上传操作，接收文件并存入文件节点
     @Override
-	public String doUploadFile(final HttpServletRequest request, final HttpServletResponse response,
-							   final MultipartFile file)
+    public String doUploadFile(final HttpServletRequest request, final HttpServletResponse response,
+                               final MultipartFile file)
     {
         String account = (String) request.getSession().getAttribute("ACCOUNT");
         final String folderId = request.getParameter("folderId");
@@ -341,7 +339,7 @@ public class FileServiceImpl extends RangeFileStreamWriter implements FileServic
 
     // 删除单个文件
     @Override
-	public String deleteFile(final HttpServletRequest request)
+    public String deleteFile(final HttpServletRequest request)
     {
         // 接收参数并接续要删除的文件
         final String fileId = request.getParameter("fileId");
@@ -379,7 +377,7 @@ public class FileServiceImpl extends RangeFileStreamWriter implements FileServic
 
     // 普通下载：下载单个文件
     @Override
-	public void doDownloadFile(final HttpServletRequest request, final HttpServletResponse response)
+    public void doDownloadFile(final HttpServletRequest request, final HttpServletResponse response)
     {
         final String account = (String) request.getSession().getAttribute("ACCOUNT");
         // 权限检查
@@ -428,7 +426,7 @@ public class FileServiceImpl extends RangeFileStreamWriter implements FileServic
 
     // 重命名文件
     @Override
-	public String doRenameFile(final HttpServletRequest request)
+    public String doRenameFile(final HttpServletRequest request)
     {
         final String fileId = request.getParameter("fileId");
         final String newFileName = request.getParameter("newFileName");
@@ -481,7 +479,7 @@ public class FileServiceImpl extends RangeFileStreamWriter implements FileServic
 
     // 删除所有选中文件和文件夹
     @Override
-	public String deleteCheckedFiles(final HttpServletRequest request)
+    public String deleteCheckedFiles(final HttpServletRequest request)
     {
         final String strIdList = request.getParameter("strIdList");
         final String strFidList = request.getParameter("strFidList");
@@ -572,7 +570,7 @@ public class FileServiceImpl extends RangeFileStreamWriter implements FileServic
 
     // 打包下载功能：前置——压缩要打包下载的文件
     @Override
-	public String downloadCheckedFiles(final HttpServletRequest request)
+    public String downloadCheckedFiles(final HttpServletRequest request)
     {
         if (ConfigureReader.getInstance().isEnableDownloadByZip())
         {
@@ -607,7 +605,7 @@ public class FileServiceImpl extends RangeFileStreamWriter implements FileServic
 
     // 打包下载功能：执行——下载压缩好的文件
     @Override
-	public void downloadCheckedFilesZip(final HttpServletRequest request, final HttpServletResponse response)
+    public void downloadCheckedFilesZip(final HttpServletRequest request, final HttpServletResponse response)
             throws Exception
     {
         final String zipname = request.getParameter("zipId");
@@ -627,7 +625,7 @@ public class FileServiceImpl extends RangeFileStreamWriter implements FileServic
     }
 
     @Override
-	public String getPackTime(final HttpServletRequest request)
+    public String getPackTime(final HttpServletRequest request)
     {
         if (ConfigureReader.getInstance().isEnableDownloadByZip())
         {

@@ -1,32 +1,33 @@
 package edu.swufe.nxksecdisk.server.service;
 
-import javax.servlet.http.*;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 public interface AccountService
 {
     String checkLoginRequest(final HttpServletRequest request, final HttpSession session);
-    
+
     void logout(final HttpSession session);
-    
+
     String getPublicKey();
-    
+
     void getNewLoginVerCode(final HttpServletRequest request, final HttpServletResponse response, final HttpSession session);
-    
+
     /**
-     * 
      * <h2>应答响应逻辑</h2>
      * <p>对于需要长期保持绘画跟踪的操作，提供定时应答以确保不退出登录。若用户已登录，则响应“pong”以进行后续应答，否则响应空字符串。</p>
-     * @author 青阳龙野(kohgylw)
+     *
      * @param request javax.servlet.http.HttpServletRequest 请求对象
      * @return java.lang.String 应答内容，“pong”或“”
+     * @author 青阳龙野(kohgylw)
      */
     String doPong(final HttpServletRequest request);
-    
+
     /**
-     * 
      * <h2>修改账户的密码</h2>
      * <p>该逻辑用语处理修改账户密码的请求，必须已经开启用户修改密码功能。</p>
-     * @author 青阳龙野(kohgylw)
+     *
      * @param request javax.servlet.http.HttpServletRequest 请求对象，必须包含加密后的修改密码请求
      * @return java.lang.String 修改结果，含义如下：
      * <ul>
@@ -39,23 +40,23 @@ public interface AccountService
      * <li>cannotchangepwd 出现意外错误导致密码修改失败</li>
      * <li>error 加密验证失败</li>
      * </ul>
+     * @author 青阳龙野(kohgylw)
      */
     String changePassword(final HttpServletRequest request);
-    
+
     /**
-     * 
      * <h2>获取是否允许自由注册新账户</h2>
      * <p>该方法用于获取是否允许注册新账户，若允许则返回字符串“true”。</p>
-     * @author 青阳龙野(kohgylw)
+     *
      * @return java.lang.String 允许与否标识，允许为“true”，否则为“false”
+     * @author 青阳龙野(kohgylw)
      */
     String isAllowSignUp();
-    
+
     /**
-     * 
      * <h2>执行账户注册</h2>
      * <p>该方法用于执行账户注册操作并返回注册结果，必须已经开启自由注册新账户功能。</p>
-     * @author 青阳龙野(kohgylw)
+     *
      * @param request javax.servlet.http.HttpServletRequest 请求对象
      * @return java.lang.String 注册结果，含义如下：
      * <ul>
@@ -69,6 +70,7 @@ public interface AccountService
      * <li>cannotsignup 出现意外错误导致注册失败</li>
      * <li>error 加密验证失败</li>
      * </ul>
+     * @author 青阳龙野(kohgylw)
      */
     String doSignUp(final HttpServletRequest request);
 }

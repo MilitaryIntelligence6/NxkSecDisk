@@ -1,5 +1,6 @@
 package edu.swufe.nxksecdisk.server.listener;
 
+import com.sun.corba.se.spi.ior.iiop.IIOPFactories;
 import edu.swufe.nxksecdisk.server.mapper.FolderMapper;
 import edu.swufe.nxksecdisk.server.util.*;
 import edu.swufe.nxksecdisk.printer.Out;
@@ -48,7 +49,7 @@ public class ServerInitListener implements ServletContextListener
     /**
      * 用于在服务器启动后实时清理失效额外权限配置的线程，以便及时清理被删除的文件夹对应的额外权限配置
      */
-    private Thread cleanInnvalidAddedAuthThread;
+    private Thread cleanInvalidAddedAuthThread;
 
     /**
      * 是否继续监听服务器主目录下的文件改动（用以控制监听的停止）
@@ -61,28 +62,28 @@ public class ServerInitListener implements ServletContextListener
     /**
      * 文件块操作工具
      */
-    private FileBlockUtil fbu;
+    private FileBlockUtil fileBlockUtil;
 
     /**
      * 公告信息解析工具
      */
-    private NoticeUtil nu;
+    private NoticeUtil noticeUtil;
 
     /**
      * 文件夹映射表
      */
-    private FolderMapper nm;
+    private FolderMapper folderMapper;
 
     /**
      * 日志记录工具
      */
-    private LogUtil lu;
+    private LogUtil logUtil;
 
     @Override
     public void contextInitialized(final ServletContextEvent sce)
     {
         // 获取IOC容器，用于实例化一些必要的工具
-        final ApplicationContext context = (ApplicationContext) WebApplicationContextUtils
+        final ApplicationContext context = WebApplicationContextUtils
                 .getWebApplicationContext(sce.getServletContext());
         // 1，初始化文件节点数据库
         FileNodeUtil.initNodeTableToDataBase();
@@ -92,9 +93,9 @@ public class ServerInitListener implements ServletContextListener
         final File fspf = new File(fsp);
         if (fspf.isDirectory() && fspf.canRead() && fspf.canWrite())
         {
-            fbu = context.getBean(FileBlockUtil.class);
-            fbu.checkFileBlocks();
-            fbu.initTempDir();
+            fileBlockUtil = context.getBean(FileBlockUtil.class);
+            fileBlockUtil.checkFileBlocks();
+            fileBlockUtil.initTempDir();
             Out.println("校对完成。");
         }
         else
@@ -102,13 +103,13 @@ public class ServerInitListener implements ServletContextListener
             Out.println("错误：文件系统节点信息校对失败，存储位置无法读写或不存在。");
         }
         // 3，解析公告信息（请确保该操作在校对文件块后进行）
-        nu = context.getBean(NoticeUtil.class);
-        nu.loadNotice();// 解析公告文件
+        noticeUtil = context.getBean(NoticeUtil.class);
+        noticeUtil.loadNotice();// 解析公告文件
         // 4，启动文件自动更新监听，对需要自动更新的文件进行实时更新
         doWatch();
         // 5，启动失效额外权限检查线程，对删除的文件夹对应的额外权限设置进行清理工作，避免堆积
-        nm = context.getBean(FolderMapper.class);
-        lu = context.getBean(LogUtil.class);
+        folderMapper = context.getBean(FolderMapper.class);
+        logUtil = context.getBean(LogUtil.class);
         cleanInvalidAddedAuth();
     }
 
@@ -119,7 +120,7 @@ public class ServerInitListener implements ServletContextListener
         run = false;
         // 2，清理临时文件夹
         Out.println("清理临时文件...");
-        fbu.initTempDir();
+        fileBlockUtil.initTempDir();
     }
 
     private void doWatch()
@@ -148,7 +149,7 @@ public class ServerInitListener implements ServletContextListener
                             switch (we.context().toString())
                             {
                                 case NoticeUtil.NOTICE_FILE_NAME:
-                                    nu.loadNotice();// 更新公告文件
+                                    noticeUtil.loadNotice();// 更新公告文件
                                     break;
 
                                 default:
@@ -170,9 +171,9 @@ public class ServerInitListener implements ServletContextListener
     {
         needCheck = true;
         continueCheck = true;
-        if (cleanInnvalidAddedAuthThread == null)
+        if (cleanInvalidAddedAuthThread == null)
         {
-            cleanInnvalidAddedAuthThread = new Thread(() ->
+            cleanInvalidAddedAuthThread = new Thread(() ->
             {
                 while (continueCheck)
                 {
@@ -182,7 +183,7 @@ public class ServerInitListener implements ServletContextListener
                         List<String> idList = ConfigureReader.getInstance().getAllAddedAuthFoldersId();
                         for (String id : idList)
                         {
-                            if (nm.queryById(id) == null)
+                            if (folderMapper.queryById(id) == null)
                             {
                                 invalidIdList.add(id);
                                 Out.println("文件夹ID：" + id + "对应的文件夹不存在或已被删除，相关的额外权限设置将被清理。");
@@ -201,11 +202,11 @@ public class ServerInitListener implements ServletContextListener
                     catch (InterruptedException e)
                     {
                         continueCheck = false;
-                        lu.writeException(e);
+                        logUtil.writeException(e);
                     }
                 }
             });
-            cleanInnvalidAddedAuthThread.start();
+            cleanInvalidAddedAuthThread.start();
         }
     }
 }

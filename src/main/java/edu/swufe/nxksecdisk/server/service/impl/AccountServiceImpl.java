@@ -24,21 +24,21 @@ import java.util.Set;
 @Service
 public class AccountServiceImpl implements AccountService
 {
-    @Resource
-    private RsaKeyUtil ku;
-    @Resource
-    private LogUtil lu;
-
     /**
      * 登录密钥有效期;
      */
     private static final long TIME_OUT = 30000L;
-
+    /**
+     * 关注账户，当任意一个账户登录失败后将加入至该集合中，登录成功则移除。登录集合中的账户必须进行验证码验证;
+     */
+    private static final Set<String> focusAccount = new HashSet<>();
+    @Resource
+    private RsaKeyUtil ku;
+    @Resource
+    private LogUtil lu;
     @Resource
     private Gson gson;
-
     private VerificationCodeFactory vcf;
-
     private CharsetEncoder ios88591Encoder;
 
     {
@@ -72,11 +72,6 @@ public class AccountServiceImpl implements AccountService
                     'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'W', 'X', 'Y', 'Z');
         }
     }
-
-    /**
-     * 关注账户，当任意一个账户登录失败后将加入至该集合中，登录成功则移除。登录集合中的账户必须进行验证码验证;
-     */
-    private static final Set<String> focusAccount = new HashSet<>();
 
     @Override
     public String checkLoginRequest(final HttpServletRequest request, final HttpSession session)
