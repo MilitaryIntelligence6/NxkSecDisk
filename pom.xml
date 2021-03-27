@@ -203,7 +203,7 @@
 						<manifest>
 							<addClasspath>true</addClasspath>
 							<classpathPrefix>libs/</classpathPrefix>
-							<mainClass>kohgylw.kiftd.Application</mainClass>
+							<mainClass>edu.swufe.nxksecdisk.Application</mainClass>
 						</manifest>
 					</archive>
 				</configuration>

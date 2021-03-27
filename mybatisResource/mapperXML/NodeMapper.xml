@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="kohgylw.kiftd.server.mapper.NodeMapper">
-	<resultMap id="BaseResultMap" type="kohgylw.kiftd.server.model.Node">
+<mapper namespace="edu.swufe.nxksecdisk.server.mapper.NodeMapper">
+	<resultMap id="BaseResultMap" type="edu.swufe.nxksecdisk.server.model.Node">
 		<result column="file_id" jdbcType="VARCHAR" property="fileId" />
 		<result column="file_name" jdbcType="VARCHAR" property="fileName" />
 		<result column="file_size" jdbcType="VARCHAR" property="fileSize" />
@@ -32,12 +32,12 @@
 		#{pfid,jdbcType=VARCHAR}
 	</select>
 
-	<insert id="insert" parameterType="kohgylw.kiftd.server.model.Node">
+	<insert id="insert" parameterType="edu.swufe.nxksecdisk.server.model.Node">
 		INSERT INTO FILE
 		VALUES(#{fileId,jdbcType=VARCHAR},#{fileName,jdbcType=VARCHAR},#{fileSize,jdbcType=VARCHAR},#{fileParentFolder,jdbcType=VARCHAR},#{fileCreationDate,jdbcType=VARCHAR},#{fileCreator,jdbcType=VARCHAR},#{filePath,jdbcType=VARCHAR})
 	</insert>
 
-	<update id="update" parameterType="kohgylw.kiftd.server.model.Node">
+	<update id="update" parameterType="edu.swufe.nxksecdisk.server.model.Node">
 		UPDATE FILE SET file_name =
 		#{fileName,jdbcType=VARCHAR},file_size =
 		#{fileSize,jdbcType=VARCHAR},file_parent_folder =
