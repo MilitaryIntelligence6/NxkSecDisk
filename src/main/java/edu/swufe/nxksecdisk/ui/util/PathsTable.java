@@ -1,5 +1,6 @@
 package edu.swufe.nxksecdisk.ui.util;
 
+import edu.swufe.nxksecdisk.system.AppSystem;
 import edu.swufe.nxksecdisk.ui.pojo.FileSystemPath;
 
 import javax.swing.*;
@@ -16,8 +17,7 @@ import java.util.Map;
 /**
  * @author Administrator
  */
-public class PathsTable extends JTable
-{
+public class PathsTable extends JTable {
     /**
      * 表头;
      */
@@ -37,80 +37,63 @@ public class PathsTable extends JTable
      */
     private static final long serialVersionUID = -3436472714356711024L;
 
-    public PathsTable()
-    {
+    public PathsTable() {
         super(new Object[][]{}, COLUMN_ARRAY);
-        addComponentListener(new ComponentListener()
-        {
+        addComponentListener(new ComponentListener() {
 
             @Override
-            public void componentResized(ComponentEvent e)
-            {
+            public void componentResized(ComponentEvent e) {
                 resizeColumns();
             }
 
             @Override
-            public void componentMoved(ComponentEvent e)
-            {
+            public void componentMoved(ComponentEvent e) {
             }
 
             @Override
-            public void componentShown(ComponentEvent e)
-            {
+            public void componentShown(ComponentEvent e) {
             }
 
             @Override
-            public void componentHidden(ComponentEvent e)
-            {
+            public void componentHidden(ComponentEvent e) {
             }
         });
     }
 
     @Override
-    public boolean isCellEditable(int row, int column)
-    {
+    public boolean isCellEditable(int row, int column) {
         // TODO 自动生成的方法存根
         return false;
     }
 
-    public void updateValues(List<FileSystemPath> paths)
-    {
-        Runnable doUpdate = new Runnable()
-        {
+    public void updateValues(List<FileSystemPath> paths) {
+        Runnable doUpdate = new Runnable() {
             @Override
-            public void run()
-            {
+            public void run() {
                 // TODO 自动生成的方法存根
                 shownFileSystemPath.clear();
-                try
-                {
-                    setModel(new TableModel()
-                    {
+                try {
+                    setModel(new TableModel() {
                         @Override
-                        public void setValueAt(Object aValue, int rowIndex, int columnIndex)
-                        {
+                        public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
                             // TODO 自动生成的方法存根
                         }
 
                         @Override
-                        public void removeTableModelListener(TableModelListener l)
-                        {
+                        public void removeTableModelListener(TableModelListener l) {
                             // TODO 自动生成的方法存根
                         }
 
                         @Override
-                        public boolean isCellEditable(int rowIndex, int columnIndex)
-                        {
+                        public boolean isCellEditable(int rowIndex, int columnIndex) {
                             // TODO 自动生成的方法存根
                             return false;
                         }
 
                         @Override
-                        public Object getValueAt(int rowIndex, int columnIndex)
-                        {
+                        public Object getValueAt(int rowIndex, int columnIndex) {
                             // TODO 自动生成的方法存根
-                            switch (columnIndex)
-                            {
+                            switch (columnIndex) {
                                 case 0:
                                     shownFileSystemPath.put(rowIndex, paths.get(rowIndex).getIndex());
                                     return paths.get(rowIndex).getType() + "（" + paths.get(rowIndex).getIndex() + "）";
@@ -122,73 +105,66 @@ public class PathsTable extends JTable
                         }
 
                         @Override
-                        public int getRowCount()
-                        {
+                        public int getRowCount() {
                             // TODO 自动生成的方法存根
                             return paths.size();
                         }
 
                         @Override
-                        public String getColumnName(int columnIndex)
-                        {
+                        public String getColumnName(int columnIndex) {
                             // TODO 自动生成的方法存根
                             return COLUMN_ARRAY[columnIndex];
                         }
 
                         @Override
-                        public int getColumnCount()
-                        {
+                        public int getColumnCount() {
                             // TODO 自动生成的方法存根
                             return COLUMN_ARRAY.length;
                         }
 
                         @Override
-                        public Class<?> getColumnClass(int columnIndex)
-                        {
+                        public Class<?> getColumnClass(int columnIndex) {
                             // TODO 自动生成的方法存根
                             return String.class;
                         }
 
                         @Override
-                        public void addTableModelListener(TableModelListener l)
-                        {
+                        public void addTableModelListener(TableModelListener l) {
                             // TODO 自动生成的方法存根
                         }
                     });
                     resizeColumns();
                     validate();
                 }
-                catch (Exception e)
-                {
+                catch (Exception e) {
                     // TODO: handle exception
                 }
             }
         };
         // 避免操作过快导致的异常
-        Thread t = new Thread(() ->
-        {
-            SwingUtilities.invokeLater(doUpdate);
-        });
-        t.start();
+        AppSystem.pool.execute(() ->
+                SwingUtilities.invokeLater(doUpdate)
+        );
+//        Thread t = new Thread(() ->
+//        {
+//            SwingUtilities.invokeLater(doUpdate);
+//        });
+//        t.start();
     }
 
-    public short getSelectFileSystemIndex()
-    {
-        if (getSelectedRow() >= 0)
-        {
+    public short getSelectFileSystemIndex() {
+        if (getSelectedRow() >= 0) {
             return shownFileSystemPath.get(getSelectedRow());
         }
         return -1;
     }
 
-    private void resizeColumns()
-    {
+    private void resizeColumns() {
         int tW = getWidth();
         TableColumn column;
         TableColumnModel jTableColumnModel = getColumnModel();
         int cantCols = jTableColumnModel.getColumnCount();
-        for (int i = 0; i < cantCols; i++)
-        {
+        for (int i = 0; i < cantCols; i++) {
             column = jTableColumnModel.getColumn(i);
             int pWidth = (int) Math.round(columnWidthPercentage[i] * tW);
             column.setPreferredWidth(pWidth);

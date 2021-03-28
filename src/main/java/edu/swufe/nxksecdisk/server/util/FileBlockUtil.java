@@ -283,39 +283,72 @@ public class FileBlockUtil {
      * @author 青阳龙野(kohgylw)
      */
     public void checkFileBlocks() {
-        Thread checkThread = new Thread(() ->
-        {
-            // 检查是否存在未正确对应文件块的文件节点信息，若有则删除，从而确保文件节点信息不出现遗留问题
-            checkNodes("root");
-            // 检查是否存在未正确对应文件节点的文件块，若有则删除，从而确保文件块不出现遗留问题
-            List<File> paths = new ArrayList<>();
-            paths.add(new File(ConfigureReader.getInstance().getFileBlockPath()));
-            for (ExtendStores es : ConfigureReader.getInstance().getExtendStores()) {
-                paths.add(es.getPath());
-            }
-            for (File path : paths) {
-                try (DirectoryStream<Path> ds = Files.newDirectoryStream(path.toPath())) {
-                    Iterator<Path> blocks = ds.iterator();
-                    while (blocks.hasNext()) {
-                        File testBlock = blocks.next().toFile();
-                        if (testBlock.isFile()) {
-                            List<Node> nodes = nodeMapper.queryByPath(testBlock.getName());
-                            if (nodes == null || nodes.isEmpty()) {
-                                testBlock.delete();
+        AppSystem.pool.execute(() -> {
+                    // 检查是否存在未正确对应文件块的文件节点信息，若有则删除，从而确保文件节点信息不出现遗留问题
+                    checkNodes("root");
+                    // 检查是否存在未正确对应文件节点的文件块，若有则删除，从而确保文件块不出现遗留问题
+                    List<File> paths = new ArrayList<>();
+                    paths.add(new File(ConfigureReader.getInstance().getFileBlockPath()));
+                    for (ExtendStores es : ConfigureReader.getInstance().getExtendStores()) {
+                        paths.add(es.getPath());
+                    }
+                    for (File path : paths) {
+                        try (DirectoryStream<Path> ds = Files.newDirectoryStream(path.toPath())) {
+                            Iterator<Path> blocks = ds.iterator();
+                            while (blocks.hasNext()) {
+                                File testBlock = blocks.next().toFile();
+                                if (testBlock.isFile()) {
+                                    List<Node> nodes = nodeMapper.queryByPath(testBlock.getName());
+                                    if (nodes == null || nodes.isEmpty()) {
+                                        testBlock.delete();
+                                    }
+                                }
                             }
+                        }
+                        catch (IOException e) {
+                            AppSystem.out.println("警告：文件节点效验时发生意外错误，可能未能正确完成文件节点效验。错误信息：" + e.getMessage());
+                            logUtil.writeException(e);
                         }
                     }
                 }
-                catch (IOException e) {
-                    AppSystem.out.println("警告：文件节点效验时发生意外错误，可能未能正确完成文件节点效验。错误信息：" + e.getMessage());
-                    logUtil.writeException(e);
-                }
-            }
-        });
-        checkThread.start();
+        );
+//        Thread checkThread = new Thread(
+//                () -> {
+//            // 检查是否存在未正确对应文件块的文件节点信息，若有则删除，从而确保文件节点信息不出现遗留问题
+//            checkNodes("root");
+//            // 检查是否存在未正确对应文件节点的文件块，若有则删除，从而确保文件块不出现遗留问题
+//            List<File> paths = new ArrayList<>();
+//            paths.add(new File(ConfigureReader.getInstance().getFileBlockPath()));
+//            for (ExtendStores es : ConfigureReader.getInstance().getExtendStores()) {
+//                paths.add(es.getPath());
+//            }
+//            for (File path : paths) {
+//                try (DirectoryStream<Path> ds = Files.newDirectoryStream(path.toPath())) {
+//                    Iterator<Path> blocks = ds.iterator();
+//                    while (blocks.hasNext()) {
+//                        File testBlock = blocks.next().toFile();
+//                        if (testBlock.isFile()) {
+//                            List<Node> nodes = nodeMapper.queryByPath(testBlock.getName());
+//                            if (nodes == null || nodes.isEmpty()) {
+//                                testBlock.delete();
+//                            }
+//                        }
+//                    }
+//                }
+//                catch (IOException e) {
+//                    AppSystem.out.println("警告：文件节点效验时发生意外错误，可能未能正确完成文件节点效验。错误信息：" + e.getMessage());
+//                    logUtil.writeException(e);
+//                }
+//            }
+//        });
+//        checkThread.start();
     }
 
-    // 校对文件节点，要求某一节点必须有对应的文件块，否则将其移除（避免出现死节点）
+    /**
+     * 校对文件节点，要求某一节点必须有对应的文件块，否则将其移除（避免出现死节点）;
+     *
+     * @param fid
+     */
     private void checkNodes(String fid) {
         List<Node> nodes = nodeMapper.queryByParentFolderId(fid);
         for (Node node : nodes) {

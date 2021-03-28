@@ -13,11 +13,11 @@ import java.util.concurrent.TimeUnit;
  */
 public  final class ThreadPoolConfig {
 
-    private static final int QUEUE_SIZE = 10;
+    private static final int QUEUE_SIZE = 12;
 
-    public static final int corePoolSize = 6;
+    public static final int corePoolSize = 24;
 
-    public static final int maximumPoolSize = 8;
+    public static final int maximumPoolSize = 30;
 
     public static final long keepAliveTime = 60;
 

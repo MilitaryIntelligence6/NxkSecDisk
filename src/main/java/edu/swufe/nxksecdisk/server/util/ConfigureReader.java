@@ -210,7 +210,7 @@ public class ConfigureReader {
 
     public static final int LEGAL_PROPERTIES = 0;
 
-    private static Thread accountPropertiesUpdateDaemonThread;
+    private static Runnable accountPropertiesUpdateDaemonRunnable;
 
     private String timeZone;
 
@@ -1218,10 +1218,9 @@ public class ConfigureReader {
      * @author 青阳龙野(kohgylw)
      */
     public void startAccountRealTimeUpdateListener() {
-        if (accountPropertiesUpdateDaemonThread == null) {
+        if (accountPropertiesUpdateDaemonRunnable == null) {
             Path confPath = Paths.get(confdir);// 获取配置文件存放路径以对其中的变动进行监听
-            accountPropertiesUpdateDaemonThread = new Thread(() ->
-            {
+            accountPropertiesUpdateDaemonRunnable = () -> {
                 try {
                     while (true) {
                         WatchService ws = confPath.getFileSystem().newWatchService();
@@ -1253,9 +1252,44 @@ public class ConfigureReader {
                 catch (Exception e) {
                     AppSystem.out.println("错误：用户配置文件更改监听失败，该功能已失效，kiftd无法实时更新用户配置（可尝试重启程序以恢复该功能）。");
                 }
-            });
-            accountPropertiesUpdateDaemonThread.setDaemon(true);
-            accountPropertiesUpdateDaemonThread.start();
+            };
+            AppSystem.pool.execute(accountPropertiesUpdateDaemonRunnable);
+//            accountPropertiesUpdateDaemonRunnable = new Thread(
+//                    () -> {
+//                try {
+//                    while (true) {
+//                        WatchService ws = confPath.getFileSystem().newWatchService();
+//                        confPath.register(ws, StandardWatchEventKinds.ENTRY_MODIFY,
+//                                StandardWatchEventKinds.ENTRY_DELETE, StandardWatchEventKinds.ENTRY_CREATE);
+//                        WatchKey wk = ws.take();
+//                        List<WatchEvent<?>> es = wk.pollEvents();
+//                        for (WatchEvent<?> we : es) {
+//                            if (ACCOUNT_PROPERTIES_FILE.equals(we.context().toString())) {
+//                                AppSystem.out.println("正在更新账户配置信息...");
+//                                final File accountProp = new File(this.confdir + ACCOUNT_PROPERTIES_FILE);
+//                                if (accountProp.isFile() && accountProp.canRead()) {
+//                                    final FileInputStream accountPropIn = new FileInputStream(accountProp);
+//                                    synchronized (accountp) {
+//                                        this.accountp.load(accountPropIn);
+//                                    }
+//                                    initIPRules();
+//                                    initSignUpRules();
+//                                    AppSystem.out.println("账户配置更新完成，已加载最新配置。");
+//                                }
+//                                else {
+//                                    accountp.clear();
+//                                    AppSystem.out.println("警告：账户配置文件已被删除或无法读取，账户信息已清空。");
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//                catch (Exception e) {
+//                    AppSystem.out.println("错误：用户配置文件更改监听失败，该功能已失效，kiftd无法实时更新用户配置（可尝试重启程序以恢复该功能）。");
+//                }
+//            });
+//            accountPropertiesUpdateDaemonRunnable.setDaemon(true);
+//            accountPropertiesUpdateDaemonRunnable.start();
         }
     }
 

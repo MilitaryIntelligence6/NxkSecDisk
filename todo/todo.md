@@ -1,0 +1,1 @@
+- 重构所有的ConfigureReader.getInstance();

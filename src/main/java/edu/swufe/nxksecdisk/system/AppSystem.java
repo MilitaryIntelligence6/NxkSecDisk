@@ -2,6 +2,7 @@ package edu.swufe.nxksecdisk.system;
 
 import edu.swufe.nxksecdisk.config.DynamicConfig;
 import edu.swufe.nxksecdisk.server.util.LogUtil;
+import edu.swufe.nxksecdisk.thread.ThreadPool;
 
 /**
  * @author Military Intelligence 6 root
@@ -13,6 +14,8 @@ import edu.swufe.nxksecdisk.server.util.LogUtil;
 public final class AppSystem {
 
     public static final IOutputStream out = requireOutStream();
+
+    public static final ThreadPool pool = ThreadPool.getInstance();
 
     public static final LogUtil log = null;
 

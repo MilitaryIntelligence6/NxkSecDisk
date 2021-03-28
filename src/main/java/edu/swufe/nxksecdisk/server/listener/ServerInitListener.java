@@ -43,12 +43,15 @@ public class ServerInitListener implements ServletContextListener {
     /**
      * 用于在服务器启动后动态监听服务器主目录的线程，以便实现某些文件的动态更新
      */
-    private Thread pathWatchServiceThread;
+//    private Thread pathWatchServiceThread;
+    private Runnable pathWatchServiceRunnable;
 
     /**
      * 用于在服务器启动后实时清理失效额外权限配置的线程，以便及时清理被删除的文件夹对应的额外权限配置
      */
-    private Thread cleanInvalidAddedAuthThread;
+//    private Thread cleanInvalidAddedAuthThread;
+    private Runnable cleanInvalidAddedAuthRunnable;
+
 
     /**
      * 是否继续监听服务器主目录下的文件改动（用以控制监听的停止）
@@ -122,11 +125,10 @@ public class ServerInitListener implements ServletContextListener {
         // 后期的动态监听部分
         run = true;
         // 之后当监听到改动操作时再重载内容
-        if (pathWatchServiceThread == null) {
+        if (pathWatchServiceRunnable == null) {
             // 对服务器主目录进行监听，主要监听文件改动事件
             Path confPath = Paths.get(ConfigureReader.getInstance().getPath());
-            pathWatchServiceThread = new Thread(() ->
-            {
+            pathWatchServiceRunnable = () -> {
                 try {
                     while (run) {
                         WatchService ws = confPath.getFileSystem().newWatchService();
@@ -137,12 +139,14 @@ public class ServerInitListener implements ServletContextListener {
                         for (WatchEvent<?> we : es) {
                             // 根据改动文件的不同调用不同的处理方法
                             switch (we.context().toString()) {
-                                case NoticeUtil.NOTICE_FILE_NAME:
+                                case NoticeUtil.NOTICE_FILE_NAME: {
                                     noticeUtil.loadNotice();// 更新公告文件
                                     break;
+                                }
 
-                                default:
+                                default: {
                                     break;
+                                }
                             }
                         }
                     }
@@ -150,17 +154,16 @@ public class ServerInitListener implements ServletContextListener {
                 catch (Exception e) {
                     AppSystem.out.println("错误：服务器文件自动更新失败，该功能已失效。某些文件将无法自动载入最新内容（请尝试重启程序以恢复该功能）。");
                 }
-            });
-            pathWatchServiceThread.start();
+            };
+            AppSystem.pool.execute(pathWatchServiceRunnable);
         }
     }
 
     private void cleanInvalidAddedAuth() {
         needCheck = true;
         continueCheck = true;
-        if (cleanInvalidAddedAuthThread == null) {
-            cleanInvalidAddedAuthThread = new Thread(() ->
-            {
+        if (cleanInvalidAddedAuthRunnable == null) {
+            cleanInvalidAddedAuthRunnable = () -> {
                 while (continueCheck) {
                     if (needCheck) {
                         List<String> invalidIdList = new ArrayList<>();
@@ -184,8 +187,8 @@ public class ServerInitListener implements ServletContextListener {
                         logUtil.writeException(e);
                     }
                 }
-            });
-            cleanInvalidAddedAuthThread.start();
+            };
+            AppSystem.pool.execute(cleanInvalidAddedAuthRunnable);
         }
     }
 }

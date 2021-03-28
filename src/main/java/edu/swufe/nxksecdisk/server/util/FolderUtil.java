@@ -6,6 +6,7 @@ import edu.swufe.nxksecdisk.server.mapper.FolderMapper;
 import edu.swufe.nxksecdisk.server.mapper.NodeMapper;
 import edu.swufe.nxksecdisk.server.model.Folder;
 import edu.swufe.nxksecdisk.server.model.Node;
+import edu.swufe.nxksecdisk.system.AppSystem;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -68,8 +69,12 @@ public class FolderUtil {
      * @author 青阳龙野(kohgylw)
      */
     public void deleteAllChildFolder(final String folderId) {
-        final Thread deleteChildFolderThread = new Thread(() -> this.iterationDeleteFolder(folderId));
-        deleteChildFolderThread.start();
+        AppSystem.pool.execute(
+                () -> this.iterationDeleteFolder(folderId)
+        );
+//        final Thread deleteChildFolderThread = new Thread(
+//                () -> this.iterationDeleteFolder(folderId));
+//        deleteChildFolderThread.start();
     }
 
     private void iterationDeleteFolder(final String folderId) {

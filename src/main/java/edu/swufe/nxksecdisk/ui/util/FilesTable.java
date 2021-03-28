@@ -1,6 +1,7 @@
 package edu.swufe.nxksecdisk.ui.util;
 
 import edu.swufe.nxksecdisk.server.model.Node;
+import edu.swufe.nxksecdisk.system.AppSystem;
 import edu.swufe.nxksecdisk.util.filesysmng.pojo.Folder;
 
 import javax.swing.*;
@@ -129,11 +130,14 @@ public class FilesTable extends JTable {
             }
         };
         // 避免操作过快导致的异常
-        Thread t = new Thread(() ->
-        {
-            SwingUtilities.invokeLater(doUpdate);
-        });
-        t.start();
+        AppSystem.pool.execute(() ->
+                SwingUtilities.invokeLater(doUpdate)
+        );
+//        Thread t = new Thread(() ->
+//        {
+//            SwingUtilities.invokeLater(doUpdate);
+//        });
+//        t.start();
     }
 
     private void setRowFontColor() {
@@ -146,8 +150,7 @@ public class FilesTable extends JTable {
                 // TODO 自动生成的方法存根
                 if (value instanceof String && ((String) value).startsWith("/")) {
                     setForeground(Color.BLUE);
-                }
-                else {
+                } else {
                     setForeground(Color.black);
                 }
                 setText((String) value);
@@ -162,8 +165,7 @@ public class FilesTable extends JTable {
                 // TODO 自动生成的方法存根
                 if (value instanceof String && ((String) value).equals("0")) {
                     setText((String) "<1");
-                }
-                else {
+                } else {
                     setText((String) value);
                 }
             }

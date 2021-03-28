@@ -238,19 +238,17 @@ public class FsViewer extends DiskDynamicWindow {
                                 return;
                         }
                     }
-                    FsProgressDialog fsd = FsProgressDialog.getNewInstance();
-                    Thread deleteListenerDialog = new Thread(() ->
-                    {
-                        fsd.show();
-                    });
-                    deleteListenerDialog.start();
+                    FsProgressDialog fsProgressDialog = FsProgressDialog.getNewInstance();
+//                    Thread deleteListenerDialog = new Thread(fsProgressDialog::show);
+//                    deleteListenerDialog.start();
+                    AppSystem.pool.execute(fsProgressDialog::show);
                     try {
                         FileSystemManager.getInstance().exportTo(folders, nodes, path, type);
-                        fsd.close();
+                        fsProgressDialog.close();
                     }
                     catch (Exception e1) {
                         // TODO 自动生成的 catch 块
-                        fsd.close();
+                        fsProgressDialog.close();
                         JOptionPane.showMessageDialog(window, "导出文件时失败，该操作已被中断，未能全部导出。", "错误",
                                 JOptionPane.ERROR_MESSAGE);
                     }
@@ -282,20 +280,18 @@ public class FsViewer extends DiskDynamicWindow {
                                     selectedNodes.add(currentView.getFiles().get(i - borderIndex).getFileId());
                                 }
                             }
-                            FsProgressDialog fsd = FsProgressDialog.getNewInstance();
-                            Thread fsProgressDialogThread = new Thread(() ->
-                            {
-                                fsd.show();
-                            });
-                            fsProgressDialogThread.start();
+                            FsProgressDialog fsProgressDialog = FsProgressDialog.getNewInstance();
+//                            Thread fsProgressDialogThread = new Thread(fsProgressDialog::show);
+//                            fsProgressDialogThread.start();
+                            AppSystem.pool.execute(fsProgressDialog::show);
                             try {
                                 FileSystemManager.getInstance().delete(selectedFolders.toArray(new String[0]),
                                         selectedNodes.toArray(new String[0]));
-                                fsd.close();
+                                fsProgressDialog.close();
                             }
                             catch (Exception e1) {
                                 // TODO 自动生成的 catch 块
-                                fsd.close();
+                                fsProgressDialog.close();
                                 JOptionPane.showMessageDialog(window, "删除文件时失败，该操作已被中断，未能全部删除。", "错误",
                                         JOptionPane.ERROR_MESSAGE);
                                 refresh();
@@ -567,12 +563,10 @@ public class FsViewer extends DiskDynamicWindow {
             }
         }
         // 打开进度提示会话框
-        FsProgressDialog fsd = FsProgressDialog.getNewInstance();
-        Thread fspt = new Thread(() ->
-        {
-            fsd.show();
-        });
-        fspt.start();
+        FsProgressDialog fsProgressDialog = FsProgressDialog.getNewInstance();
+//        Thread fspt = new Thread(fsProgressDialog::show);
+//        fspt.start();
+        AppSystem.pool.execute(fsProgressDialog::show);
         try {
             FileSystemManager.getInstance().importFrom(files, folderId, type);
         }
@@ -585,7 +579,7 @@ public class FsViewer extends DiskDynamicWindow {
         catch (Exception e3) {
             JOptionPane.showMessageDialog(window, "导入失败，无法完成导入，该操作已被中断。", "错误", JOptionPane.ERROR_MESSAGE);
         }
-        fsd.close();
+        fsProgressDialog.close();
         refresh();
     }
 

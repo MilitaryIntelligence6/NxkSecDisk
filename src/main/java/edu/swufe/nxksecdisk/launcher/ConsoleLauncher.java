@@ -122,15 +122,23 @@ public class ConsoleLauncher {
     private void startKiftdByConsole() {
         AppSystem.out.println(" 青阳网络文件系统-kiftd 控制台模式[Console model]");
         AppSystem.out.println("Character encoding with UTF-8");
-        final Thread t = new Thread(() ->
-        {
-            AppSystem.out.println("正在初始化服务器...");
-            if (ConfigureReader.getInstance().getPropertiesStatus() == 0) {
-                this.awaiting();
-            }
-            return;
-        });
-        t.start();
+        AppSystem.pool.execute(() -> {
+                    AppSystem.out.println("正在初始化服务器...");
+                    if (ConfigureReader.getInstance().getPropertiesStatus() == 0) {
+                        this.awaiting();
+                    }
+                    return;
+                }
+        );
+//        final Thread t = new Thread(() ->
+//        {
+//            AppSystem.out.println("正在初始化服务器...");
+//            if (ConfigureReader.getInstance().getPropertiesStatus() == 0) {
+//                this.awaiting();
+//            }
+//            return;
+//        });
+//        t.start();
     }
 
     private void startServer() {
@@ -222,8 +230,7 @@ public class ConsoleLauncher {
     }
 
     private void awaiting() {
-        Thread t = new Thread(() ->
-        {
+        AppSystem.pool.execute(() -> {
             reader = new Scanner(System.in);
             AppSystem.out.printf("命令帮助：\r\n%s\r\n", commandTips);
             try {
@@ -273,7 +280,58 @@ public class ConsoleLauncher {
                 AppSystem.out.println("错误：读取命令时出现意外导致程序退出，请重启kiftd。");
             }
         });
-        t.start();
+//        Thread t = new Thread(() ->
+//        {
+//            reader = new Scanner(System.in);
+//            AppSystem.out.printf("命令帮助：\r\n%s\r\n", commandTips);
+//            try {
+//                while (true) {
+//                    AppSystem.out.println("kiftd: console$ ");
+//                    String command = reader.nextLine();
+//                    switch (command) {
+//                        case "-start": {
+//                            startServer();
+//                            break;
+//                        }
+//                        case "-stop": {
+//                            stopServer();
+//                            break;
+//                        }
+//                        case "-restart": {
+//                            restartServer();
+//                            break;
+//                        }
+//                        case "-status": {
+//                            printServerStatus();
+//                            break;
+//                        }
+//                        case "-files": {
+//                            fileSystemManagerModel();
+//                            break;
+//                        }
+//                        case "-exit": {
+//                            reader.close();
+//                            exit();
+//                            return;
+//                        }
+//                        case "help":
+//                        case "--help":
+//                        case "-help": {
+//                            AppSystem.out.printf("命令帮助：\r\n%s", commandTips);
+//                            break;
+//                        }
+//                        default: {
+//                            AppSystem.out.printf("错误：无法识别的指令。\r\n%s", commandTips);
+//                            break;
+//                        }
+//                    }
+//                }
+//            }
+//            catch (Exception e) {
+//                AppSystem.out.println("错误：读取命令时出现意外导致程序退出，请重启kiftd。");
+//            }
+//        });
+//        t.start();
     }
 
     // 打印服务器状态

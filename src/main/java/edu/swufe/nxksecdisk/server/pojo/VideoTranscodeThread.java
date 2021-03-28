@@ -34,8 +34,33 @@ public class VideoTranscodeThread {
         progress = "0.0";
         MultimediaObject mo = new MultimediaObject(f, fl);
         encoder = new Encoder(fl);
-        Thread t = new Thread(() ->
-        {
+//        Thread t = new Thread(
+//                () -> {
+//            try {
+//                outputFileName = String.format("video_%s.mp4", UUID.randomUUID().toString());
+//                encoder.encode(mo, new File(ConfigureReader.getInstance().getTemporaryfilePath(), outputFileName),
+//                        ea, new EncoderProgressListener() {
+//                            @Override
+//                            public void sourceInfo(MultimediaInfo arg0) {
+//                            }
+//
+//                            @Override
+//                            public void progress(int arg0) {
+//                                progress = String.format("%s", arg0 / 10.00);
+//                            }
+//
+//                            @Override
+//                            public void message(String arg0) {
+//                            }
+//                        });
+//                progress = "FIN";
+//            }
+//            catch (Exception e) {
+//                AppSystem.out.printf("警告：在线转码功能出现意外错误。详细信息：%s", e.getMessage());
+//            }
+//        });
+//        t.start();
+        AppSystem.pool.execute(() -> {
             try {
                 outputFileName = String.format("video_%s.mp4", UUID.randomUUID().toString());
                 encoder.encode(mo, new File(ConfigureReader.getInstance().getTemporaryfilePath(), outputFileName),
@@ -59,7 +84,6 @@ public class VideoTranscodeThread {
                 AppSystem.out.printf("警告：在线转码功能出现意外错误。详细信息：%s", e.getMessage());
             }
         });
-        t.start();
     }
 
     public String getMd5() {
