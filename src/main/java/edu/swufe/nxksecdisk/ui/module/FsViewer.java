@@ -1,6 +1,6 @@
 package edu.swufe.nxksecdisk.ui.module;
 
-import edu.swufe.nxksecdisk.printer.Out;
+import edu.swufe.nxksecdisk.system.AppSystem;
 import edu.swufe.nxksecdisk.server.exception.FilesTotalOutOfLimitException;
 import edu.swufe.nxksecdisk.server.exception.FoldersTotalOutOfLimitException;
 import edu.swufe.nxksecdisk.server.util.FileNodeUtil;
@@ -536,7 +536,8 @@ public class FsViewer extends DiskDynamicWindow
         catch (Exception e)
         {
             // TODO 自动生成的 catch 块
-            Out.println("错误：无法打开文件系统，该文件系统可能正在被另一个kiftd占用。");
+            e.printStackTrace();
+            AppSystem.out.println("错误：无法打开文件系统，该文件系统可能正在被另一个kiftd占用。");
         }
     }
 

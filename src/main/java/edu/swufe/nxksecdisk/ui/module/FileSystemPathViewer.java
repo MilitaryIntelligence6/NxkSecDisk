@@ -1,6 +1,6 @@
 package edu.swufe.nxksecdisk.ui.module;
 
-import edu.swufe.nxksecdisk.printer.Out;
+import edu.swufe.nxksecdisk.system.AppSystem;
 import edu.swufe.nxksecdisk.server.util.ConfigureReader;
 import edu.swufe.nxksecdisk.ui.pojo.FileSystemPath;
 import edu.swufe.nxksecdisk.ui.util.PathsTable;
@@ -360,7 +360,7 @@ public class FileSystemPathViewer extends DiskDynamicWindow
         refresh();
         if (paths == null || paths.size() == 0)
         {
-            Out.println("错误：无法获取文件系统设置，请手动检查配置文件并重启应用。");
+            AppSystem.out.println("错误：无法获取文件系统设置，请手动检查配置文件并重启应用。");
         }
         else
         {

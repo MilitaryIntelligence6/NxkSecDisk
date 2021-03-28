@@ -2,7 +2,7 @@ package edu.swufe.nxksecdisk.server.util;
 
 import edu.swufe.nxksecdisk.server.model.Folder;
 import edu.swufe.nxksecdisk.server.model.Node;
-import edu.swufe.nxksecdisk.printer.Out;
+import edu.swufe.nxksecdisk.system.AppSystem;
 
 import java.io.File;
 import java.sql.Connection;
@@ -50,7 +50,7 @@ public class FileNodeUtil
      */
     public static void initNodeTableToDataBase()
     {
-        Out.println("初始化文件节点...");
+        AppSystem.out.println("初始化文件节点...");
         try
         {
             if (conn == null)
@@ -115,12 +115,12 @@ public class FileNodeUtil
                         "CREATE TABLE IF NOT EXISTS PROPERTIES(propertie_key VARCHAR(128) PRIMARY KEY,propertie_value VARCHAR(128) NOT NULL)");
                 state5.close();
             }
-            Out.println("文件节点初始化完毕。");
+            AppSystem.out.println("文件节点初始化完毕。");
         }
         catch (Exception e)
         {
-            Out.println(e.getMessage());
-            Out.println("错误：文件节点初始化失败。");
+            AppSystem.out.println(e.getMessage());
+            AppSystem.out.println("错误：文件节点初始化失败。");
         }
     }
 
@@ -162,12 +162,15 @@ public class FileNodeUtil
             i++;
             if (originalName.indexOf(".") >= 0)
             {
-                newName = originalName.substring(0, originalName.lastIndexOf(".")) + " (" + i + ")"
-                        + originalName.substring(originalName.lastIndexOf("."));
+                newName = String.format("%s (%d)%s",
+                        originalName.substring(0, originalName.lastIndexOf(".")),
+                        i,
+                        originalName.substring(originalName.lastIndexOf(".")));
             }
             else
             {
-                newName = originalName + " (" + i + ")";
+                newName = String.format("%s (%d)",
+                        originalName, i);
             }
         }
         return newName;

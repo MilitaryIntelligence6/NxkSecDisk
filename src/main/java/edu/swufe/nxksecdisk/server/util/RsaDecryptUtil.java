@@ -1,6 +1,6 @@
 package edu.swufe.nxksecdisk.server.util;
 
-import edu.swufe.nxksecdisk.printer.Out;
+import edu.swufe.nxksecdisk.system.AppSystem;
 
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
@@ -51,8 +51,8 @@ public class RsaDecryptUtil
         catch (Exception e)
         {
             e.printStackTrace();
-            Out.println(e.getMessage());
-            Out.println("错误：RSA解密失败。");
+            AppSystem.out.println(e.getMessage());
+            AppSystem.out.println("错误：RSA解密失败。");
         }
         return null;
     }

@@ -1,6 +1,6 @@
 package edu.swufe.nxksecdisk.server.pojo;
 
-import edu.swufe.nxksecdisk.printer.Out;
+import edu.swufe.nxksecdisk.system.AppSystem;
 import edu.swufe.nxksecdisk.server.util.ConfigureReader;
 import org.apache.commons.codec.digest.DigestUtils;
 import ws.schild.jave.*;
@@ -39,7 +39,7 @@ public class VideoTranscodeThread
         {
             try
             {
-                outputFileName = "video_" + UUID.randomUUID().toString() + ".mp4";
+                outputFileName = String.format("video_%s.mp4", UUID.randomUUID().toString());
                 encoder.encode(mo, new File(ConfigureReader.getInstance().getTemporaryfilePath(), outputFileName),
                         ea, new EncoderProgressListener()
                         {
@@ -63,7 +63,7 @@ public class VideoTranscodeThread
             }
             catch (Exception e)
             {
-                Out.println("警告：在线转码功能出现意外错误。详细信息：" + e.getMessage());
+                AppSystem.out.printf("警告：在线转码功能出现意外错误。详细信息：%s", e.getMessage());
             }
         });
         t.start();

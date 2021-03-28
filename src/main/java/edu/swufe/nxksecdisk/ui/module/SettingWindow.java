@@ -1,6 +1,6 @@
 package edu.swufe.nxksecdisk.ui.module;
 
-import edu.swufe.nxksecdisk.printer.Out;
+import edu.swufe.nxksecdisk.system.AppSystem;
 import edu.swufe.nxksecdisk.server.enumeration.LogLevel;
 import edu.swufe.nxksecdisk.server.enumeration.VcLevel;
 import edu.swufe.nxksecdisk.server.pojo.ExtendStores;
@@ -312,8 +312,8 @@ public class SettingWindow extends DiskDynamicWindow
                             }
                             catch (Exception exc)
                             {
-                                Out.println(exc.getMessage());
-                                Out.println("错误：无法更新服务器设置");
+                                AppSystem.out.println(exc.getMessage());
+                                AppSystem.out.println("错误：无法更新服务器设置");
                             }
                         }
                         else

@@ -1,6 +1,6 @@
 package edu.swufe.nxksecdisk.server.util;
 
-import edu.swufe.nxksecdisk.printer.Out;
+import edu.swufe.nxksecdisk.system.AppSystem;
 import edu.swufe.nxksecdisk.server.enumeration.AccountAuth;
 import edu.swufe.nxksecdisk.server.enumeration.LogLevel;
 import edu.swufe.nxksecdisk.server.enumeration.VcLevel;
@@ -289,35 +289,35 @@ public class ConfigureReader
         final File serverProp = new File(this.confdir + SERVER_PROPERTIES_FILE);
         if (!serverProp.isFile())
         {
-            Out.println("服务器配置文件不存在，需要初始化服务器配置。");
+            AppSystem.out.println("服务器配置文件不存在，需要初始化服务器配置。");
             this.createDefaultServerPropertiesFile();
         }
         final File accountProp = new File(String.format("%s%s", this.confdir, ACCOUNT_PROPERTIES_FILE));
         if (!accountProp.isFile())
         {
-            Out.println("用户账户配置文件不存在，需要初始化账户配置。");
+            AppSystem.out.println("用户账户配置文件不存在，需要初始化账户配置。");
             this.createDefaultAccountPropertiesFile();
         }
         try
         {
-            Out.println("正在载入配置文件...");
+            AppSystem.out.println("正在载入配置文件...");
             final FileInputStream serverPropIn = new FileInputStream(serverProp);
             this.serverp.load(serverPropIn);
             final FileInputStream accountPropIn = new FileInputStream(accountProp);
             this.accountp.load(accountPropIn);
             initIPRules();
             initSignUpRules();
-            Out.println("配置文件载入完毕。正在检查配置...");
+            AppSystem.out.println("配置文件载入完毕。正在检查配置...");
             this.propertiesStatus = this.testServerPropertiesAndEffect();
             if (this.propertiesStatus == LEGAL_PROPERTIES)
             {
-                Out.println("准备就绪。");
+                AppSystem.out.println("准备就绪。");
                 startAccountRealTimeUpdateListener();
             }
         }
         catch (Exception e)
         {
-            Out.println("错误：无法加载一个或多个配置文件（位于" + this.confdir + "路径下），请尝试删除旧的配置文件并重新启动本应用或查看安装路径的权限（必须可读写）。");
+            AppSystem.out.printf("错误：无法加载一个或多个配置文件（位于%s路径下），请尝试删除旧的配置文件并重新启动本应用或查看安装路径的权限（必须可读写）。", this.confdir);
         }
     }
 
@@ -759,7 +759,7 @@ public class ConfigureReader
     {
         if (ss != null)
         {
-            Out.println("正在更新服务器配置...");
+            AppSystem.out.println("正在更新服务器配置...");
             this.serverp.setProperty("mustLogin", ss.isMustLogin() ? "N" : "O");
             this.serverp.setProperty("buff.size", ss.getBuffSize() + "");
             this.serverp.setProperty("password.change", ss.isAllowChangePassword() ? "Y" : "N");
@@ -819,12 +819,12 @@ public class ConfigureReader
                 try
                 {
                     this.serverp.store(new FileOutputStream(this.confdir + SERVER_PROPERTIES_FILE), null);
-                    Out.println("配置更新完毕，准备就绪。");
+                    AppSystem.out.println("配置更新完毕，准备就绪。");
                     return true;
                 }
                 catch (Exception e)
                 {
-                    Out.println("错误：更新设置失败，无法存入设置文件。");
+                    AppSystem.out.println("错误：更新设置失败，无法存入设置文件。");
                 }
             }
         }
@@ -842,18 +842,18 @@ public class ConfigureReader
      */
     private int testServerPropertiesAndEffect()
     {
-        Out.println("正在检查服务器配置...");
+        AppSystem.out.println("正在检查服务器配置...");
         final String pMustLogin = this.serverp.getProperty("mustLogin");
         if (pMustLogin == null)
         {
-            Out.println("警告：未找到是否必须登录配置，将采用默认值（O）。");
+            AppSystem.out.println("警告：未找到是否必须登录配置，将采用默认值（O）。");
             this.mustLogin = "O";
         }
         else
         {
             if (!"N".equals(pMustLogin) && !"O".equals(pMustLogin))
             {
-                Out.println("错误：必须登入功能配置不正确（只能设置为“O”或“N”），请重新检查。");
+                AppSystem.out.println("错误：必须登入功能配置不正确（只能设置为“O”或“N”），请重新检查。");
                 return INVALID_MUST_LOGIN_SETTING;
             }
             this.mustLogin = pMustLogin;
@@ -861,7 +861,7 @@ public class ConfigureReader
         final String ports = this.serverp.getProperty("port");
         if (ports == null)
         {
-            Out.println("警告：未找到端口配置，将采用默认值（8080）。");
+            AppSystem.out.println("警告：未找到端口配置，将采用默认值（8080）。");
             this.port = 8080;
         }
         else
@@ -871,27 +871,27 @@ public class ConfigureReader
                 this.port = Integer.parseInt(ports);
                 if (this.port <= 0 || this.port > 65535)
                 {
-                    Out.println("错误：端口号配置不正确，必须使用1-65535之间的整数。");
+                    AppSystem.out.println("错误：端口号配置不正确，必须使用1-65535之间的整数。");
                     return INVALID_PORT;
                 }
             }
             catch (Exception e)
             {
-                Out.println("错误：端口号配置不正确，必须使用1-65535之间的整数。");
+                AppSystem.out.println("错误：端口号配置不正确，必须使用1-65535之间的整数。");
                 return INVALID_PORT;
             }
         }
         final String logs = this.serverp.getProperty("log");
         if (logs == null)
         {
-            Out.println("警告：未找到日志等级配置，将采用默认值（E）。");
+            AppSystem.out.println("警告：未找到日志等级配置，将采用默认值（E）。");
             this.log = "E";
         }
         else
         {
             if (!logs.equals("N") && !logs.equals("R") && !logs.equals("E"))
             {
-                Out.println("错误：日志等级配置不正确（只能设置为“N”、“R”或“E”），请重新检查。");
+                AppSystem.out.println("错误：日志等级配置不正确（只能设置为“N”、“R”或“E”），请重新检查。");
                 return INVALID_LOG;
             }
             this.log = logs;
@@ -899,7 +899,7 @@ public class ConfigureReader
         final String vcl = this.serverp.getProperty("VC.level");
         if (vcl == null)
         {
-            Out.println("警告：未找到登录验证码配置，将采用默认值（STANDARD）。");
+            AppSystem.out.println("警告：未找到登录验证码配置，将采用默认值（STANDARD）。");
             this.vc = DEFAULT_VC_LEVEL;
         }
         else
@@ -912,7 +912,7 @@ public class ConfigureReader
                     this.vc = vcl;
                     break;
                 default:
-                    Out.println("错误：登录验证码配置不正确（只能设置为“STANDARD”、“SIMP”或“CLOSE”），请重新检查。");
+                    AppSystem.out.println("错误：登录验证码配置不正确（只能设置为“STANDARD”、“SIMP”或“CLOSE”），请重新检查。");
                     return INVALID_VC;
             }
         }
@@ -920,7 +920,7 @@ public class ConfigureReader
         final String changePassword = this.serverp.getProperty("password.change");
         if (changePassword == null)
         {
-            Out.println("警告：未找到用户修改密码功能配置，将采用默认值（禁用）。");
+            AppSystem.out.println("警告：未找到用户修改密码功能配置，将采用默认值（禁用）。");
             this.allowChangePassword = false;
         }
         else
@@ -934,7 +934,7 @@ public class ConfigureReader
                     this.allowChangePassword = false;
                     break;
                 default:
-                    Out.println("错误：用户修改账户密码功能配置不正确（只能设置为“Y”或“N”），请重新检查。");
+                    AppSystem.out.println("错误：用户修改账户密码功能配置不正确（只能设置为“Y”或“N”），请重新检查。");
                     return INVALID_CHANGE_PASSWORD_SETTING;
             }
         }
@@ -942,7 +942,7 @@ public class ConfigureReader
         final String fileChain = this.serverp.getProperty("openFileChain");
         if (fileChain == null)
         {
-            Out.println("警告：未找到永久资源链接功能配置，将采用默认值（禁用）。");
+            AppSystem.out.println("警告：未找到永久资源链接功能配置，将采用默认值（禁用）。");
             this.openFileChain = false;
         }
         else
@@ -956,7 +956,7 @@ public class ConfigureReader
                     this.openFileChain = false;
                     break;
                 default:
-                    Out.println("错误：永久资源链接功能配置不正确（只能设置为“OPEN”或“CLOSE”），请重新检查。");
+                    AppSystem.out.println("错误：永久资源链接功能配置不正确（只能设置为“OPEN”或“CLOSE”），请重新检查。");
                     return INVALID_FILE_CHAIN_SETTING;
             }
         }
@@ -964,7 +964,7 @@ public class ConfigureReader
         final String bufferSizes = this.serverp.getProperty("buff.size");
         if (bufferSizes == null)
         {
-            Out.println("警告：未找到缓冲大小配置，将采用默认值（1048576）。");
+            AppSystem.out.println("警告：未找到缓冲大小配置，将采用默认值（1048576）。");
             this.bufferSize = 1048576;
         }
         else
@@ -974,13 +974,13 @@ public class ConfigureReader
                 this.bufferSize = Integer.parseInt(bufferSizes);
                 if (this.bufferSize <= 0)
                 {
-                    Out.println("错误：缓冲区大小设置无效。");
+                    AppSystem.out.println("错误：缓冲区大小设置无效。");
                     return INVALID_BUFFER_SIZE;
                 }
             }
             catch (Exception e2)
             {
-                Out.println("错误：缓冲区大小设置无效。");
+                AppSystem.out.println("错误：缓冲区大小设置无效。");
                 return INVALID_BUFFER_SIZE;
             }
         }
@@ -988,7 +988,7 @@ public class ConfigureReader
         this.FSPath = this.serverp.getProperty("FS.path");
         if (this.FSPath == null)
         {
-            Out.println("警告：未找到主文件系统路径配置，将采用默认值。");
+            AppSystem.out.println("警告：未找到主文件系统路径配置，将采用默认值。");
             this.fileSystemPath = this.DEFAULT_FILE_SYSTEM_PATH;
         }
         else if (this.FSPath.equals("DEFAULT"))
@@ -1018,14 +1018,14 @@ public class ConfigureReader
         final File fsFile = new File(this.fileSystemPath);
         if (!fsFile.isDirectory() || !fsFile.canRead() || !fsFile.canWrite())
         {
-            Out.println("错误：文件系统路径[" + this.fileSystemPath + "]无效，该路径必须指向一个具备读写权限的文件夹。");
+            AppSystem.out.println("错误：文件系统路径[" + this.fileSystemPath + "]无效，该路径必须指向一个具备读写权限的文件夹。");
             return INVALID_FILE_SYSTEM_PATH;
         }
         for (ExtendStores es : extendStores)
         {
             if (!es.getPath().isDirectory() || !es.getPath().canRead() || !es.getPath().canWrite())
             {
-                Out.println("错误：扩展存储区路径[" + es.getPath().getAbsolutePath() + "]无效，该路径必须指向一个具备读写权限的文件夹。");
+                AppSystem.out.println("错误：扩展存储区路径[" + es.getPath().getAbsolutePath() + "]无效，该路径必须指向一个具备读写权限的文件夹。");
                 return INVALID_FILE_SYSTEM_PATH;
             }
         }
@@ -1035,7 +1035,7 @@ public class ConfigureReader
             {
                 if (extendStores.get(i).getPath().equals(extendStores.get(j).getPath()))
                 {
-                    Out.println(
+                    AppSystem.out.println(
                             "错误：扩展存储区路径[" + extendStores.get(j).getPath().getAbsolutePath() + "]无效，该路径已被其他扩展存储区占用。");
                     return INVALID_FILE_SYSTEM_PATH;
                 }
@@ -1045,21 +1045,21 @@ public class ConfigureReader
         final File fbFile = new File(this.fileBlockPath);
         if (!fbFile.isDirectory() && !fbFile.mkdirs())
         {
-            Out.println("错误：无法创建文件块存放区[" + this.fileBlockPath + "]。");
+            AppSystem.out.println("错误：无法创建文件块存放区[" + this.fileBlockPath + "]。");
             return CANT_CREATE_FILE_BLOCK_PATH;
         }
         this.fileNodePath = this.fileSystemPath + "filenodes" + File.separator;
         final File fnFile = new File(this.fileNodePath);
         if (!fnFile.isDirectory() && !fnFile.mkdirs())
         {
-            Out.println("错误：无法创建文件节点存放区[" + this.fileNodePath + "]。");
+            AppSystem.out.println("错误：无法创建文件节点存放区[" + this.fileNodePath + "]。");
             return CANT_CREATE_FILE_NODE_PATH;
         }
         this.tfPath = this.fileSystemPath + "temporaryfiles" + File.separator;
         final File tfFile = new File(this.tfPath);
         if (!tfFile.isDirectory() && !tfFile.mkdirs())
         {
-            Out.println("错误：无法创建临时文件存放区[" + this.tfPath + "]。");
+            AppSystem.out.println("错误：无法创建临时文件存放区[" + this.tfPath + "]。");
             return CANT_CREATE_TF_PATH;
         }
 
@@ -1069,7 +1069,7 @@ public class ConfigureReader
             String url = serverp.getProperty("mysql.url", "127.0.0.1/kift");
             if (url.indexOf("/") <= 0 || url.substring(url.indexOf("/")).length() == 1)
             {
-                Out.println("错误：自定义数据库的URL中必须指定数据库名称。");
+                AppSystem.out.println("错误：自定义数据库的URL中必须指定数据库名称。");
                 return CANT_CONNECT_DB;
             }
             dbURL = "jdbc:mysql://" + url + "?useUnicode=true&characterEncoding=utf8";
@@ -1088,7 +1088,7 @@ public class ConfigureReader
             }
             catch (Exception e)
             {
-                Out.println(
+                AppSystem.out.println(
                         "错误：无法连接至自定义数据库：" + dbURL + "（user=" + dbUser + ",password=" + dbPwd + "），请确重新配置MySQL数据库相关项。");
                 return CANT_CONNECT_DB;
             }
@@ -1120,7 +1120,7 @@ public class ConfigureReader
                     }
                     else
                     {
-                        Out.println(
+                        AppSystem.out.println(
                                 "错误：无法启用https支持，因为kiftd未能找到https证书文件。您必须在应用主目录内放置PKCS12（必须命名为https.p12）或JKS（必须命名为https.jks）证书。");
                         return HTTPS_SETTING_ERROR;
                     }
@@ -1130,7 +1130,7 @@ public class ConfigureReader
                 String httpsports = serverp.getProperty("https.port");
                 if (httpsports == null)
                 {
-                    Out.println("警告：未找到https端口配置，将采用默认值（443）。");
+                    AppSystem.out.println("警告：未找到https端口配置，将采用默认值（443）。");
                     httpsPort = 443;
                 }
                 else
@@ -1140,13 +1140,13 @@ public class ConfigureReader
                         this.httpsPort = Integer.parseInt(httpsports);
                         if (httpsPort <= 0 || httpsPort > 65535)
                         {
-                            Out.println("错误：无法启用https支持，https访问端口号配置不正确。");
+                            AppSystem.out.println("错误：无法启用https支持，https访问端口号配置不正确。");
                             return HTTPS_SETTING_ERROR;
                         }
                     }
                     catch (Exception e)
                     {
-                        Out.println("错误：无法启用https支持，https访问端口号配置不正确。");
+                        AppSystem.out.println("错误：无法启用https支持，https访问端口号配置不正确。");
                         return HTTPS_SETTING_ERROR;
                     }
                 }
@@ -1154,7 +1154,7 @@ public class ConfigureReader
             }
             else if (!"false".equals(enableHttps))
             {
-                Out.println("错误：https支持功能的启用项配置不正确（只能设置为“true”或“false”），请重新检查。");
+                AppSystem.out.println("错误：https支持功能的启用项配置不正确（只能设置为“true”或“false”），请重新检查。");
                 return HTTPS_SETTING_ERROR;
             }
         }
@@ -1171,7 +1171,7 @@ public class ConfigureReader
                     ipXFFAnalysis = true;
                     break;
                 default:
-                    Out.println("错误：IP地址xff解析配置不正确（只能设置为“disable”或“enable”），请重新检查。");
+                    AppSystem.out.println("错误：IP地址xff解析配置不正确（只能设置为“disable”或“enable”），请重新检查。");
                     return INVALID_IP_XFF_SETTING;
             }
         }
@@ -1192,7 +1192,7 @@ public class ConfigureReader
                     enableFFMPEG = true;
                     break;
                 default:
-                    Out.println("错误：视频播放功能的在线解码配置不正确（只能设置为“disable”或“enable”），请重新检查。");
+                    AppSystem.out.println("错误：视频播放功能的在线解码配置不正确（只能设置为“disable”或“enable”），请重新检查。");
                     return INVALID_FFMPEG_SETTING;
             }
         }
@@ -1213,7 +1213,7 @@ public class ConfigureReader
                     enableDownloadByZip = true;
                     break;
                 default:
-                    Out.println("错误：“打包下载”功能的配置不正确（只能设置为“disable”或“enable”），请重新检查。");
+                    AppSystem.out.println("错误：“打包下载”功能的配置不正确（只能设置为“disable”或“enable”），请重新检查。");
                     return INVALID_DOWNLOAD_ZIP_SETTING;
             }
         }
@@ -1221,13 +1221,13 @@ public class ConfigureReader
         {
             enableDownloadByZip = true;
         }
-        Out.println("检查完毕。");
+        AppSystem.out.println("检查完毕。");
         return LEGAL_PROPERTIES;
     }
 
     public void createDefaultServerPropertiesFile()
     {
-        Out.println("正在生成初始服务器配置文件（" + this.confdir + SERVER_PROPERTIES_FILE + "）...");
+        AppSystem.out.println("正在生成初始服务器配置文件（" + this.confdir + SERVER_PROPERTIES_FILE + "）...");
         final Properties dsp = new Properties();
         dsp.setProperty("mustLogin", DEFAULT_MUST_LOGIN);
         dsp.setProperty("port", DEFAULT_PORT + "");
@@ -1241,21 +1241,21 @@ public class ConfigureReader
         {
             dsp.store(new FileOutputStream(this.confdir + SERVER_PROPERTIES_FILE),
                     "<This is the default kiftd server setting file. >");
-            Out.println("初始服务器配置文件生成完毕。");
+            AppSystem.out.println("初始服务器配置文件生成完毕。");
         }
         catch (FileNotFoundException e)
         {
-            Out.println("错误：无法生成初始服务器配置文件，存储路径不存在。");
+            AppSystem.out.println("错误：无法生成初始服务器配置文件，存储路径不存在。");
         }
         catch (IOException e2)
         {
-            Out.println("错误：无法生成初始服务器配置文件，写入失败。");
+            AppSystem.out.println("错误：无法生成初始服务器配置文件，写入失败。");
         }
     }
 
     private void createDefaultAccountPropertiesFile()
     {
-        Out.println("正在生成初始账户配置文件（" + this.confdir + ACCOUNT_PROPERTIES_FILE + "）...");
+        AppSystem.out.println("正在生成初始账户配置文件（" + this.confdir + ACCOUNT_PROPERTIES_FILE + "）...");
         final Properties dap = new Properties();
         dap.setProperty(DEFAULT_ACCOUNT_ID + ".pwd", DEFAULT_ACCOUNT_PWD);
         dap.setProperty(DEFAULT_ACCOUNT_ID + ".auth", DEFAULT_ACCOUNT_AUTH);
@@ -1264,15 +1264,15 @@ public class ConfigureReader
         try (FileOutputStream accountSettingOut = new FileOutputStream(this.confdir + ACCOUNT_PROPERTIES_FILE))
         {
             dap.store(accountSettingOut, "<This is the default kiftd account setting file. >");
-            Out.println("初始账户配置文件生成完毕。");
+            AppSystem.out.println("初始账户配置文件生成完毕。");
         }
         catch (FileNotFoundException e)
         {
-            Out.println("错误：无法生成初始账户配置文件，存储路径不存在。");
+            AppSystem.out.println("错误：无法生成初始账户配置文件，存储路径不存在。");
         }
         catch (IOException e2)
         {
-            Out.println("错误：无法生成初始账户配置文件，写入失败。");
+            AppSystem.out.println("错误：无法生成初始账户配置文件，写入失败。");
         }
     }
 
@@ -1444,7 +1444,7 @@ public class ConfigureReader
                         {
                             if (ACCOUNT_PROPERTIES_FILE.equals(we.context().toString()))
                             {
-                                Out.println("正在更新账户配置信息...");
+                                AppSystem.out.println("正在更新账户配置信息...");
                                 final File accountProp = new File(this.confdir + ACCOUNT_PROPERTIES_FILE);
                                 if (accountProp.isFile() && accountProp.canRead())
                                 {
@@ -1455,12 +1455,12 @@ public class ConfigureReader
                                     }
                                     initIPRules();
                                     initSignUpRules();
-                                    Out.println("账户配置更新完成，已加载最新配置。");
+                                    AppSystem.out.println("账户配置更新完成，已加载最新配置。");
                                 }
                                 else
                                 {
                                     accountp.clear();
-                                    Out.println("警告：账户配置文件已被删除或无法读取，账户信息已清空。");
+                                    AppSystem.out.println("警告：账户配置文件已被删除或无法读取，账户信息已清空。");
                                 }
                             }
                         }
@@ -1468,7 +1468,7 @@ public class ConfigureReader
                 }
                 catch (Exception e)
                 {
-                    Out.println("错误：用户配置文件更改监听失败，该功能已失效，kiftd无法实时更新用户配置（可尝试重启程序以恢复该功能）。");
+                    AppSystem.out.println("错误：用户配置文件更改监听失败，该功能已失效，kiftd无法实时更新用户配置（可尝试重启程序以恢复该功能）。");
                 }
             });
             accountPropertiesUpdateDaemonThread.setDaemon(true);
@@ -1743,7 +1743,7 @@ public class ConfigureReader
             }
             catch (Exception e)
             {
-                Out.println("错误：更新账户配置文件时出现错误，请立即检查账户配置文件。");
+                AppSystem.out.println("错误：更新账户配置文件时出现错误，请立即检查账户配置文件。");
                 return false;
             }
         }

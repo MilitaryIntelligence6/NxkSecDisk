@@ -1,6 +1,6 @@
 package edu.swufe.nxksecdisk.server.service.impl;
 
-import edu.swufe.nxksecdisk.printer.Out;
+import edu.swufe.nxksecdisk.system.AppSystem;
 import edu.swufe.nxksecdisk.server.enumeration.AccountAuth;
 import edu.swufe.nxksecdisk.server.enumeration.PowerPointType;
 import edu.swufe.nxksecdisk.server.mapper.FolderMapper;
@@ -387,7 +387,7 @@ public class ResourceServiceImpl implements ResourceService
                             }
                             catch (Exception e)
                             {
-                                Out.println(e.getMessage());
+                                AppSystem.out.println(e.getMessage());
                                 logUtil.writeException(e);
                             }
                         }
@@ -447,7 +447,7 @@ public class ResourceServiceImpl implements ResourceService
                             }
                             catch (Exception e)
                             {
-                                Out.println(e.getMessage());
+                                AppSystem.out.println(e.getMessage());
                                 logUtil.writeException(e);
                             }
                         }
@@ -478,7 +478,7 @@ public class ResourceServiceImpl implements ResourceService
                 }
                 catch (Exception e)
                 {
-                    Out.println("错误：视频转码功能出现意外错误。详细信息：" + e.getMessage());
+                    AppSystem.out.println("错误：视频转码功能出现意外错误。详细信息：" + e.getMessage());
                     logUtil.writeException(e);
                 }
             }
@@ -535,7 +535,7 @@ public class ResourceServiceImpl implements ResourceService
                                 }
                                 catch (Exception e)
                                 {
-                                    Out.println(e.getMessage());
+                                    AppSystem.out.println(e.getMessage());
                                     logUtil.writeException(e);
                                 }
                                 break;
@@ -627,7 +627,7 @@ public class ResourceServiceImpl implements ResourceService
                             }
                             catch (Exception e)
                             {
-                                Out.println(e.getMessage());
+                                AppSystem.out.println(e.getMessage());
                                 logUtil.writeException(e);
                             }
 

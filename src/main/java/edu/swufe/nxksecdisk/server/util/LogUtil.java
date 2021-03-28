@@ -1,6 +1,6 @@
 package edu.swufe.nxksecdisk.server.util;
 
-import edu.swufe.nxksecdisk.printer.Out;
+import edu.swufe.nxksecdisk.system.AppSystem;
 import edu.swufe.nxksecdisk.server.enumeration.LogLevel;
 import edu.swufe.nxksecdisk.server.mapper.FolderMapper;
 import edu.swufe.nxksecdisk.server.mapper.NodeMapper;
@@ -572,7 +572,7 @@ public class LogUtil
         }
         catch (Exception e1)
         {
-            Out.println(String.format("KohgylwIFT:[Log]Cannt write to file,message:%s", e1.getMessage()));
+            AppSystem.out.println(String.format("KohgylwIFT:[Log]Cannt write to file,message:%s", e1.getMessage()));
         }
     }
 

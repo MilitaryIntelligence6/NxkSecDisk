@@ -1,9 +1,8 @@
 package edu.swufe.nxksecdisk.server.listener;
 
-import com.sun.corba.se.spi.ior.iiop.IIOPFactories;
 import edu.swufe.nxksecdisk.server.mapper.FolderMapper;
 import edu.swufe.nxksecdisk.server.util.*;
-import edu.swufe.nxksecdisk.printer.Out;
+import edu.swufe.nxksecdisk.system.AppSystem;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -88,7 +87,7 @@ public class ServerInitListener implements ServletContextListener
         // 1，初始化文件节点数据库
         FileNodeUtil.initNodeTableToDataBase();
         // 2，校对文件块并清理临时文件夹
-        Out.println("文件系统节点信息校对...");
+        AppSystem.out.println("文件系统节点信息校对...");
         final String fsp = ConfigureReader.getInstance().getFileSystemPath();
         final File fspf = new File(fsp);
         if (fspf.isDirectory() && fspf.canRead() && fspf.canWrite())
@@ -96,11 +95,11 @@ public class ServerInitListener implements ServletContextListener
             fileBlockUtil = context.getBean(FileBlockUtil.class);
             fileBlockUtil.checkFileBlocks();
             fileBlockUtil.initTempDir();
-            Out.println("校对完成。");
+            AppSystem.out.println("校对完成。");
         }
         else
         {
-            Out.println("错误：文件系统节点信息校对失败，存储位置无法读写或不存在。");
+            AppSystem.out.println("错误：文件系统节点信息校对失败，存储位置无法读写或不存在。");
         }
         // 3，解析公告信息（请确保该操作在校对文件块后进行）
         noticeUtil = context.getBean(NoticeUtil.class);
@@ -119,7 +118,7 @@ public class ServerInitListener implements ServletContextListener
         // 1，关闭动态监听
         run = false;
         // 2，清理临时文件夹
-        Out.println("清理临时文件...");
+        AppSystem.out.println("清理临时文件...");
         fileBlockUtil.initTempDir();
     }
 
@@ -160,7 +159,7 @@ public class ServerInitListener implements ServletContextListener
                 }
                 catch (Exception e)
                 {
-                    Out.println("错误：服务器文件自动更新失败，该功能已失效。某些文件将无法自动载入最新内容（请尝试重启程序以恢复该功能）。");
+                    AppSystem.out.println("错误：服务器文件自动更新失败，该功能已失效。某些文件将无法自动载入最新内容（请尝试重启程序以恢复该功能）。");
                 }
             });
             pathWatchServiceThread.start();
@@ -186,12 +185,12 @@ public class ServerInitListener implements ServletContextListener
                             if (folderMapper.queryById(id) == null)
                             {
                                 invalidIdList.add(id);
-                                Out.println("文件夹ID：" + id + "对应的文件夹不存在或已被删除，相关的额外权限设置将被清理。");
+                                AppSystem.out.println("文件夹ID：" + id + "对应的文件夹不存在或已被删除，相关的额外权限设置将被清理。");
                             }
                         }
                         if (ConfigureReader.getInstance().removeAddedAuthByFolderId(invalidIdList))
                         {
-                            Out.println("失效的额外权限设置已经清理完成。");
+                            AppSystem.out.println("失效的额外权限设置已经清理完成。");
                         }
                         needCheck = false;
                     }

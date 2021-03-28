@@ -1,7 +1,7 @@
 package edu.swufe.nxksecdisk.server.service.impl;
 
 import com.google.gson.Gson;
-import edu.swufe.nxksecdisk.printer.Out;
+import edu.swufe.nxksecdisk.system.AppSystem;
 import edu.swufe.nxksecdisk.server.enumeration.AccountAuth;
 import edu.swufe.nxksecdisk.server.mapper.FolderMapper;
 import edu.swufe.nxksecdisk.server.mapper.NodeMapper;
@@ -82,7 +82,7 @@ public class PlayVideoServiceImpl implements PlayVideoService
                                 }
                                 catch (Exception e)
                                 {
-                                    Out.println(String.format("错误：视频文件“%s”在解析时出现意外错误。详细信息：%s", f.getFileName(), e.getMessage()));
+                                    AppSystem.out.println(String.format("错误：视频文件“%s”在解析时出现意外错误。详细信息：%s", f.getFileName(), e.getMessage()));
                                     logUtil.writeException(e);
                                 }
                                 // 对于其他编码格式，则设定需要转码

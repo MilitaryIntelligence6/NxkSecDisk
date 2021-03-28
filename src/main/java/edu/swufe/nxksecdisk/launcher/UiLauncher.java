@@ -1,10 +1,11 @@
 package edu.swufe.nxksecdisk.launcher;
 
 import com.formdev.flatlaf.FlatDarculaLaf;
-import edu.swufe.nxksecdisk.server.app.DiskApplication;
+import edu.swufe.nxksecdisk.config.DynamicConfig;
+import edu.swufe.nxksecdisk.constant.EnumLauncherMode;
+import edu.swufe.nxksecdisk.server.app.DiskAppController;
 import edu.swufe.nxksecdisk.server.util.ConfigureReader;
 import edu.swufe.nxksecdisk.ui.pojo.FileSystemPath;
-import edu.swufe.nxksecdisk.printer.Out;
 import edu.swufe.nxksecdisk.server.enumeration.LogLevel;
 import edu.swufe.nxksecdisk.server.enumeration.VcLevel;
 import edu.swufe.nxksecdisk.server.pojo.ExtendStores;
@@ -36,20 +37,21 @@ public class UiLauncher
     private UiLauncher() throws Exception
     {
         initSkin();
-        Out.putModel(true);
-        final ServerUiModule ui = ServerUiModule.getInstance();
+        DynamicConfig.setLauncherMode(EnumLauncherMode.UI);
+//        UiOutStream.putModel(true);
+        final ServerUiModule serverUi = ServerUiModule.getInstance();
         // 服务器控制层，用于连接UI与服务器内核;
-        DiskApplication application = new DiskApplication();
-        ServerUiModule.setStartServer(() -> application.start());
-        ServerUiModule.setOnCloseServer(() -> application.stop());
-        ServerUiModule.setGetServerTime(() -> ServerTimeUtil.getServerTime());
+        DiskAppController appController = new DiskAppController();
+        ServerUiModule.setStartServer(appController::start);
+        ServerUiModule.setOnCloseServer(appController::stop);
+        ServerUiModule.setGetServerTime(ServerTimeUtil::getServerTime);
         ServerUiModule.setGetServerStatus(new GetServerStatus()
         {
             @Override
             public boolean getServerStatus()
             {
                 // TODO 自动生成的方法存根
-                return application.started();
+                return appController.started();
             }
 
             @Override
@@ -104,16 +106,16 @@ public class UiLauncher
             @Override
             public List<FileSystemPath> getExtendStores()
             {
-                List<FileSystemPath> fsps = new ArrayList<FileSystemPath>();
+                List<FileSystemPath> fileSystemPathList = new ArrayList<>();
                 for (ExtendStores es : ConfigureReader.getInstance().getExtendStores())
                 {
-                    FileSystemPath fsp = new FileSystemPath();
-                    fsp.setIndex(es.getIndex());
-                    fsp.setPath(es.getPath());
-                    fsp.setType(FileSystemPath.EXTEND_STORES_NAME);
-                    fsps.add(fsp);
+                    FileSystemPath fileSystemPath = new FileSystemPath();
+                    fileSystemPath.setIndex(es.getIndex());
+                    fileSystemPath.setPath(es.getPath());
+                    fileSystemPath.setType(FileSystemPath.EXTEND_STORES_NAME);
+                    fileSystemPathList.add(fileSystemPath);
                 }
-                return fsps;
+                return fileSystemPathList;
             }
 
             @Override
@@ -177,7 +179,7 @@ public class UiLauncher
             // TODO 自动生成的方法存根
             return ConfigureReader.getInstance().doUpdate(s);
         });
-        ui.show();
+        serverUi.show();
     }
 
     public static UiLauncher getInstance() throws Exception

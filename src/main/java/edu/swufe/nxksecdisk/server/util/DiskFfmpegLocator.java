@@ -1,6 +1,6 @@
 package edu.swufe.nxksecdisk.server.util;
 
-import edu.swufe.nxksecdisk.printer.Out;
+import edu.swufe.nxksecdisk.system.AppSystem;
 import org.springframework.stereotype.Component;
 import ws.schild.jave.FFMPEGLocator;
 
@@ -107,7 +107,7 @@ public class DiskFfmpegLocator extends FFMPEGLocator
                 }
                 catch (IOException e)
                 {
-                    Out.println("警告：自定义的ffmpeg引擎可执行文件无法读取，视频播放的在线解码功能将不可用。");
+                    AppSystem.out.println("警告：自定义的ffmpeg引擎可执行文件无法读取，视频播放的在线解码功能将不可用。");
                     logUtil.writeException(e);
                     enableFFmpeg = false;
                     return null;
@@ -130,7 +130,7 @@ public class DiskFfmpegLocator extends FFMPEGLocator
                 }
                 catch (NullPointerException e)
                 {
-                    Out.println("警告：未能找到适合此操作系统的ffmpeg引擎可执行文件，视频播放的在线解码功能将不可用。");
+                    AppSystem.out.println("警告：未能找到适合此操作系统的ffmpeg引擎可执行文件，视频播放的在线解码功能将不可用。");
                     logUtil.writeException(e);
                     enableFFmpeg = false;
                     return null;

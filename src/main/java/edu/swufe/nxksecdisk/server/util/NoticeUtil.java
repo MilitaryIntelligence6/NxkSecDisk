@@ -5,7 +5,7 @@ import com.vladsch.flexmark.parser.Parser;
 import com.vladsch.flexmark.parser.ParserEmulationProfile;
 import com.vladsch.flexmark.util.data.MutableDataHolder;
 import com.vladsch.flexmark.util.data.MutableDataSet;
-import edu.swufe.nxksecdisk.printer.Out;
+import edu.swufe.nxksecdisk.system.AppSystem;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.stereotype.Component;
 
@@ -70,7 +70,7 @@ public class NoticeUtil
         File noticeHTML = new File(ConfigureReader.getInstance().getTemporaryfilePath(), NOTICE_OUTPUT_NAME);
         if (noticeMD.isFile() && noticeMD.canRead())
         {
-            Out.println("正在载入公告信息...");
+            AppSystem.out.println("正在载入公告信息...");
             try
             {
                 // 先判断公告信息文件的编码格式
@@ -94,12 +94,12 @@ public class NoticeUtil
                 writer.close();
                 // 计算md5并保存
                 md5 = DigestUtils.md5Hex(new FileInputStream(noticeMD));
-                Out.println("公告信息载入完成。");
+                AppSystem.out.println("公告信息载入完成。");
                 return;
             }
             catch (Exception e)
             {
-                Out.println("错误：公告文件载入失败，服务器将无法为用户显示公告内容。");
+                AppSystem.out.println("错误：公告文件载入失败，服务器将无法为用户显示公告内容。");
             }
         }
         md5 = null;

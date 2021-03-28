@@ -1,8 +1,8 @@
 package edu.swufe.nxksecdisk.ui.module;
 
 import edu.swufe.nxksecdisk.server.util.ConfigureReader;
+import edu.swufe.nxksecdisk.system.AppSystem;
 import edu.swufe.nxksecdisk.ui.callback.*;
-import edu.swufe.nxksecdisk.printer.Out;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -526,7 +526,7 @@ public class ServerUiModule extends DiskDynamicWindow
                 catch (SQLException e1)
                 {
                     // TODO 自动生成的 catch 块
-                    Out.println("错误：无法读取文件，文件系统可能已经损坏，您可以尝试重启应用。");
+                    AppSystem.out.println("错误：无法读取文件，文件系统可能已经损坏，您可以尝试重启应用。");
                 }
                 ServerUiModule.fileIOUtil.setEnabled(true);
                 if (ServerUiModule.filesViewer != null)
@@ -537,6 +537,17 @@ public class ServerUiModule extends DiskDynamicWindow
             t.start();
         });
         modifyComponentSize(ServerUiModule.window);
+        init();
+    }
+
+    private void init()
+    {
+        initDateFormat();
+    }
+
+    private void initDateFormat()
+    {
+        sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
     }
 
     public void show()
@@ -665,27 +676,16 @@ public class ServerUiModule extends DiskDynamicWindow
 
     public void println(final String context)
     {
-        out.append(String.format(
-                "[%s]%s\n",
-                this.requireFormatDate(),
-                context));
+        out.append(decorateWithDate(context));
     }
 
-//    public void printf(final String context, Object... args)
-//    {
-//        out.append(String.format(
-//                "[%s]%s\n",
-//                this.getFormateDate(),
-//                context,
-//                args));
-//    }
+    public void printf(final String context, Object... args)
+    {
+        out.append(String.format(decorateWithDate(context), args));
+    }
 
     private String requireFormatDate()
     {
-        if (null == sdf)
-        {
-            sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-        }
         if (ServerUiModule.serverTime != null)
         {
             final Date d = ServerUiModule.serverTime.get();
@@ -694,13 +694,24 @@ public class ServerUiModule extends DiskDynamicWindow
         return sdf.format(new Date());
     }
 
-    public static void setGetServerTime(final GetServerTime ti)
+    public String decorateWithDate(String context)
     {
-        ServerUiModule.serverTime = ti;
+        return new StringBuilder()
+                .append("[")
+                .append(this.requireFormatDate())
+                .append("]")
+                .append(context)
+                .append("\n")
+                .toString();
     }
 
-    public static void setUpdateSetting(final UpdateSetting us)
+    public static void setGetServerTime(final GetServerTime serverTime)
     {
-        SettingWindow.updateSetting = us;
+        ServerUiModule.serverTime = serverTime;
+    }
+
+    public static void setUpdateSetting(final UpdateSetting updateSetting)
+    {
+        SettingWindow.updateSetting = updateSetting;
     }
 }

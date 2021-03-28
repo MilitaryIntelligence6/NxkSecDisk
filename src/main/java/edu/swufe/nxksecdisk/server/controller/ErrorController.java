@@ -1,6 +1,6 @@
 package edu.swufe.nxksecdisk.server.controller;
 
-import edu.swufe.nxksecdisk.printer.Out;
+import edu.swufe.nxksecdisk.system.AppSystem;
 import edu.swufe.nxksecdisk.server.util.FileBlockUtil;
 import edu.swufe.nxksecdisk.server.util.LogUtil;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -25,7 +25,8 @@ public class ErrorController
     {
         this.logUtil.writeException(e);
         this.fileBlockUtil.checkFileBlocks();
-        Out.println(String.format("处理请求时发生错误：\n\r------信息------\n\r%s\n\r------信息------",
-                e.getMessage()));
+        e.printStackTrace();
+        AppSystem.out.printf("处理请求时发生错误：\n\r------信息------\n\r%s\n\r------信息------",
+                e.getMessage());
     }
 }

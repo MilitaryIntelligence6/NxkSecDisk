@@ -1,13 +1,15 @@
 package edu.swufe.nxksecdisk.launcher;
 
-import edu.swufe.nxksecdisk.server.app.DiskApplication;
+import edu.swufe.nxksecdisk.config.DynamicConfig;
+import edu.swufe.nxksecdisk.constant.EnumLauncherMode;
+import edu.swufe.nxksecdisk.server.app.DiskAppController;
 import edu.swufe.nxksecdisk.server.exception.FilesTotalOutOfLimitException;
 import edu.swufe.nxksecdisk.server.exception.FoldersTotalOutOfLimitException;
 import edu.swufe.nxksecdisk.server.util.ConfigureReader;
+import edu.swufe.nxksecdisk.system.AppSystem;
 import edu.swufe.nxksecdisk.util.filesysmng.FileSystemManager;
 import edu.swufe.nxksecdisk.util.filesysmng.pojo.Folder;
 import edu.swufe.nxksecdisk.util.filesysmng.pojo.FolderView;
-import edu.swufe.nxksecdisk.printer.Out;
 import edu.swufe.nxksecdisk.server.model.Node;
 import edu.swufe.nxksecdisk.server.util.FileNodeUtil;
 
@@ -32,7 +34,7 @@ public class ConsoleLauncher
 {
     private volatile static ConsoleLauncher instance;
 
-    private static DiskApplication ctl;
+    private static DiskAppController ctl;
 
     private static String commandTips;
 
@@ -46,8 +48,9 @@ public class ConsoleLauncher
 
     private ConsoleLauncher()
     {
-        Out.putModel(false);
-        ConsoleLauncher.ctl = new DiskApplication();
+        DynamicConfig.setLauncherMode(EnumLauncherMode.CONSOLE);
+//        UiOutStream.putModel(false);
+        ConsoleLauncher.ctl = new DiskAppController();
         worker = Executors.newSingleThreadExecutor();
         ConsoleLauncher.commandTips = "kiftd:您可以输入以下指令以控制服务器：\r\n-start 启动服务器\r\n-stop 停止服务器\r\n-exit 停止服务器并退出应用\r\n-restart 重启服务器\r\n-files 文件管理\r\n-status 查看服务器状态\r\n-help 显示帮助文本";
         ConsoleLauncher.fsCommandTips = "kiftd files:您可以输入以下指令进行文件管理：\r\nls 显示当前文件夹内容\r\ncd {“文件夹名称” 或 “--文件夹序号”} 进入指定文件夹（示例：“cd foo” 或 “cd --1”，如需返回上一级请输入“cd ../”）\r\nimport {要导入的本地文件（必须使用完整路径）} 将本地文件或文件夹导入至此\r\nexport {“目标名称” 或 “--目标序号”（省略该项则导出当前文件夹的全部内容）} {要导出至本地的路径（必须使用完整路径）} 将指定文件或文件夹导出本地\r\nrm {“文件夹名称” 或 “--文件夹序号”} 删除指定文件或文件夹\r\nexit 退出文件管理并返回kiftd控制台\r\nhelp 显示帮助文本";
@@ -119,7 +122,7 @@ public class ConsoleLauncher
                 }
                 default:
                 {
-                    Out.println("kiftd:无效的指令，使用控制台模式启动请输入参数 -console，直接启动服务器引擎请输入参数 -start，使用UI模式启动请不要传入任何参数。");
+                    AppSystem.out.println("kiftd:无效的指令，使用控制台模式启动请输入参数 -console，直接启动服务器引擎请输入参数 -start，使用UI模式启动请不要传入任何参数。");
                     break;
                 }
             }
@@ -128,11 +131,11 @@ public class ConsoleLauncher
 
     private void startKiftdByConsole()
     {
-        Out.println(" 青阳网络文件系统-kiftd 控制台模式[Console model]");
-        Out.println("Character encoding with UTF-8");
+        AppSystem.out.println(" 青阳网络文件系统-kiftd 控制台模式[Console model]");
+        AppSystem.out.println("Character encoding with UTF-8");
         final Thread t = new Thread(() ->
         {
-            Out.println("正在初始化服务器...");
+            AppSystem.out.println("正在初始化服务器...");
             if (ConfigureReader.getInstance().getPropertiesStatus() == 0)
             {
                 this.awaiting();
@@ -144,14 +147,14 @@ public class ConsoleLauncher
 
     private void startServer()
     {
-        Out.println("执行命令：启动服务器...");
+        AppSystem.out.println("执行命令：启动服务器...");
         if (ConsoleLauncher.ctl.started())
         {
-            Out.println("错误：服务器已经启动了。您可以使用 -status 命令查看服务器运行状态或使用 -stop 命令停止服务器。");
+            AppSystem.out.println("错误：服务器已经启动了。您可以使用 -status 命令查看服务器运行状态或使用 -stop 命令停止服务器。");
         }
         else if (ConsoleLauncher.ctl.start())
         {
-            Out.println("kiftd服务器已启动，可以正常访问了，您可以使用 -status 指令查看运行状态。");
+            AppSystem.out.println("kiftd服务器已启动，可以正常访问了，您可以使用 -status 指令查看运行状态。");
         }
         else
         {
@@ -161,99 +164,99 @@ public class ConsoleLauncher
                 {
                     case ConfigureReader.INVALID_PORT:
                     {
-                        Out.println("错误：kiftd服务器未能启动，端口设置无效。");
+                        AppSystem.out.println("错误：kiftd服务器未能启动，端口设置无效。");
                         break;
                     }
                     case ConfigureReader.INVALID_BUFFER_SIZE:
                     {
-                        Out.println("错误：kiftd服务器未能启动，缓存设置无效。");
+                        AppSystem.out.println("错误：kiftd服务器未能启动，缓存设置无效。");
                         break;
                     }
                     case ConfigureReader.INVALID_FILE_SYSTEM_PATH:
                     {
-                        Out.println("错误：kiftd服务器未能启动，文件系统路径或某一扩展存储区设置无效。");
+                        AppSystem.out.println("错误：kiftd服务器未能启动，文件系统路径或某一扩展存储区设置无效。");
                         break;
                     }
                     case ConfigureReader.INVALID_LOG:
                     {
-                        Out.println("错误：kiftd服务器未能启动，日志设置无效。");
+                        AppSystem.out.println("错误：kiftd服务器未能启动，日志设置无效。");
                         break;
                     }
                     case ConfigureReader.INVALID_VC:
                     {
-                        Out.println("错误：kiftd服务器未能启动，登录验证码设置无效。");
+                        AppSystem.out.println("错误：kiftd服务器未能启动，登录验证码设置无效。");
                         break;
                     }
                     default:
                     {
-                        Out.println("错误：kiftd服务器未能启动，请重试或检查设置。");
+                        AppSystem.out.println("错误：kiftd服务器未能启动，请重试或检查设置。");
                         break;
                     }
                 }
             }
             else
             {
-                Out.println("错误：kiftd服务器未能启动，请重试或检查设置。");
+                AppSystem.out.println("错误：kiftd服务器未能启动，请重试或检查设置。");
             }
         }
     }
 
     private void exit()
     {
-        Out.println("执行命令：停止服务器并退出kiftd...");
+        AppSystem.out.println("执行命令：停止服务器并退出kiftd...");
         if (ConsoleLauncher.ctl.started() && ConsoleLauncher.ctl.stop())
         {
-            Out.println("服务器已关闭，停止所有访问。");
+            AppSystem.out.println("服务器已关闭，停止所有访问。");
         }
         worker.shutdown();
-        Out.println("退出应用。");
+        AppSystem.out.println("退出应用。");
         System.exit(0);
     }
 
     private void restartServer()
     {
-        Out.println("执行命令：重启服务器...");
+        AppSystem.out.println("执行命令：重启服务器...");
         if (ConsoleLauncher.ctl.started())
         {
             if (ConsoleLauncher.ctl.stop())
             {
                 if (ConsoleLauncher.ctl.start())
                 {
-                    Out.println("服务器重启成功，可以正常访问了。");
+                    AppSystem.out.println("服务器重启成功，可以正常访问了。");
                 }
                 else
                 {
-                    Out.println("错误：无法重新启动服务器，请尝试手动启动。");
+                    AppSystem.out.println("错误：无法重新启动服务器，请尝试手动启动。");
                 }
             }
             else
             {
-                Out.println("错误：无法关闭服务器，请尝试手动关闭。");
+                AppSystem.out.println("错误：无法关闭服务器，请尝试手动关闭。");
             }
         }
         else
         {
-            Out.println("错误：服务器尚未启动。您可以使用 -start 命令启动服务器或使用 -status 命令查看服务器运行状态。");
+            AppSystem.out.println("错误：服务器尚未启动。您可以使用 -start 命令启动服务器或使用 -status 命令查看服务器运行状态。");
         }
     }
 
     private void stopServer()
     {
-        Out.println("执行命令：停止服务器...");
+        AppSystem.out.println("执行命令：停止服务器...");
         if (ConsoleLauncher.ctl.started())
         {
             if (ConsoleLauncher.ctl.stop())
             {
-                Out.println("服务器已关闭，停止所有访问。");
+                AppSystem.out.println("服务器已关闭，停止所有访问。");
             }
             else
             {
-                Out.println("错误：无法关闭服务器，您可以尝试强制关闭。");
+                AppSystem.out.println("错误：无法关闭服务器，您可以尝试强制关闭。");
             }
         }
         else
         {
-            Out.println("错误：服务器尚未启动。您可以使用 -start 命令启动服务器或使用 -exit 命令退出应用。");
+            AppSystem.out.println("错误：服务器尚未启动。您可以使用 -start 命令启动服务器或使用 -exit 命令退出应用。");
         }
     }
 
@@ -262,48 +265,64 @@ public class ConsoleLauncher
         Thread t = new Thread(() ->
         {
             reader = new Scanner(System.in);
-            Out.println("命令帮助：\r\n" + commandTips + "\r\n");
+            AppSystem.out.printf("命令帮助：\r\n%s\r\n", commandTips);
             try
             {
                 while (true)
                 {
-                    Out.println("kiftd: console$ ");
+                    AppSystem.out.println("kiftd: console$ ");
                     String command = reader.nextLine();
                     switch (command)
                     {
                         case "-start":
+                        {
                             startServer();
                             break;
+                        }
                         case "-stop":
+                        {
                             stopServer();
                             break;
+                        }
                         case "-restart":
+                        {
                             restartServer();
                             break;
+                        }
                         case "-status":
+                        {
                             printServerStatus();
                             break;
+                        }
                         case "-files":
+                        {
                             fileSystemManagerModel();
                             break;
+                        }
                         case "-exit":
+                        {
                             reader.close();
                             exit();
                             return;
+                        }
                         case "help":
                         case "--help":
                         case "-help":
-                            Out.println("命令帮助：\r\n" + commandTips);
+                        {
+                            AppSystem.out.printf("命令帮助：\r\n%s", commandTips);
                             break;
+                        }
                         default:
-                            Out.println("错误：无法识别的指令。\r\n" + commandTips);
+                        {
+                            AppSystem.out.printf("错误：无法识别的指令。\r\n%s", commandTips);
                             break;
+                        }
                     }
                 }
             }
             catch (Exception e)
             {
-                Out.println("错误：读取命令时出现意外导致程序退出，请重启kiftd。");
+                AppSystem.out.println("错误：读取命令时出现意外导致程序退出，请重启kiftd。");
             }
         });
         t.start();
@@ -312,20 +331,22 @@ public class ConsoleLauncher
     // 打印服务器状态
     private void printServerStatus()
     {
-        Out.println(String.format("服务器状态：\r\n<Port>端口号:%d\r\n<LogLevel>日志等级:%s\r\n<BufferSize>缓冲区大小:%d " +
+        AppSystem.out.printf("服务器状态：\r\n<Port>端口号:%d\r\n<LogLevel>日志等级:%s\r\n<BufferSize>缓冲区大小:%d " +
                         "B\r\n<FileSystemPath>文件系统存储路径：%s\r\n<MustLogin>是否必须登录：%s\r\n<Running>运行状态：%s",
                 ConfigureReader.getInstance().getPort(),
                 ConfigureReader.getInstance().getLogLevel(),
                 ConfigureReader.getInstance().getBuffSize(),
                 ConfigureReader.getInstance().getFileSystemPath(),
                 ConfigureReader.getInstance().mustLogin(),
-                ConsoleLauncher.ctl.started()));
+                ConsoleLauncher.ctl.started());
     }
 
-    // 进入文件管理模式（航天飞机模式）
+    /**
+     * 进入文件管理模式（航天飞机模式）;
+     */
     private void fileSystemManagerModel()
     {
-        Out.println("已进入文件管理功能。");
+        AppSystem.out.println("已进入文件管理功能。");
         try
         {
             FileNodeUtil.initNodeTableToDataBase();
@@ -337,15 +358,15 @@ public class ConsoleLauncher
         }
         catch (Exception e)
         {
-            Out.println("错误：无法打开文件系统，该文件系统可能正在被另一个kiftd占用。");
+            AppSystem.out.println("错误：无法打开文件系统，该文件系统可能正在被另一个kiftd占用。");
             return;
         }
-        System.out.println("命令帮助：\r\n" + fsCommandTips + "\r\n");
+        System.out.printf("命令帮助：\r\n%s\r\n%n", fsCommandTips);
         try
         {
             while (true)
             {
-                System.out.println("kiftd: " + currentFolder.getCurrent().getFolderName() + "$ ");
+                System.out.printf("kiftd: %s$ %n", currentFolder.getCurrent().getFolderName());
                 String command = reader.nextLine();
                 // 针对一些带参数指令的操作
                 if (command.startsWith("cd "))
@@ -378,19 +399,19 @@ public class ConsoleLauncher
                     }
                     case "exit":
                     {
-                        Out.println("退出文件管理。");
+                        AppSystem.out.println("退出文件管理。");
                         return;
                     }
                     case "help":
                     case "--help":
                     case "-help":
                     {
-                        Out.println("命令帮助：\r\n" + fsCommandTips);
+                        AppSystem.out.println("命令帮助：\r\n" + fsCommandTips);
                         break;
                     }
                     default:
                     {
-                        Out.println("错误：无法识别的指令。\r\n" + fsCommandTips);
+                        AppSystem.out.println("错误：无法识别的指令。\r\n" + fsCommandTips);
                         break;
                     }
                 }
@@ -398,7 +419,7 @@ public class ConsoleLauncher
         }
         catch (Exception e)
         {
-            Out.println("错误：读取命令时出现意外，已退出文件管理功能。");
+            AppSystem.out.println("错误：读取命令时出现意外，已退出文件管理功能。");
         }
     }
 
@@ -463,7 +484,7 @@ public class ConsoleLauncher
                 getFolderView(fid);
                 return;
             }
-            Out.println("错误：该文件夹不存在或其不是一个文件夹（" + fname + "）。");
+            AppSystem.out.println("错误：该文件夹不存在或其不是一个文件夹（" + fname + "）。");
         }
         catch (SQLException e)
         {
@@ -543,7 +564,7 @@ public class ConsoleLauncher
             }
             catch (Exception e)
             {
-
+                e.printStackTrace();
             }
             return null;
         }
@@ -554,7 +575,7 @@ public class ConsoleLauncher
         }
         catch (NoSuchElementException e)
         {
-
+            e.printStackTrace();
         }
         return null;
     }
@@ -597,7 +618,7 @@ public class ConsoleLauncher
             }
             catch (Exception e)
             {
-
+                e.printStackTrace();
             }
             return null;
         }
@@ -615,6 +636,7 @@ public class ConsoleLauncher
             }
             catch (NoSuchElementException e2)
             {
+                e2.printStackTrace();
             }
         }
         return null;
@@ -650,18 +672,18 @@ public class ConsoleLauncher
             }
             else
             {
-                Out.println("错误：导入失败，必须指定导入目标（示例：“-import /ROOT/ /home/your/import/file.txt”）。");
+                AppSystem.out.println("错误：导入失败，必须指定导入目标（示例：“-import /ROOT/ /home/your/import/file.txt”）。");
                 return;
             }
             if (!(path instanceof Folder))
             {
-                Out.println("错误：导入位置（" + importPath + "）必须是一个文件夹（示例：“/ROOT”）。");
+                AppSystem.out.println("错误：导入位置（" + importPath + "）必须是一个文件夹（示例：“/ROOT”）。");
                 return;
             }
             String folderId = ((Folder) path).getFolderId();
             if (!target.exists())
             {
-                Out.println("错误：导入失败，要导入的文件或文件夹不存在（" + importTarget + "）。");
+                AppSystem.out.println("错误：导入失败，要导入的文件或文件夹不存在（" + importTarget + "）。");
                 return;
             }
             File[] files = new File[]{target};
@@ -684,7 +706,7 @@ public class ConsoleLauncher
                         }
                         default:
                         {
-                            Out.println("错误：导入失败，导入路径下存在相同的文件或文件夹（请使用以下参数：[-C]覆盖 [-B]保留两者）。");
+                            AppSystem.out.println("错误：导入失败，导入路径下存在相同的文件或文件夹（请使用以下参数：[-C]覆盖 [-B]保留两者）。");
                             return;
                         }
                     }
@@ -695,7 +717,7 @@ public class ConsoleLauncher
                 }
                 else
                 {
-                    Out.println("错误：导入失败，导入路径下存在相同的文件或文件夹（请增加以下参数：[-C]覆盖 [-B]保留两者）。");
+                    AppSystem.out.println("错误：导入失败，导入路径下存在相同的文件或文件夹（请增加以下参数：[-C]覆盖 [-B]保留两者）。");
                     return;
                 }
             }
@@ -709,12 +731,12 @@ public class ConsoleLauncher
             }
             else
             {
-                Out.println("错误：导入失败，可能导入全部文件。");
+                AppSystem.out.println("错误：导入失败，可能导入全部文件。");
             }
         }
         catch (Exception e1)
         {
-            Out.println("错误：导入失败，出现意外错误。");
+            AppSystem.out.println("错误：导入失败，出现意外错误。");
         }
     }
 
@@ -727,7 +749,7 @@ public class ConsoleLauncher
         File f = new File(fpath);
         if (!f.exists())
         {
-            Out.println("错误：无法导入文件或文件夹，该目标不存在（" + fpath + "），请重新检查。");
+            AppSystem.out.println("错误：无法导入文件或文件夹，该目标不存在（" + fpath + "），请重新检查。");
             return;
         }
         String targetFolder = currentFolder.getCurrent().getFolderId();
@@ -747,7 +769,7 @@ public class ConsoleLauncher
                     {
                         case "C":
                         {
-                            Out.println("导入被取消。");
+                            AppSystem.out.println("导入被取消。");
                             return;
                         }
                         case "V":
@@ -768,12 +790,12 @@ public class ConsoleLauncher
                     }
                 }
             }
-            Out.println("正在导入，请稍候...");
+            AppSystem.out.println("正在导入，请稍候...");
             pl = new ProgressListener();
             worker.execute(pl);
             FileSystemManager.getInstance().importFrom(importFiles, targetFolder, type);
             pl.c = false;
-            Out.println("导入完成。");
+            AppSystem.out.println("导入完成。");
         }
         catch (FilesTotalOutOfLimitException e1)
         {
@@ -781,7 +803,7 @@ public class ConsoleLauncher
             {
                 pl.c = false;
             }
-            Out.println("错误：导入失败，该文件夹内的文件数目已达上限，无法导入更多文件。");
+            AppSystem.out.println("错误：导入失败，该文件夹内的文件数目已达上限，无法导入更多文件。");
         }
         catch (FoldersTotalOutOfLimitException e2)
         {
@@ -789,7 +811,7 @@ public class ConsoleLauncher
             {
                 pl.c = false;
             }
-            Out.println("错误：导入失败，该文件夹内的文件夹数目已达上限，无法导入更多文件夹。");
+            AppSystem.out.println("错误：导入失败，该文件夹内的文件夹数目已达上限，无法导入更多文件夹。");
         }
         catch (Exception e3)
         {
@@ -797,7 +819,7 @@ public class ConsoleLauncher
             {
                 pl.c = false;
             }
-            Out.println("错误：无法导入该文件（或文件夹），请重试。");
+            AppSystem.out.println("错误：无法导入该文件（或文件夹），请重试。");
         }
     }
 
@@ -828,17 +850,17 @@ public class ConsoleLauncher
             }
             else
             {
-                Out.println("错误：导出失败，必须指定导出路径（示例：“-export /ROOT/ /home/your/export/folder”）。");
+                AppSystem.out.println("错误：导出失败，必须指定导出路径（示例：“-export /ROOT/ /home/your/export/folder”）。");
                 return;
             }
             if (!path.isDirectory())
             {
-                Out.println("错误：导出路径（" + exportPath + "）必须指向一个已经存在的文件夹。");
+                AppSystem.out.println("错误：导出路径（" + exportPath + "）必须指向一个已经存在的文件夹。");
                 return;
             }
             if (target == null)
             {
-                Out.println("错误：导出失败，要导出的文件或文件夹不存在（" + exportTarget + "）。");
+                AppSystem.out.println("错误：导出失败，要导出的文件或文件夹不存在（" + exportTarget + "）。");
                 return;
             }
             String[] foldersId;
@@ -856,7 +878,7 @@ public class ConsoleLauncher
             }
             else
             {
-                Out.println("错误：导出失败，出现意外错误。");
+                AppSystem.out.println("错误：导出失败，出现意外错误。");
                 return;
             }
             if (FileSystemManager.getInstance().hasExistsFilesOrFolders(foldersId, filesId, path) > 0)
@@ -877,7 +899,7 @@ public class ConsoleLauncher
                         }
                         default:
                         {
-                            Out.println("错误：导出失败，导出路径下存在相同的文件或文件夹（请使用以下参数：[-C]覆盖 [-B]保留两者）。");
+                            AppSystem.out.println("错误：导出失败，导出路径下存在相同的文件或文件夹（请使用以下参数：[-C]覆盖 [-B]保留两者）。");
                             return;
                         }
                     }
@@ -888,7 +910,7 @@ public class ConsoleLauncher
                 }
                 else
                 {
-                    Out.println("错误：导出失败，导出路径下存在相同的文件或文件夹（请增加以下参数：[-C]覆盖 [-B]保留两者）。");
+                    AppSystem.out.println("错误：导出失败，导出路径下存在相同的文件或文件夹（请增加以下参数：[-C]覆盖 [-B]保留两者）。");
                     return;
                 }
             }
@@ -902,16 +924,19 @@ public class ConsoleLauncher
             }
             else
             {
-                Out.println("错误：导出失败，可能导出全部文件。");
+                AppSystem.out.println("错误：导出失败，可能导出全部文件。");
             }
         }
         catch (Exception e1)
         {
-            Out.println("错误：导出失败，出现意外错误。");
+            AppSystem.out.println("错误：导出失败，出现意外错误。");
         }
     }
 
-    // 导出一个文件或文件夹
+    /**
+     * 导出一个文件或文件夹;
+     * @param command
+     */
     private void doExport(String command)
     {
         String[] args = command.split(" ");
@@ -930,7 +955,7 @@ public class ConsoleLauncher
         }
         else
         {
-            Out.println("错误：导出失败，输入参数不正确。");
+            AppSystem.out.println("错误：导出失败，输入参数不正确。");
             return;
         }
         File targetPath = new File(path);
@@ -938,7 +963,7 @@ public class ConsoleLauncher
         {
             if (id == null)
             {
-                Out.println("错误：导出失败，该文件或文件夹不存在（" + args[0] + "）。");
+                AppSystem.out.println("错误：导出失败，该文件或文件夹不存在（" + args[0] + "）。");
                 return;
             }
             try
@@ -959,7 +984,7 @@ public class ConsoleLauncher
                 }
                 else
                 {
-                    Out.println("错误：要导出的文件（或文件夹）不合法，只允许在当前文件夹内的选择（" + path + "）。");
+                    AppSystem.out.println("错误：要导出的文件（或文件夹）不合法，只允许在当前文件夹内的选择（" + path + "）。");
                     return;
                 }
                 if (FileSystemManager.getInstance().hasExistsFilesOrFolders(foldersId, filesId, targetPath) > 0)
@@ -973,7 +998,7 @@ public class ConsoleLauncher
                         {
                             case "C":
                             {
-                                Out.println("导出被取消。");
+                                AppSystem.out.println("导出被取消。");
                                 return;
                             }
                             case "V":
@@ -994,12 +1019,12 @@ public class ConsoleLauncher
                         }
                     }
                 }
-                Out.println("正在导出，请稍候...");
+                AppSystem.out.println("正在导出，请稍候...");
                 pl = new ProgressListener();
                 worker.execute(pl);
                 FileSystemManager.getInstance().exportTo(foldersId, filesId, targetPath, type);
                 pl.c = false;
-                Out.println("导出完成。");
+                AppSystem.out.println("导出完成。");
             }
             catch (Exception e1)
             {
@@ -1007,12 +1032,12 @@ public class ConsoleLauncher
                 {
                     pl.c = false;
                 }
-                Out.println("错误：无法导出该文件（或文件夹），请重试。");
+                AppSystem.out.println("错误：无法导出该文件（或文件夹），请重试。");
             }
         }
         else
         {
-            Out.println("错误：导出失败，导出的目标必须是一个文件夹（" + path + "）。");
+            AppSystem.out.println("错误：导出失败，导出的目标必须是一个文件夹（" + path + "）。");
         }
     }
 
@@ -1039,22 +1064,22 @@ public class ConsoleLauncher
             {
                 if (confirmOpt("确认要删除该文件夹么？"))
                 {
-                    Out.println("正在删除文件夹，请稍候...");
+                    AppSystem.out.println("正在删除文件夹，请稍候...");
                     pl = new ProgressListener();
                     worker.execute(pl);
                     if (FileSystemManager.getInstance().delete(new String[]{id}, new String[]{}))
                     {
-                        Out.println("删除完毕。");
+                        AppSystem.out.println("删除完毕。");
                     }
                     else
                     {
-                        Out.println("删除失败，可能未能删除该文件夹，请重试。");
+                        AppSystem.out.println("删除失败，可能未能删除该文件夹，请重试。");
                     }
                     pl.c = false;
                 }
                 else
                 {
-                    Out.println("已取消删除。");
+                    AppSystem.out.println("已取消删除。");
                 }
                 return;
             }
@@ -1062,22 +1087,22 @@ public class ConsoleLauncher
             {
                 if (confirmOpt("确认要删除该文件么？"))
                 {
-                    Out.println("正在删除文件，请稍候...");
+                    AppSystem.out.println("正在删除文件，请稍候...");
                     pl = new ProgressListener();
                     worker.execute(pl);
                     if (FileSystemManager.getInstance().delete(new String[]{}, new String[]{id}))
                     {
-                        Out.println("删除完毕。");
+                        AppSystem.out.println("删除完毕。");
                     }
                     else
                     {
-                        Out.println("删除失败，可能未能删除该文件，请重试。");
+                        AppSystem.out.println("删除失败，可能未能删除该文件，请重试。");
                     }
                     pl.c = false;
                 }
                 else
                 {
-                    Out.println("已取消删除。");
+                    AppSystem.out.println("已取消删除。");
                 }
                 return;
             }
@@ -1088,9 +1113,9 @@ public class ConsoleLauncher
             {
                 pl.c = false;
             }
-            Out.println("错误：无法删除文件，请重试。");
+            AppSystem.out.println("错误：无法删除文件，请重试。");
         }
-        Out.println("错误：该文件或文件夹不存在（" + fname + "）。");
+        AppSystem.out.println("错误：该文件或文件夹不存在（" + fname + "）。");
     }
 
     /**
@@ -1157,7 +1182,7 @@ public class ConsoleLauncher
      */
     private void openFolderError()
     {
-        Out.println("错误：无法读取指定文件夹，是否返回根目录？[Y/N]");
+        AppSystem.out.println("错误：无法读取指定文件夹，是否返回根目录？[Y/N]");
         while (true)
         {
             System.out.print("> ");
@@ -1172,7 +1197,7 @@ public class ConsoleLauncher
                     }
                     catch (SQLException e1)
                     {
-                        Out.println("错误：无法读取根目录，请尝试重新打开文件管理系统或重启kiftd。");
+                        AppSystem.out.println("错误：无法读取根目录，请尝试重新打开文件管理系统或重启kiftd。");
                     }
                     return;
                 }

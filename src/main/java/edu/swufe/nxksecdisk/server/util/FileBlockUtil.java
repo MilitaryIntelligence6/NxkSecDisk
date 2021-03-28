@@ -1,6 +1,6 @@
 package edu.swufe.nxksecdisk.server.util;
 
-import edu.swufe.nxksecdisk.printer.Out;
+import edu.swufe.nxksecdisk.system.AppSystem;
 import edu.swufe.nxksecdisk.server.enumeration.AccountAuth;
 import edu.swufe.nxksecdisk.server.mapper.FolderMapper;
 import edu.swufe.nxksecdisk.server.mapper.NodeMapper;
@@ -85,14 +85,14 @@ public class FileBlockUtil
             {
                 logUtil.writeException(e);
                 // FIXME 所有format换成printf;
-                Out.println(String.format("错误：临时文件清理失败，请手动清理%s文件夹内的临时文件。", f.getAbsolutePath()));
+                AppSystem.out.println(String.format("错误：临时文件清理失败，请手动清理%s文件夹内的临时文件。", f.getAbsolutePath()));
             }
         }
         else
         {
             if (!f.mkdir())
             {
-                Out.println("错误：无法创建临时文件夹" + f.getAbsolutePath() + "，请检查主文件系统存储路径是否可用。");
+                AppSystem.out.println("错误：无法创建临时文件夹" + f.getAbsolutePath() + "，请检查主文件系统存储路径是否可用。");
             }
         }
     }
@@ -168,7 +168,7 @@ public class FileBlockUtil
                     catch (Exception e)
                     {
                         logUtil.writeException(e);
-                        Out.println(e.getMessage());
+                        AppSystem.out.println(e.getMessage());
                         continue;
                     }
                 }
@@ -187,7 +187,7 @@ public class FileBlockUtil
         catch (Exception e)
         {
             logUtil.writeException(e);
-            Out.println("错误：文件块生成失败，无法存入新的文件数据。详细信息：" + e.getMessage());
+            AppSystem.out.println("错误：文件块生成失败，无法存入新的文件数据。详细信息：" + e.getMessage());
         }
         return null;
     }
@@ -311,7 +311,7 @@ public class FileBlockUtil
         catch (Exception e)
         {
             logUtil.writeException(e);
-            Out.println("错误：文件数据读取失败。详细信息：" + e.getMessage());
+            AppSystem.out.println("错误：文件数据读取失败。详细信息：" + e.getMessage());
         }
         return null;
     }
@@ -357,7 +357,7 @@ public class FileBlockUtil
                 }
                 catch (IOException e)
                 {
-                    Out.println("警告：文件节点效验时发生意外错误，可能未能正确完成文件节点效验。错误信息：" + e.getMessage());
+                    AppSystem.out.println("警告：文件节点效验时发生意外错误，可能未能正确完成文件节点效验。错误信息：" + e.getMessage());
                     logUtil.writeException(e);
                 }
             }
@@ -489,7 +489,7 @@ public class FileBlockUtil
         catch (Exception e)
         {
             logUtil.writeException(e);
-            Out.println(e.getMessage());
+            AppSystem.out.println(e.getMessage());
             return null;
         }
     }

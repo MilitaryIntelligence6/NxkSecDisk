@@ -1,6 +1,6 @@
 package edu.swufe.nxksecdisk.server.app;
 
-import edu.swufe.nxksecdisk.printer.Out;
+import edu.swufe.nxksecdisk.system.AppSystem;
 import edu.swufe.nxksecdisk.server.config.Mvc;
 import edu.swufe.nxksecdisk.server.util.ConfigureReader;
 import org.apache.catalina.Context;
@@ -32,9 +32,10 @@ import org.springframework.http.HttpStatus;
  */
 @SpringBootApplication
 @Import({Mvc.class})
-public class DiskApplication
+public class DiskAppController
 {
     private static ApplicationContext context;
+
     private static boolean run;
 
     /**
@@ -57,32 +58,34 @@ public class DiskApplication
      */
     public boolean start()
     {
-        Out.println("正在初始化服务器设置...");
+        AppSystem.out.println("正在初始化服务器设置...");
         final String[] args = new String[0];
-        if (!DiskApplication.run)
+        if (!DiskAppController.run)
         {
-            ConfigureReader.getInstance().reTestServerPropertiesAndEffect();// 启动服务器前重新检查各项设置并加载
+            // 启动服务器前重新检查各项设置并加载;
+            ConfigureReader.getInstance().reTestServerPropertiesAndEffect();
             if (ConfigureReader.getInstance().getPropertiesStatus() == 0)
             {
                 try
                 {
-                    Out.println("正在开启服务器引擎...");
-                    SpringApplication springApplication = new SpringApplication(DiskApplication.class);
-                    springApplication.setBannerMode(Banner.Mode.OFF);// 关闭自定义标志输出，简化日志信息
-                    DiskApplication.context = springApplication.run(args);
-                    DiskApplication.run = (DiskApplication.context != null);
-                    Out.println("服务器引擎已启动。");
-                    return DiskApplication.run;
+                    AppSystem.out.println("正在开启服务器引擎...");
+                    SpringApplication springApplication = new SpringApplication(DiskAppController.class);
+                    // 关闭自定义标志输出，简化日志信息;
+                    springApplication.setBannerMode(Banner.Mode.OFF);
+                    DiskAppController.context = springApplication.run(args);
+                    DiskAppController.run = (DiskAppController.context != null);
+                    AppSystem.out.println("服务器引擎已启动。");
+                    return DiskAppController.run;
                 }
                 catch (Exception e)
                 {
                     return false;
                 }
             }
-            Out.println("服务器设置检查失败，无法开启服务器。");
+            AppSystem.out.println("服务器设置检查失败，无法开启服务器。");
             return false;
         }
-        Out.println("服务器正在运行中。");
+        AppSystem.out.println("服务器正在运行中。");
         return true;
     }
 
@@ -97,22 +100,22 @@ public class DiskApplication
      */
     public boolean stop()
     {
-        Out.println("正在关闭服务器...");
-        if (DiskApplication.context != null)
+        AppSystem.out.println("正在关闭服务器...");
+        if (DiskAppController.context != null)
         {
-            Out.println("正在终止服务器引擎...");
+            AppSystem.out.println("正在终止服务器引擎...");
             try
             {
-                DiskApplication.run = (SpringApplication.exit(DiskApplication.context, new ExitCodeGenerator[0]) != 0);
-                Out.println("服务器引擎已终止。");
-                return !DiskApplication.run;
+                DiskAppController.run = (SpringApplication.exit(DiskAppController.context, new ExitCodeGenerator[0]) != 0);
+                AppSystem.out.println("服务器引擎已终止。");
+                return !DiskAppController.run;
             }
             catch (Exception e)
             {
                 return false;
             }
         }
-        Out.println("服务器未启动。");
+        AppSystem.out.println("服务器未启动。");
         return true;
     }
 
@@ -127,12 +130,12 @@ public class DiskApplication
      */
     public boolean started()
     {
-        return DiskApplication.run;
+        return DiskAppController.run;
     }
 
     static
     {
-        DiskApplication.run = false;
+        DiskAppController.run = false;
     }
 
     /**
@@ -184,25 +187,35 @@ public class DiskApplication
             tomcat.setPort(ConfigureReader.getInstance().getPort());
         }
         // 设置错误处理页面
-        tomcat.addErrorPages(new ErrorPage[]{new ErrorPage(HttpStatus.NOT_FOUND, "/prv/error.html"),
+        tomcat.addErrorPages(
+                new ErrorPage(HttpStatus.NOT_FOUND, "/prv/error.html"),
                 new ErrorPage(HttpStatus.INTERNAL_SERVER_ERROR, "/prv/error.html"),
                 new ErrorPage(HttpStatus.UNAUTHORIZED, "/prv/error.html"),
-                new ErrorPage(HttpStatus.FORBIDDEN, "/prv/forbidden.html")});
+                new ErrorPage(HttpStatus.FORBIDDEN, "/prv/forbidden.html"));
         return tomcat;
     }
 
-    // 生成https支持配置，包括端口号、证书文件、证书密码等
+    /**
+     * 生成https支持配置，包括端口号、证书文件、证书密码等;
+     * @return
+     */
     private Connector createHttpsConnector()
     {
         Connector connector = new Connector("org.apache.coyote.http11.Http11NioProtocol");
         // 配置针对Https的支持
-        connector.setScheme("https");// 设置请求协议头
-        connector.setPort(ConfigureReader.getInstance().getHttpsPort());// 设置https请求端口
+        // 设置请求协议头;
+        connector.setScheme("https");
+        // 设置https请求端口;
+        connector.setPort(ConfigureReader.getInstance().getHttpsPort());
         Http11NioProtocol protocol = (Http11NioProtocol) connector.getProtocolHandler();
-        protocol.setSSLEnabled(true);// 开启SSL加密通信
-        protocol.setKeystoreFile(ConfigureReader.getInstance().getHttpsKeyFile());// 设置证书文件
-        protocol.setKeystoreType(ConfigureReader.getInstance().getHttpsKeyType());// 设置加密类别（PKCS12/JKS）
-        protocol.setKeystorePass(ConfigureReader.getInstance().getHttpsKeyPass());// 设置证书密码
+        // 开启SSL加密通信;
+        protocol.setSSLEnabled(true);
+        // 设置证书文件;
+        protocol.setKeystoreFile(ConfigureReader.getInstance().getHttpsKeyFile());
+        // 设置加密类别（PKCS12/JKS）;
+        protocol.setKeystoreType(ConfigureReader.getInstance().getHttpsKeyType());
+        // 设置证书密码;
+        protocol.setKeystorePass(ConfigureReader.getInstance().getHttpsKeyPass());
         return connector;
     }
 }

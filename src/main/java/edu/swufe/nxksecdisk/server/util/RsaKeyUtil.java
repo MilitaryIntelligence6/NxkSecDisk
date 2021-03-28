@@ -1,6 +1,6 @@
 package edu.swufe.nxksecdisk.server.util;
 
-import edu.swufe.nxksecdisk.printer.Out;
+import edu.swufe.nxksecdisk.system.AppSystem;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
@@ -40,8 +40,8 @@ public class RsaKeyUtil
         }
         catch (NoSuchAlgorithmException e)
         {
-            Out.println(e.getMessage());
-            Out.println("错误：RSA密钥生成失败。");
+            AppSystem.out.println(e.getMessage());
+            AppSystem.out.println("错误：RSA密钥生成失败。");
         }
     }
 

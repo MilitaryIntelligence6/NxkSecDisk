@@ -1,6 +1,6 @@
 package edu.swufe.nxksecdisk.util.filesysmng;
 
-import edu.swufe.nxksecdisk.printer.Out;
+import edu.swufe.nxksecdisk.system.AppSystem;
 import edu.swufe.nxksecdisk.server.exception.FilesTotalOutOfLimitException;
 import edu.swufe.nxksecdisk.server.exception.FoldersTotalOutOfLimitException;
 import edu.swufe.nxksecdisk.server.model.Node;
@@ -142,9 +142,9 @@ public class FileSystemManager
             selectFolderById = c.prepareStatement("SELECT * FROM FOLDER WHERE folder_id = ?");
             selectNodeById = c.prepareStatement("SELECT * FROM FILE WHERE file_id = ?");
             selectNodesByPathExcludeById = c.prepareStatement(
-                    "SELECT * FROM FILE WHERE file_path = ? AND file_id <> ? LIMIT 0," + MAX_FOLDERS_OR_FILES_LIMIT);
+                    String.format("SELECT * FROM FILE WHERE file_path = ? AND file_id <> ? LIMIT 0,%d", MAX_FOLDERS_OR_FILES_LIMIT));
             selectNodesByFolderId = c.prepareStatement(
-                    "SELECT * FROM FILE WHERE file_parent_folder = ? LIMIT 0," + MAX_FOLDERS_OR_FILES_LIMIT);
+                    String.format("SELECT * FROM FILE WHERE file_parent_folder = ? LIMIT 0,%d", MAX_FOLDERS_OR_FILES_LIMIT));
             selectFoldersByParentFolderId = c.prepareStatement(
                     "SELECT * FROM FOLDER WHERE folder_parent = ? LIMIT 0," + MAX_FOLDERS_OR_FILES_LIMIT);
             insertNode = c.prepareStatement("INSERT INTO FILE VALUES(?,?,?,?,?,?,?)");
@@ -161,7 +161,7 @@ public class FileSystemManager
         }
         catch (SQLException e)
         {
-            Out.println("错误：出现未知错误，文件系统解析失败，无法浏览文件。");
+            AppSystem.out.println("错误：出现未知错误，文件系统解析失败，无法浏览文件。");
         }
     }
 
@@ -496,10 +496,14 @@ public class FileSystemManager
         if (f.isFile())
         {
             String name = f.getName();
-            String newName = name;// 这个变量记录最终使用的文件名，初始等于原文件名，如果冲突可能改为其他名称
-            per = 0;// 操作进度置0
-            message = "正在导入文件：" + name;// 初始化操作信息
-            long size = f.length();// 获得文件体积
+            // 这个变量记录最终使用的文件名，初始等于原文件名，如果冲突可能改为其他名称;
+            String newName = name;
+            // 操作进度置0;
+            per = 0;
+            // 初始化操作信息;
+            message = String.format("正在导入文件：%s", name);
+            // 获得文件体积
+            long size = f.length();
             // 检查目标文件夹内是否有重名文件？
             List<Node> nodes = selectNodesByFolderId(folderId);
             if (nodes.parallelStream().anyMatch((e) -> e.getFileName().equals(name)))
@@ -1002,7 +1006,7 @@ public class FileSystemManager
         }
         catch (Exception e)
         {
-            Out.println("错误：文件数据读取失败。详细信息：" + e.getMessage());
+            AppSystem.out.println("错误：文件数据读取失败。详细信息：" + e.getMessage());
         }
         return null;
     }
@@ -1064,7 +1068,7 @@ public class FileSystemManager
                     }
                     catch (Exception e)
                     {
-                        Out.println(e.getMessage());
+                        AppSystem.out.println(e.getMessage());
                         continue;
                     }
                 }
@@ -1082,7 +1086,7 @@ public class FileSystemManager
         }
         catch (Exception e)
         {
-            Out.println("错误：文件块生成失败，无法存入新的文件数据。详细信息：" + e.getMessage());
+            AppSystem.out.println("错误：文件块生成失败，无法存入新的文件数据。详细信息：" + e.getMessage());
         }
         return null;
     }
