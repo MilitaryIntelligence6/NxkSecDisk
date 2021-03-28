@@ -82,8 +82,7 @@ public class FileBlockUtil {
                 // FIXME 所有format换成printf;
                 AppSystem.out.println(String.format("错误：临时文件清理失败，请手动清理%s文件夹内的临时文件。", f.getAbsolutePath()));
             }
-        }
-        else {
+        } else {
             if (!f.mkdir()) {
                 AppSystem.out.println("错误：无法创建临时文件夹" + f.getAbsolutePath() + "，请检查主文件系统存储路径是否可用。");
             }
@@ -103,26 +102,24 @@ public class FileBlockUtil {
      */
     public File saveToFileBlocks(final MultipartFile f) {
         // 如果存在扩展存储区，则优先在已有文件块数目最少的扩展存储区中存放文件（避免占用主文件系统）
-        List<ExtendStores> ess = ConfigureReader.getInstance().getExtendStores();// 得到全部扩展存储区
+        // 得到全部扩展存储区;
+        List<ExtendStores> ess = ConfigureReader.getInstance().getExtendStores();
         if (ess.size() > 0) {
             // 将所有扩展存储区按照已存储文件块的数目从小到大进行排序
-            Collections.sort(ess, new Comparator<ExtendStores>() {
-                @Override
-                public int compare(ExtendStores o1, ExtendStores o2) {
+            Collections.sort(ess, (o1, o2) -> {
+                try {
+                    // 通常情况下，直接比较子文件列表长度即可
+                    return o1.getPath().list().length - o2.getPath().list().length;
+                }
+                catch (Exception e) {
                     try {
-                        // 通常情况下，直接比较子文件列表长度即可
-                        return o1.getPath().list().length - o2.getPath().list().length;
+                        // 如果文件太多以至于超出数组上限，则换用如下统计方法
+                        long dValue = Files.list(o1.getPath().toPath()).count()
+                                - Files.list(o2.getPath().toPath()).count();
+                        return dValue > 0L ? 1 : dValue == 0 ? 0 : -1;
                     }
-                    catch (Exception e) {
-                        try {
-                            // 如果文件太多以至于超出数组上限，则换用如下统计方法
-                            long dValue = Files.list(o1.getPath().toPath()).count()
-                                    - Files.list(o2.getPath().toPath()).count();
-                            return dValue > 0L ? 1 : dValue == 0 ? 0 : -1;
-                        }
-                        catch (IOException e1) {
-                            return 0;
-                        }
+                    catch (IOException e1) {
+                        return 0;
                     }
                 }
             });
@@ -135,8 +132,7 @@ public class FileBlockUtil {
                         if (file != null) {
                             f.transferTo(file);// 则执行存放，并将文件命名为“{存储区编号}_{UUID}.block”的形式
                             return file;
-                        }
-                        else {
+                        } else {
                             continue;// 如果本处无法生成新的文件块，那么在其他路径下继续尝试
                         }
                     }
@@ -177,12 +173,10 @@ public class FileBlockUtil {
             if (appendIndex >= 0 && appendIndex < Integer.MAX_VALUE) {
                 newBlock = new File(parent, newName + "_" + appendIndex + ".block");
                 appendIndex++;
-            }
-            else {
+            } else {
                 if (retryNum >= 5) {
                     return null;
-                }
-                else {
+                } else {
                     newName = prefix + UUID.randomUUID().toString().replace("-", "");
                     newBlock = new File(parent, newName + ".block");
                     retryNum++;
@@ -232,8 +226,7 @@ public class FileBlockUtil {
                 return file.delete();// 执行删除操作
             }
             return false;
-        }
-        else {
+        } else {
             // 如果还有，那么直接返回true即可，认为此节点的文件块已经删除了（其他的引用是属于其他节点的）
             return true;
         }
@@ -256,8 +249,7 @@ public class FileBlockUtil {
             if (f.getFilePath().startsWith("file_")) {// 存放于主文件系统中
                 // 直接从主文件系统的文件块存放区获得对应的文件块
                 file = new File(ConfigureReader.getInstance().getFileBlockPath(), f.getFilePath());
-            }
-            else {// 存放于扩展存储区
+            } else {// 存放于扩展存储区
                 short index = Short.parseShort(f.getFilePath().substring(0, f.getFilePath().indexOf('_')));
                 // 根据编号查到对应的扩展存储区路径，进而获取对应的文件块
                 file = new File(ConfigureReader.getInstance().getExtendStores().parallelStream()
@@ -283,65 +275,7 @@ public class FileBlockUtil {
      * @author 青阳龙野(kohgylw)
      */
     public void checkFileBlocks() {
-        AppSystem.pool.execute(() -> {
-                    // 检查是否存在未正确对应文件块的文件节点信息，若有则删除，从而确保文件节点信息不出现遗留问题
-                    checkNodes("root");
-                    // 检查是否存在未正确对应文件节点的文件块，若有则删除，从而确保文件块不出现遗留问题
-                    List<File> paths = new ArrayList<>();
-                    paths.add(new File(ConfigureReader.getInstance().getFileBlockPath()));
-                    for (ExtendStores es : ConfigureReader.getInstance().getExtendStores()) {
-                        paths.add(es.getPath());
-                    }
-                    for (File path : paths) {
-                        try (DirectoryStream<Path> ds = Files.newDirectoryStream(path.toPath())) {
-                            Iterator<Path> blocks = ds.iterator();
-                            while (blocks.hasNext()) {
-                                File testBlock = blocks.next().toFile();
-                                if (testBlock.isFile()) {
-                                    List<Node> nodes = nodeMapper.queryByPath(testBlock.getName());
-                                    if (nodes == null || nodes.isEmpty()) {
-                                        testBlock.delete();
-                                    }
-                                }
-                            }
-                        }
-                        catch (IOException e) {
-                            AppSystem.out.println("警告：文件节点效验时发生意外错误，可能未能正确完成文件节点效验。错误信息：" + e.getMessage());
-                            logUtil.writeException(e);
-                        }
-                    }
-                }
-        );
-//        Thread checkThread = new Thread(
-//                () -> {
-//            // 检查是否存在未正确对应文件块的文件节点信息，若有则删除，从而确保文件节点信息不出现遗留问题
-//            checkNodes("root");
-//            // 检查是否存在未正确对应文件节点的文件块，若有则删除，从而确保文件块不出现遗留问题
-//            List<File> paths = new ArrayList<>();
-//            paths.add(new File(ConfigureReader.getInstance().getFileBlockPath()));
-//            for (ExtendStores es : ConfigureReader.getInstance().getExtendStores()) {
-//                paths.add(es.getPath());
-//            }
-//            for (File path : paths) {
-//                try (DirectoryStream<Path> ds = Files.newDirectoryStream(path.toPath())) {
-//                    Iterator<Path> blocks = ds.iterator();
-//                    while (blocks.hasNext()) {
-//                        File testBlock = blocks.next().toFile();
-//                        if (testBlock.isFile()) {
-//                            List<Node> nodes = nodeMapper.queryByPath(testBlock.getName());
-//                            if (nodes == null || nodes.isEmpty()) {
-//                                testBlock.delete();
-//                            }
-//                        }
-//                    }
-//                }
-//                catch (IOException e) {
-//                    AppSystem.out.println("警告：文件节点效验时发生意外错误，可能未能正确完成文件节点效验。错误信息：" + e.getMessage());
-//                    logUtil.writeException(e);
-//                }
-//            }
-//        });
-//        checkThread.start();
+        AppSystem.pool.execute(this::runCheckFileBlocks);
     }
 
     /**
@@ -413,8 +347,7 @@ public class FileBlockUtil {
                             .count() > 1) {
                         fo.setFolderName(flname + " " + i);
                         i++;
-                    }
-                    else {
+                    } else {
                         break;
                     }
                 }
@@ -432,13 +365,11 @@ public class FileBlockUtil {
                             if (fname.indexOf(".") >= 0) {
                                 node.setFileName(fname.substring(0, fname.lastIndexOf(".")) + " (" + i + ")"
                                         + fname.substring(fname.lastIndexOf(".")));
-                            }
-                            else {
+                            } else {
                                 node.setFileName(fname + " (" + i + ")");
                             }
                             i++;
-                        }
-                        else {
+                        } else {
                             break;
                         }
                     }
@@ -486,8 +417,7 @@ public class FileBlockUtil {
                             .count() > 1) {
                         fo.setFolderName(flname + " " + i);
                         i++;
-                    }
-                    else {
+                    } else {
                         break;
                     }
                 }
@@ -504,13 +434,11 @@ public class FileBlockUtil {
                         if (fname.indexOf(".") >= 0) {
                             node.setFileName(fname.substring(0, fname.lastIndexOf(".")) + " (" + i + ")"
                                     + fname.substring(fname.lastIndexOf(".")));
-                        }
-                        else {
+                        } else {
                             node.setFileName(fname + " (" + i + ")");
                         }
                         i++;
-                    }
-                    else {
+                    } else {
                         break;
                     }
                 }
@@ -562,8 +490,7 @@ public class FileBlockUtil {
         f2.setFileId(UUID.randomUUID().toString());
         if (account != null) {
             f2.setFileCreator(account);
-        }
-        else {
+        } else {
             f2.setFileCreator("\u533f\u540d\u7528\u6237");
         }
         f2.setFileCreationDate(ServerTimeUtil.accurateToDay());
@@ -578,8 +505,7 @@ public class FileBlockUtil {
                 if (this.nodeMapper.insert(f2) > 0) {
                     if (isValidNode(f2)) {
                         return f2;
-                    }
-                    else {
+                    } else {
                         break;
                     }
                 }
@@ -617,8 +543,7 @@ public class FileBlockUtil {
             // 所谓撤销，也就是将该节点的数据立即删除（如果有）
             nodeMapper.deleteById(n.getFileId());
             return false;// 返回“无效”的判定结果
-        }
-        else {
+        } else {
             return true;// 否则，该节点有效，返回结果
         }
     }
@@ -646,4 +571,32 @@ public class FileBlockUtil {
         return pl.toString();
     }
 
+    private void runCheckFileBlocks() {
+        // 检查是否存在未正确对应文件块的文件节点信息，若有则删除，从而确保文件节点信息不出现遗留问题
+        checkNodes("root");
+        // 检查是否存在未正确对应文件节点的文件块，若有则删除，从而确保文件块不出现遗留问题
+        List<File> paths = new ArrayList<>();
+        paths.add(new File(ConfigureReader.getInstance().getFileBlockPath()));
+        for (ExtendStores es : ConfigureReader.getInstance().getExtendStores()) {
+            paths.add(es.getPath());
+        }
+        for (File path : paths) {
+            try (DirectoryStream<Path> ds = Files.newDirectoryStream(path.toPath())) {
+                Iterator<Path> blocks = ds.iterator();
+                while (blocks.hasNext()) {
+                    File testBlock = blocks.next().toFile();
+                    if (testBlock.isFile()) {
+                        List<Node> nodes = nodeMapper.queryByPath(testBlock.getName());
+                        if (nodes == null || nodes.isEmpty()) {
+                            testBlock.delete();
+                        }
+                    }
+                }
+            }
+            catch (IOException e) {
+                AppSystem.out.println("警告：文件节点效验时发生意外错误，可能未能正确完成文件节点效验。错误信息：" + e.getMessage());
+                logUtil.writeException(e);
+            }
+        }
+    }
 }

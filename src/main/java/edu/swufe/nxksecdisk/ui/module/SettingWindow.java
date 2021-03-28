@@ -85,26 +85,26 @@ public class SettingWindow extends DiskDynamicWindow {
         setUIFont();
         // 窗口主体相关设置
 
-window = new JDialog(ServerUiModule.window, "kiftd-设置");
+        window = new JDialog(ServerUiModule.window, "kiftd-设置");
         window.setModal(true);
 
-window.setSize(420, 425);
+        window.setSize(420, 425);
 
-window.setLocation(150, 150);
+        window.setLocation(150, 150);
 
-window.setDefaultCloseOperation(1);
+        window.setDefaultCloseOperation(1);
 
-window.setResizable(false);
+        window.setResizable(false);
 
-window.setLayout(new BoxLayout(
-window.getContentPane(), 3));
+        window.setLayout(new BoxLayout(
+                window.getContentPane(), 3));
         final JPanel titlebox = new JPanel(new FlowLayout(1));
         titlebox.setBorder(new EmptyBorder(0, 0, (int) (7 * proportion), 0));
         final JLabel title = new JLabel("服务器设置 Server Setting");
         title.setFont(new Font("宋体", 1, (int) (20 * proportion)));
         titlebox.add(title);
 
-window.add(titlebox);
+        window.add(titlebox);
         // 窗口组件排布
         final JPanel settingbox = new JPanel(new GridLayout(8, 1, 0, 0));
         settingbox.setBorder(new EtchedBorder());
@@ -114,102 +114,102 @@ window.add(titlebox);
         mlbox.setBorder(new EmptyBorder(interval, 0, interval, 0));
         final JLabel mltitle = new JLabel("必须登入(must login)：");
         (
-mlInput = new JComboBox<>()).addItem(ML_OPEN);
+                mlInput = new JComboBox<>()).addItem(ML_OPEN);
 
-mlInput.addItem(ML_CLOSE);
+        mlInput.addItem(ML_CLOSE);
 
-mlInput.setPreferredSize(new Dimension((int) (170 * proportion), (int) (20 * proportion)));
+        mlInput.setPreferredSize(new Dimension((int) (170 * proportion), (int) (20 * proportion)));
         mlbox.add(mltitle);
         mlbox.add(
-mlInput);
+                mlInput);
         // 登录验证码下拉框
         final JPanel vcbox = new JPanel(new FlowLayout(1));
         vcbox.setBorder(new EmptyBorder(interval, 0, interval, 0));
         final JLabel vctitle = new JLabel("登录验证码(VC type)：");
         (
-vcInput = new JComboBox<>()).addItem(VC_STANDARD);
+                vcInput = new JComboBox<>()).addItem(VC_STANDARD);
 
-vcInput.addItem(VC_SIMP);
+        vcInput.addItem(VC_SIMP);
 
-vcInput.addItem(VC_CLOSE);
+        vcInput.addItem(VC_CLOSE);
 
-mlInput.setPreferredSize(new Dimension((int) (170 * proportion), (int) (20 * proportion)));
+        mlInput.setPreferredSize(new Dimension((int) (170 * proportion), (int) (20 * proportion)));
         vcbox.add(vctitle);
         vcbox.add(
-vcInput);
+                vcInput);
         // 端口号输入框
         final JPanel portbox = new JPanel(new FlowLayout(1));
         portbox.setBorder(new EmptyBorder(interval, 0, interval, 0));
         final JLabel porttitle = new JLabel("端口(port)：");
         (
-portInput = new JTextField())
+                portInput = new JTextField())
                 .setPreferredSize(new Dimension((int) (120 * proportion), (int) (25 * proportion)));
         portbox.add(porttitle);
         portbox.add(
-portInput);
+                portInput);
         // 缓存大小输入框
         final JPanel bufferbox = new JPanel(new FlowLayout(1));
         bufferbox.setBorder(new EmptyBorder(interval, 0, interval, 0));
         final JLabel buffertitle = new JLabel("缓存大小(buffer)：");
         (
-bufferInput = new JTextField())
+                bufferInput = new JTextField())
                 .setPreferredSize(new Dimension((int) (170 * proportion), (int) (25 * proportion)));
         final JLabel bufferUnit = new JLabel("KB");
         bufferbox.add(buffertitle);
         bufferbox.add(
-bufferInput);
+                bufferInput);
         bufferbox.add(bufferUnit);
         // 日志等级选择框
         final JPanel logbox = new JPanel(new FlowLayout(1));
         logbox.setBorder(new EmptyBorder(interval, 0, interval, 0));
         final JLabel logtitle = new JLabel("日志等级(port)：");
         (
-logLevelInput = new JComboBox<>()).addItem("记录全部(ALL)");
+                logLevelInput = new JComboBox<>()).addItem("记录全部(ALL)");
 
-logLevelInput.addItem("仅异常(EXCEPTION)");
+        logLevelInput.addItem("仅异常(EXCEPTION)");
 
-logLevelInput.addItem("不记录(NONE)");
+        logLevelInput.addItem("不记录(NONE)");
 
-logLevelInput.setPreferredSize(new Dimension((int) (170 * proportion), (int) (20 * proportion)));
+        logLevelInput.setPreferredSize(new Dimension((int) (170 * proportion), (int) (20 * proportion)));
         logbox.add(logtitle);
         logbox.add(
-logLevelInput);
+                logLevelInput);
         // 用户修改密码选择框
         final JPanel cpbox = new JPanel(new FlowLayout(1));
         cpbox.setBorder(new EmptyBorder(interval, 0, interval, 0));
         final JLabel cptitle = new JLabel("用户修改密码(change password)：");
         (
-changePwdInput = new JComboBox<>()).addItem(CHANGE_PWD_CLOSE);
+                changePwdInput = new JComboBox<>()).addItem(CHANGE_PWD_CLOSE);
 
-changePwdInput.addItem(CHANGE_PWD_OPEN);
+        changePwdInput.addItem(CHANGE_PWD_OPEN);
 
-changePwdInput.setPreferredSize(new Dimension((int) (170 * proportion), (int) (20 * proportion)));
+        changePwdInput.setPreferredSize(new Dimension((int) (170 * proportion), (int) (20 * proportion)));
         cpbox.add(cptitle);
         cpbox.add(
-changePwdInput);
+                changePwdInput);
         // 用户修改密码选择框
         final JPanel scbox = new JPanel(new FlowLayout(1));
         cpbox.setBorder(new EmptyBorder(interval, 0, interval, 0));
         final JLabel sctitle = new JLabel("永久资源链接(file chain)：");
         (
-showChainInput = new JComboBox<>()).addItem(SHOW_CHAIN_CLOSE);
+                showChainInput = new JComboBox<>()).addItem(SHOW_CHAIN_CLOSE);
 
-showChainInput.addItem(SHOW_CHAIN_OPEN);
+        showChainInput.addItem(SHOW_CHAIN_OPEN);
 
-showChainInput.setPreferredSize(new Dimension((int) (170 * proportion), (int) (20 * proportion)));
+        showChainInput.setPreferredSize(new Dimension((int) (170 * proportion), (int) (20 * proportion)));
         scbox.add(sctitle);
         scbox.add(
-showChainInput);
+                showChainInput);
         // 文件系统管理按钮
         final JPanel filePathBox = new JPanel(new FlowLayout(1));
         filePathBox.setBorder(new EmptyBorder(interval, 0, interval, 0));
         final JLabel filePathtitle = new JLabel("文件系统路径(file system path)：");
 
-changeFileSystemPath = new JButton("管理(Manage)");
+        changeFileSystemPath = new JButton("管理(Manage)");
         changeFileSystemPath.setPreferredSize(new Dimension((int) (170 * proportion), (int) (32 * proportion)));
         filePathBox.add(filePathtitle);
         filePathBox.add(
-changeFileSystemPath);
+                changeFileSystemPath);
         // 界面布局顺序
         settingbox.add(portbox);
         settingbox.add(mlbox);
@@ -220,238 +220,30 @@ changeFileSystemPath);
         settingbox.add(scbox);
         settingbox.add(filePathBox);
 
-window.add(settingbox);
+        window.add(settingbox);
         final JPanel buttonbox = new JPanel(new FlowLayout(1));
         buttonbox.setBorder(new EmptyBorder((int) (0 * proportion), 0, (int) (5 * proportion), 0));
 
-update = new JButton("应用(Update)");
+        update = new JButton("应用(Update)");
 
-cancel = new JButton("取消(Cancel)");
+        cancel = new JButton("取消(Cancel)");
         update.setPreferredSize(new Dimension((int) (155 * proportion), (int) (32 * proportion)));
         cancel.setPreferredSize(new Dimension((int) (155 * proportion), (int) (32 * proportion)));
-        buttonbox.add(
-update);
-        buttonbox.add(
-cancel);
+        buttonbox.add(update);
+        buttonbox.add(cancel);
 
-window.add(buttonbox);
-
-cancel.addActionListener(e -> window.setVisible(false));
-
-update.addActionListener(e -> {
+        window.add(buttonbox);
+        cancel.addActionListener(e -> window.setVisible(false));
+        update.addActionListener(e -> {
             // 仅在服务器停止时才可以进行修改
             if (serverStatus.getServerStatus()) {
-                getServerStatus();
+                startServerStatus();
             } else {
-                AppSystem.pool.execute(() -> {
-                    if (updateSetting != null) {
-                        try {
-                            ServerSetting ss = new ServerSetting();
-                            ss.setPort(Integer.parseInt(portInput.getText()));
-                            ss.setBuffSize(Integer.parseInt(bufferInput.getText()) * 1024);
-                            ss.setFsPath(chooserPath.getAbsolutePath());
-                            List<ExtendStores> ess = new ArrayList<>();
-                            for (FileSystemPath fsp : extendStores) {
-                                ExtendStores es = new ExtendStores();
-                                es.setIndex(fsp.getIndex());
-                                es.setPath(fsp.getPath());
-                                ess.add(es);
-                            }
-                            ss.setExtendStores(ess);
-                            switch (logLevelInput.getSelectedIndex()) {
-                                case 0: {
-                                    ss.setLog(LogLevel.EVENT);
-                                    break;
-                                }
-                                case 1: {
-                                    ss.setLog(LogLevel.RUNTIME_EXCEPTION);
-                                    break;
-                                }
-                                case 2: {
-                                    ss.setLog(LogLevel.NONE);
-                                    break;
-                                }
-                                default: {
-                                    // 注意，当选择未知的日志等级时，不做任何操作
-                                    break;
-                                }
-                            }
-                            switch (mlInput.getSelectedIndex()) {
-                                case 0: {
-                                    ss.setMustLogin(true);
-                                    break;
-                                }
-                                case 1: {
-                                    ss.setMustLogin(false);
-                                    break;
-                                }
-                                default: {
-                                    break;
-                                }
-                            }
-                            switch (changePwdInput.getSelectedIndex()) {
-                                case 0: {
-                                    ss.setChangePassword(false);
-                                    break;
-                                }
-                                case 1: {
-                                    ss.setChangePassword(true);
-                                    break;
-                                }
-                                default: {
-                                    break;
-                                }
-                            }
-                            switch (showChainInput.getSelectedIndex()) {
-                                case 0: {
-                                    ss.setFileChain(false);
-                                    break;
-                                }
-                                case 1: {
-                                    ss.setFileChain(true);
-                                    break;
-                                }
-                                default: {
-                                    break;
-                                }
-                            }
-                            switch (vcInput.getSelectedIndex()) {
-                                case 0: {
-                                    ss.setVc(VcLevel.STANDARD);
-                                    break;
-                                }
-                                case 1: {
-                                    ss.setVc(VcLevel.SIMPLIFIED);
-                                    break;
-                                }
-                                case 2: {
-                                    ss.setVc(VcLevel.CLOSE);
-                                    break;
-                                }
-                                default:
-                                    break;
-                            }
-                            if (updateSetting.update(ss)) {
-                                ServerUiModule.getInstance().updateServerStatus();
-                                window.setVisible(false);
-                            }
-                        }
-                        catch (Exception exc) {
-                            AppSystem.out.println(exc.getMessage());
-                            AppSystem.out.println("错误：无法更新服务器设置");
-                        }
-                    } else {
-                        window.setVisible(false);
-                    }
-                });
-//                Thread t = new Thread(() ->
-//                {
-//                    if (updateSetting != null) {
-//                        try {
-//                            ServerSetting ss = new ServerSetting();
-//                            ss.setPort(Integer.parseInt(portInput.getText()));
-//                            ss.setBuffSize(Integer.parseInt(bufferInput.getText()) * 1024);
-//                            ss.setFsPath(chooserPath.getAbsolutePath());
-//                            List<ExtendStores> ess = new ArrayList<>();
-//                            for (FileSystemPath fsp : extendStores) {
-//                                ExtendStores es = new ExtendStores();
-//                                es.setIndex(fsp.getIndex());
-//                                es.setPath(fsp.getPath());
-//                                ess.add(es);
-//                            }
-//                            ss.setExtendStores(ess);
-//                            switch (logLevelInput.getSelectedIndex()) {
-//                                case 0: {
-//                                    ss.setLog(LogLevel.EVENT);
-//                                    break;
-//                                }
-//                                case 1: {
-//                                    ss.setLog(LogLevel.RUNTIME_EXCEPTION);
-//                                    break;
-//                                }
-//                                case 2: {
-//                                    ss.setLog(LogLevel.NONE);
-//                                    break;
-//                                }
-//                                default: {
-//                                    // 注意，当选择未知的日志等级时，不做任何操作
-//                                    break;
-//                                }
-//                            }
-//                            switch (mlInput.getSelectedIndex()) {
-//                                case 0: {
-//                                    ss.setMustLogin(true);
-//                                    break;
-//                                }
-//                                case 1: {
-//                                    ss.setMustLogin(false);
-//                                    break;
-//                                }
-//                                default: {
-//                                    break;
-//                                }
-//                            }
-//                            switch (changePwdInput.getSelectedIndex()) {
-//                                case 0: {
-//                                    ss.setChangePassword(false);
-//                                    break;
-//                                }
-//                                case 1: {
-//                                    ss.setChangePassword(true);
-//                                    break;
-//                                }
-//                                default: {
-//                                    break;
-//                                }
-//                            }
-//                            switch (showChainInput.getSelectedIndex()) {
-//                                case 0: {
-//                                    ss.setFileChain(false);
-//                                    break;
-//                                }
-//                                case 1: {
-//                                    ss.setFileChain(true);
-//                                    break;
-//                                }
-//                                default: {
-//                                    break;
-//                                }
-//                            }
-//                            switch (vcInput.getSelectedIndex()) {
-//                                case 0: {
-//                                    ss.setVc(VcLevel.STANDARD);
-//                                    break;
-//                                }
-//                                case 1: {
-//                                    ss.setVc(VcLevel.SIMPLIFIED);
-//                                    break;
-//                                }
-//                                case 2: {
-//                                    ss.setVc(VcLevel.CLOSE);
-//                                    break;
-//                                }
-//                                default:
-//                                    break;
-//                            }
-//                            if (updateSetting.update(ss)) {
-//                                ServerUiModule.getInstance().updateServerStatus();
-//                                window.setVisible(false);
-//                            }
-//                        }
-//                        catch (Exception exc) {
-//                            AppSystem.out.println(exc.getMessage());
-//                            AppSystem.out.println("错误：无法更新服务器设置");
-//                        }
-//                    }
-//                    else {
-//                        window.setVisible(false);
-//                    }
-//                });
-//                t.start();
+                AppSystem.pool.execute(SettingWindow.this::runServerSetting);
             }
         });
 
-changeFileSystemPath.addActionListener(e -> {
+        changeFileSystemPath.addActionListener(e -> {
             fileSystemPathViewer = FileSystemPathViewer.getInstance();
             fileSystemPathViewer.show();
         });
@@ -459,203 +251,12 @@ changeFileSystemPath.addActionListener(e -> {
     }
 
     protected void show() {
-        this.getServerStatus();
+        this.startServerStatus();
         window.setVisible(true);
     }
 
-    private void getServerStatus() {
-        AppSystem.pool.execute(() -> {
-            if (serverStatus != null) {
-                bufferInput
-                        .setText(serverStatus.getBufferSize() == 0 ?
-                                serverStatus.getInitBufferSize()
-                                : String.format("%d", serverStatus.getBufferSize() / 1024));
-                portInput.setText(serverStatus.getPort() == 0 ?
-                        String.format("%s", serverStatus.getInitProt())
-                        : String.format("%d", serverStatus.getPort()));
-                if (serverStatus.getFileSystemPath() != null) {
-                    chooserPath = new File(serverStatus.getFileSystemPath());
-                } else {
-                    chooserPath = new File(serverStatus.getInitFileSystemPath());
-                }
-                extendStores = serverStatus.getExtendStores();
-                if (serverStatus.getLogLevel() != null) {
-                    switch (serverStatus.getLogLevel()) {
-                        case EVENT: {
-                            logLevelInput.setSelectedIndex(0);
-                            break;
-                        }
-                        case RUNTIME_EXCEPTION: {
-                            logLevelInput.setSelectedIndex(1);
-                            break;
-                        }
-                        case NONE: {
-                            logLevelInput.setSelectedIndex(2);
-                            break;
-                        }
-                    }
-                } else {
-                    switch (serverStatus.getInitLogLevel()) {
-                        case EVENT: {
-                            logLevelInput.setSelectedIndex(0);
-                            break;
-                        }
-                        case RUNTIME_EXCEPTION: {
-                            logLevelInput.setSelectedIndex(1);
-                            break;
-                        }
-                        case NONE: {
-                            logLevelInput.setSelectedIndex(2);
-                            break;
-                        }
-                    }
-                }
-                if (serverStatus.getMustLogin()) {
-                    mlInput.setSelectedIndex(0);
-                } else {
-                    mlInput.setSelectedIndex(1);
-                }
-                if (serverStatus.isAllowChangePassword()) {
-                    changePwdInput.setSelectedIndex(1);
-                } else {
-                    changePwdInput.setSelectedIndex(0);
-                }
-                if (serverStatus.isOpenFileChain()) {
-                    showChainInput.setSelectedIndex(1);
-                } else {
-                    showChainInput.setSelectedIndex(0);
-                }
-                if (serverStatus.getVCLevel() != null) {
-                    switch (serverStatus.getVCLevel()) {
-                        case STANDARD: {
-                            vcInput.setSelectedIndex(0);
-                            break;
-                        }
-                        case SIMPLIFIED: {
-                            vcInput.setSelectedIndex(1);
-                            break;
-                        }
-                        case CLOSE: {
-                            vcInput.setSelectedIndex(2);
-                            break;
-                        }
-                    }
-                } else {
-                    switch (serverStatus.getInitVCLevel()) {
-                        case STANDARD: {
-                            vcInput.setSelectedIndex(0);
-                            break;
-                        }
-                        case SIMPLIFIED: {
-                            vcInput.setSelectedIndex(1);
-                            break;
-                        }
-                        case CLOSE: {
-                            vcInput.setSelectedIndex(2);
-                            break;
-                        }
-                    }
-                }
-            }
-            return;
-        });
-//        final Thread t = new Thread(() ->
-//        {
-//            if (serverStatus != null) {
-//                bufferInput
-//                        .setText(serverStatus.getBufferSize() == 0 ?
-//                                serverStatus.getInitBufferSize()
-//                                : String.format("%d", serverStatus.getBufferSize() / 1024));
-//                portInput.setText(serverStatus.getPort() == 0 ?
-//                        String.format("%s", serverStatus.getInitProt())
-//                        : String.format("%d", serverStatus.getPort()));
-//                if (serverStatus.getFileSystemPath() != null) {
-//                    chooserPath = new File(serverStatus.getFileSystemPath());
-//                } else {
-//                    chooserPath = new File(serverStatus.getInitFileSystemPath());
-//                }
-//                extendStores = serverStatus.getExtendStores();
-//                if (serverStatus.getLogLevel() != null) {
-//                    switch (serverStatus.getLogLevel()) {
-//                        case EVENT: {
-//                            logLevelInput.setSelectedIndex(0);
-//                            break;
-//                        }
-//                        case RUNTIME_EXCEPTION: {
-//                            logLevelInput.setSelectedIndex(1);
-//                            break;
-//                        }
-//                        case NONE: {
-//                            logLevelInput.setSelectedIndex(2);
-//                            break;
-//                        }
-//                    }
-//                } else {
-//                    switch (serverStatus.getInitLogLevel()) {
-//                        case EVENT: {
-//                            logLevelInput.setSelectedIndex(0);
-//                            break;
-//                        }
-//                        case RUNTIME_EXCEPTION: {
-//                            logLevelInput.setSelectedIndex(1);
-//                            break;
-//                        }
-//                        case NONE: {
-//                            logLevelInput.setSelectedIndex(2);
-//                            break;
-//                        }
-//                    }
-//                }
-//                if (serverStatus.getMustLogin()) {
-//                    mlInput.setSelectedIndex(0);
-//                } else {
-//                    mlInput.setSelectedIndex(1);
-//                }
-//                if (serverStatus.isAllowChangePassword()) {
-//                    changePwdInput.setSelectedIndex(1);
-//                } else {
-//                    changePwdInput.setSelectedIndex(0);
-//                }
-//                if (serverStatus.isOpenFileChain()) {
-//                    showChainInput.setSelectedIndex(1);
-//                } else {
-//                    showChainInput.setSelectedIndex(0);
-//                }
-//                if (serverStatus.getVCLevel() != null) {
-//                    switch (serverStatus.getVCLevel()) {
-//                        case STANDARD: {
-//                            vcInput.setSelectedIndex(0);
-//                            break;
-//                        }
-//                        case SIMPLIFIED: {
-//                            vcInput.setSelectedIndex(1);
-//                            break;
-//                        }
-//                        case CLOSE: {
-//                            vcInput.setSelectedIndex(2);
-//                            break;
-//                        }
-//                    }
-//                } else {
-//                    switch (serverStatus.getInitVCLevel()) {
-//                        case STANDARD: {
-//                            vcInput.setSelectedIndex(0);
-//                            break;
-//                        }
-//                        case SIMPLIFIED: {
-//                            vcInput.setSelectedIndex(1);
-//                            break;
-//                        }
-//                        case CLOSE: {
-//                            vcInput.setSelectedIndex(2);
-//                            break;
-//                        }
-//                    }
-//                }
-//            }
-//            return;
-//        });
-//        t.start();
+    private void startServerStatus() {
+        AppSystem.pool.execute(this::runServerStatus);
     }
 
     protected static SettingWindow getInstance() {
@@ -667,5 +268,214 @@ changeFileSystemPath.addActionListener(e -> {
             }
         }
         return instance;
+    }
+
+    private void runServerSetting() {
+        if (updateSetting != null) {
+            try {
+                ServerSetting serverSetting = new ServerSetting();
+                serverSetting.setPort(Integer.parseInt(portInput.getText()));
+                serverSetting.setBuffSize(Integer.parseInt(bufferInput.getText()) * 1024);
+                serverSetting.setFsPath(chooserPath.getAbsolutePath());
+                List<ExtendStores> extendStoresList = new ArrayList<>();
+                for (FileSystemPath fileSystemPath : extendStores) {
+                    ExtendStores extendStores = new ExtendStores();
+                    extendStores.setIndex(fileSystemPath.getIndex());
+                    extendStores.setPath(fileSystemPath.getPath());
+                    extendStoresList.add(extendStores);
+                }
+                serverSetting.setExtendStores(extendStoresList);
+                switch (logLevelInput.getSelectedIndex()) {
+                    case 0: {
+                        serverSetting.setLog(LogLevel.EVENT);
+                        break;
+                    }
+                    case 1: {
+                        serverSetting.setLog(LogLevel.RUNTIME_EXCEPTION);
+                        break;
+                    }
+                    case 2: {
+                        serverSetting.setLog(LogLevel.NONE);
+                        break;
+                    }
+                    default: {
+                        // 注意，当选择未知的日志等级时，不做任何操作
+                        break;
+                    }
+                }
+                switch (mlInput.getSelectedIndex()) {
+                    case 0: {
+                        serverSetting.setMustLogin(true);
+                        break;
+                    }
+                    case 1: {
+                        serverSetting.setMustLogin(false);
+                        break;
+                    }
+                    default: {
+                        break;
+                    }
+                }
+                switch (changePwdInput.getSelectedIndex()) {
+                    case 0: {
+                        serverSetting.setChangePassword(false);
+                        break;
+                    }
+                    case 1: {
+                        serverSetting.setChangePassword(true);
+                        break;
+                    }
+                    default: {
+                        break;
+                    }
+                }
+                switch (showChainInput.getSelectedIndex()) {
+                    case 0: {
+                        serverSetting.setFileChain(false);
+                        break;
+                    }
+                    case 1: {
+                        serverSetting.setFileChain(true);
+                        break;
+                    }
+                    default: {
+                        break;
+                    }
+                }
+                switch (vcInput.getSelectedIndex()) {
+                    case 0: {
+                        serverSetting.setVc(VcLevel.STANDARD);
+                        break;
+                    }
+                    case 1: {
+                        serverSetting.setVc(VcLevel.SIMPLIFIED);
+                        break;
+                    }
+                    case 2: {
+                        serverSetting.setVc(VcLevel.CLOSE);
+                        break;
+                    }
+                    default:
+                        break;
+                }
+                if (updateSetting.update(serverSetting)) {
+                    ServerUiModule.getInstance().updateServerStatus();
+                    window.setVisible(false);
+                }
+            }
+            catch (Exception exc) {
+                AppSystem.out.println(exc.getMessage());
+                AppSystem.out.println("错误：无法更新服务器设置");
+            }
+        } else {
+            window.setVisible(false);
+        }
+    }
+
+    private void runServerStatus() {
+        if (serverStatus != null) {
+            bufferInput
+                    .setText(serverStatus.getBufferSize() == 0 ?
+                            serverStatus.getInitBufferSize()
+                            : String.format("%d", serverStatus.getBufferSize() / 1024));
+            portInput.setText(serverStatus.getPort() == 0 ?
+                    String.format("%s", serverStatus.getInitProt())
+                    : String.format("%d", serverStatus.getPort()));
+            if (serverStatus.getFileSystemPath() != null) {
+                chooserPath = new File(serverStatus.getFileSystemPath());
+            } else {
+                chooserPath = new File(serverStatus.getInitFileSystemPath());
+            }
+            extendStores = serverStatus.getExtendStores();
+            if (serverStatus.getLogLevel() != null) {
+                switch (serverStatus.getLogLevel()) {
+                    case EVENT: {
+                        logLevelInput.setSelectedIndex(0);
+                        break;
+                    }
+                    case RUNTIME_EXCEPTION: {
+                        logLevelInput.setSelectedIndex(1);
+                        break;
+                    }
+                    case NONE: {
+                        logLevelInput.setSelectedIndex(2);
+                        break;
+                    }
+                    default: {
+                        break;
+                    }
+                }
+            } else {
+                switch (serverStatus.getInitLogLevel()) {
+                    case EVENT: {
+                        logLevelInput.setSelectedIndex(0);
+                        break;
+                    }
+                    case RUNTIME_EXCEPTION: {
+                        logLevelInput.setSelectedIndex(1);
+                        break;
+                    }
+                    case NONE: {
+                        logLevelInput.setSelectedIndex(2);
+                        break;
+                    }
+                    default: {
+                        break;
+                    }
+                }
+            }
+            if (serverStatus.getMustLogin()) {
+                mlInput.setSelectedIndex(0);
+            } else {
+                mlInput.setSelectedIndex(1);
+            }
+            if (serverStatus.isAllowChangePassword()) {
+                changePwdInput.setSelectedIndex(1);
+            } else {
+                changePwdInput.setSelectedIndex(0);
+            }
+            if (serverStatus.isOpenFileChain()) {
+                showChainInput.setSelectedIndex(1);
+            } else {
+                showChainInput.setSelectedIndex(0);
+            }
+            if (serverStatus.getVCLevel() != null) {
+                switch (serverStatus.getVCLevel()) {
+                    case STANDARD: {
+                        vcInput.setSelectedIndex(0);
+                        break;
+                    }
+                    case SIMPLIFIED: {
+                        vcInput.setSelectedIndex(1);
+                        break;
+                    }
+                    case CLOSE: {
+                        vcInput.setSelectedIndex(2);
+                        break;
+                    }
+                    default: {
+                        break;
+                    }
+                }
+            } else {
+                switch (serverStatus.getInitVCLevel()) {
+                    case STANDARD: {
+                        vcInput.setSelectedIndex(0);
+                        break;
+                    }
+                    case SIMPLIFIED: {
+                        vcInput.setSelectedIndex(1);
+                        break;
+                    }
+                    case CLOSE: {
+                        vcInput.setSelectedIndex(2);
+                        break;
+                    }
+                    default: {
+                        break;
+                    }
+                }
+            }
+        }
     }
 }

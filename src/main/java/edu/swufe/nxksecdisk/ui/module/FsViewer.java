@@ -239,8 +239,6 @@ public class FsViewer extends DiskDynamicWindow {
                         }
                     }
                     FsProgressDialog fsProgressDialog = FsProgressDialog.getNewInstance();
-//                    Thread deleteListenerDialog = new Thread(fsProgressDialog::show);
-//                    deleteListenerDialog.start();
                     AppSystem.pool.execute(fsProgressDialog::show);
                     try {
                         FileSystemManager.getInstance().exportTo(folders, nodes, path, type);
@@ -281,8 +279,6 @@ public class FsViewer extends DiskDynamicWindow {
                                 }
                             }
                             FsProgressDialog fsProgressDialog = FsProgressDialog.getNewInstance();
-//                            Thread fsProgressDialogThread = new Thread(fsProgressDialog::show);
-//                            fsProgressDialogThread.start();
                             AppSystem.pool.execute(fsProgressDialog::show);
                             try {
                                 FileSystemManager.getInstance().delete(selectedFolders.toArray(new String[0]),
@@ -564,8 +560,6 @@ public class FsViewer extends DiskDynamicWindow {
         }
         // 打开进度提示会话框
         FsProgressDialog fsProgressDialog = FsProgressDialog.getNewInstance();
-//        Thread fspt = new Thread(fsProgressDialog::show);
-//        fspt.start();
         AppSystem.pool.execute(fsProgressDialog::show);
         try {
             FileSystemManager.getInstance().importFrom(files, folderId, type);

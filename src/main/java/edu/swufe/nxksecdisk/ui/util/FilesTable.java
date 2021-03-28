@@ -130,14 +130,7 @@ public class FilesTable extends JTable {
             }
         };
         // 避免操作过快导致的异常
-        AppSystem.pool.execute(() ->
-                SwingUtilities.invokeLater(doUpdate)
-        );
-//        Thread t = new Thread(() ->
-//        {
-//            SwingUtilities.invokeLater(doUpdate);
-//        });
-//        t.start();
+        AppSystem.pool.execute(() -> SwingUtilities.invokeLater(doUpdate));
     }
 
     private void setRowFontColor() {

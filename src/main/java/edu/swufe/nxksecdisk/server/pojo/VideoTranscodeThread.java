@@ -28,62 +28,16 @@ public class VideoTranscodeThread {
 
     private String outputFileName;
 
-    public VideoTranscodeThread(File f, EncodingAttributes ea, FFMPEGLocator fl) throws Exception {
+    public VideoTranscodeThread(File f,
+                                EncodingAttributes encodingAttributes,
+                                FFMPEGLocator ffmpegLocator)
+            throws Exception {
         // 首先计算MD5值
         md5 = DigestUtils.md5Hex(new FileInputStream(f));
         progress = "0.0";
-        MultimediaObject mo = new MultimediaObject(f, fl);
-        encoder = new Encoder(fl);
-//        Thread t = new Thread(
-//                () -> {
-//            try {
-//                outputFileName = String.format("video_%s.mp4", UUID.randomUUID().toString());
-//                encoder.encode(mo, new File(ConfigureReader.getInstance().getTemporaryfilePath(), outputFileName),
-//                        ea, new EncoderProgressListener() {
-//                            @Override
-//                            public void sourceInfo(MultimediaInfo arg0) {
-//                            }
-//
-//                            @Override
-//                            public void progress(int arg0) {
-//                                progress = String.format("%s", arg0 / 10.00);
-//                            }
-//
-//                            @Override
-//                            public void message(String arg0) {
-//                            }
-//                        });
-//                progress = "FIN";
-//            }
-//            catch (Exception e) {
-//                AppSystem.out.printf("警告：在线转码功能出现意外错误。详细信息：%s", e.getMessage());
-//            }
-//        });
-//        t.start();
-        AppSystem.pool.execute(() -> {
-            try {
-                outputFileName = String.format("video_%s.mp4", UUID.randomUUID().toString());
-                encoder.encode(mo, new File(ConfigureReader.getInstance().getTemporaryfilePath(), outputFileName),
-                        ea, new EncoderProgressListener() {
-                            @Override
-                            public void sourceInfo(MultimediaInfo arg0) {
-                            }
-
-                            @Override
-                            public void progress(int arg0) {
-                                progress = String.format("%s", arg0 / 10.00);
-                            }
-
-                            @Override
-                            public void message(String arg0) {
-                            }
-                        });
-                progress = "FIN";
-            }
-            catch (Exception e) {
-                AppSystem.out.printf("警告：在线转码功能出现意外错误。详细信息：%s", e.getMessage());
-            }
-        });
+        MultimediaObject multimediaObject = new MultimediaObject(f, ffmpegLocator);
+        encoder = new Encoder(ffmpegLocator);
+        AppSystem.pool.execute(() -> run(multimediaObject, encodingAttributes));
     }
 
     public String getMd5() {
@@ -114,4 +68,29 @@ public class VideoTranscodeThread {
         }
     }
 
+    private void run(MultimediaObject multimediaObject,
+                     EncodingAttributes encodingAttributes) {
+        try {
+            outputFileName = String.format("video_%s.mp4", UUID.randomUUID().toString());
+            encoder.encode(multimediaObject, new File(ConfigureReader.getInstance().getTemporaryfilePath(), outputFileName),
+                    encodingAttributes, new EncoderProgressListener() {
+                        @Override
+                        public void sourceInfo(MultimediaInfo arg0) {
+                        }
+
+                        @Override
+                        public void progress(int arg0) {
+                            progress = String.format("%s", arg0 / 10.00);
+                        }
+
+                        @Override
+                        public void message(String arg0) {
+                        }
+                    });
+            progress = "FIN";
+        }
+        catch (Exception e) {
+            AppSystem.out.printf("警告：在线转码功能出现意外错误。详细信息：%s", e.getMessage());
+        }
+    }
 }

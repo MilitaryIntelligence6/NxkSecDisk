@@ -397,8 +397,7 @@ public class ConfigureReader {
                     return false;
                 }
             }
-        }
-        else {
+        } else {
             final String overall2 = this.accountp.getProperty("authOverall");
             if (overall2 == null) {
                 return false;
@@ -436,8 +435,7 @@ public class ConfigureReader {
     public String getInitBuffSize() {
         if (this.serverp != null && serverp.getProperty("buff.size") != null) {
             return serverp.getProperty("buff.size");
-        }
-        else {
+        } else {
             return DEFAULT_BUFFER_SIZE + "";
         }
     }
@@ -502,8 +500,7 @@ public class ConfigureReader {
         if (this.serverp != null && serverp.getProperty("FS.path") != null) {
             return serverp.getProperty("FS.path").equals("DEFAULT") ? DEFAULT_FILE_SYSTEM_PATH
                     : serverp.getProperty("FS.path");
-        }
-        else {
+        } else {
             return DEFAULT_FILE_SYSTEM_PATH;
         }
     }
@@ -573,8 +570,7 @@ public class ConfigureReader {
                 default:
                     return LogLevel.EVENT;
             }
-        }
-        else {
+        } else {
             return LogLevel.EVENT;
         }
     }
@@ -621,8 +617,7 @@ public class ConfigureReader {
                 default:
                     return VcLevel.STANDARD;
             }
-        }
-        else {
+        } else {
             return VcLevel.STANDARD;
         }
     }
@@ -634,8 +629,7 @@ public class ConfigureReader {
     public String getInitPort() {
         if (this.serverp != null && serverp.getProperty("port") != null) {
             return serverp.getProperty("port");
-        }
-        else {
+        } else {
             return DEFAULT_PORT + "";
         }
     }
@@ -732,8 +726,7 @@ public class ConfigureReader {
         if (pMustLogin == null) {
             AppSystem.out.println("警告：未找到是否必须登录配置，将采用默认值（O）。");
             this.mustLogin = "O";
-        }
-        else {
+        } else {
             if (!"N".equals(pMustLogin) && !"O".equals(pMustLogin)) {
                 AppSystem.out.println("错误：必须登入功能配置不正确（只能设置为“O”或“N”），请重新检查。");
                 return INVALID_MUST_LOGIN_SETTING;
@@ -744,8 +737,7 @@ public class ConfigureReader {
         if (ports == null) {
             AppSystem.out.println("警告：未找到端口配置，将采用默认值（8080）。");
             this.port = 8080;
-        }
-        else {
+        } else {
             try {
                 this.port = Integer.parseInt(ports);
                 if (this.port <= 0 || this.port > 65535) {
@@ -762,8 +754,7 @@ public class ConfigureReader {
         if (logs == null) {
             AppSystem.out.println("警告：未找到日志等级配置，将采用默认值（E）。");
             this.log = "E";
-        }
-        else {
+        } else {
             if (!logs.equals("N") && !logs.equals("R") && !logs.equals("E")) {
                 AppSystem.out.println("错误：日志等级配置不正确（只能设置为“N”、“R”或“E”），请重新检查。");
                 return INVALID_LOG;
@@ -774,8 +765,7 @@ public class ConfigureReader {
         if (vcl == null) {
             AppSystem.out.println("警告：未找到登录验证码配置，将采用默认值（STANDARD）。");
             this.vc = DEFAULT_VC_LEVEL;
-        }
-        else {
+        } else {
             switch (vcl) {
                 case "STANDARD":
                 case "SIMP":
@@ -792,8 +782,7 @@ public class ConfigureReader {
         if (changePassword == null) {
             AppSystem.out.println("警告：未找到用户修改密码功能配置，将采用默认值（禁用）。");
             this.allowChangePassword = false;
-        }
-        else {
+        } else {
             switch (changePassword) {
                 case "Y":
                     this.allowChangePassword = true;
@@ -811,8 +800,7 @@ public class ConfigureReader {
         if (fileChain == null) {
             AppSystem.out.println("警告：未找到永久资源链接功能配置，将采用默认值（禁用）。");
             this.openFileChain = false;
-        }
-        else {
+        } else {
             switch (fileChain) {
                 case "OPEN":
                     this.openFileChain = true;
@@ -830,8 +818,7 @@ public class ConfigureReader {
         if (bufferSizes == null) {
             AppSystem.out.println("警告：未找到缓冲大小配置，将采用默认值（1048576）。");
             this.bufferSize = 1048576;
-        }
-        else {
+        } else {
             try {
                 this.bufferSize = Integer.parseInt(bufferSizes);
                 if (this.bufferSize <= 0) {
@@ -849,11 +836,9 @@ public class ConfigureReader {
         if (this.FSPath == null) {
             AppSystem.out.println("警告：未找到主文件系统路径配置，将采用默认值。");
             this.fileSystemPath = this.DEFAULT_FILE_SYSTEM_PATH;
-        }
-        else if (this.FSPath.equals("DEFAULT")) {
+        } else if (this.FSPath.equals("DEFAULT")) {
             this.fileSystemPath = this.DEFAULT_FILE_SYSTEM_PATH;
-        }
-        else {
+        } else {
             this.fileSystemPath = this.FSPath.replaceAll("\\\\:", ":").replaceAll("\\\\\\\\", "\\\\");//
             // 后面的替换是为了兼容以前版本的设置
         }
@@ -933,8 +918,7 @@ public class ConfigureReader {
                         "错误：无法连接至自定义数据库：" + dbURL + "（user=" + dbUser + ",password=" + dbPwd + "），请确重新配置MySQL数据库相关项。");
                 return CANT_CONNECT_DB;
             }
-        }
-        else {
+        } else {
             dbDriver = "org.h2.Driver";
             dbURL = "jdbc:h2:file:" + fileNodePath + File.separator + "kift";
             dbUser = "root";
@@ -947,13 +931,11 @@ public class ConfigureReader {
                 File keyFile = new File(path, "https.p12");
                 if (keyFile.isFile()) {
                     httpsKeyType = "PKCS12";
-                }
-                else {
+                } else {
                     keyFile = new File(path, "https.jks");
                     if (keyFile.isFile()) {
                         httpsKeyType = "JKS";
-                    }
-                    else {
+                    } else {
                         AppSystem.out.println(
                                 "错误：无法启用https支持，因为kiftd未能找到https证书文件。您必须在应用主目录内放置PKCS12（必须命名为https" +
                                         ".p12）或JKS（必须命名为https.jks）证书。");
@@ -966,8 +948,7 @@ public class ConfigureReader {
                 if (httpsports == null) {
                     AppSystem.out.println("警告：未找到https端口配置，将采用默认值（443）。");
                     httpsPort = 443;
-                }
-                else {
+                } else {
                     try {
                         this.httpsPort = Integer.parseInt(httpsports);
                         if (httpsPort <= 0 || httpsPort > 65535) {
@@ -981,8 +962,7 @@ public class ConfigureReader {
                     }
                 }
                 openHttps = true;
-            }
-            else if (!"false".equals(enableHttps)) {
+            } else if (!"false".equals(enableHttps)) {
                 AppSystem.out.println("错误：https支持功能的启用项配置不正确（只能设置为“true”或“false”），请重新检查。");
                 return HTTPS_SETTING_ERROR;
             }
@@ -1001,8 +981,7 @@ public class ConfigureReader {
                     AppSystem.out.println("错误：IP地址xff解析配置不正确（只能设置为“disable”或“enable”），请重新检查。");
                     return INVALID_IP_XFF_SETTING;
             }
-        }
-        else {
+        } else {
             ipXFFAnalysis = true;
         }
         // 是否启用视频播放的在线解码功能
@@ -1019,8 +998,7 @@ public class ConfigureReader {
                     AppSystem.out.println("错误：视频播放功能的在线解码配置不正确（只能设置为“disable”或“enable”），请重新检查。");
                     return INVALID_FFMPEG_SETTING;
             }
-        }
-        else {
+        } else {
             enableFFMPEG = true;
         }
         // 是否启用“打包下载”功能
@@ -1037,8 +1015,7 @@ public class ConfigureReader {
                     AppSystem.out.println("错误：“打包下载”功能的配置不正确（只能设置为“disable”或“enable”），请重新检查。");
                     return INVALID_DOWNLOAD_ZIP_SETTING;
             }
-        }
-        else {
+        } else {
             enableDownloadByZip = true;
         }
         AppSystem.out.println("检查完毕。");
@@ -1175,8 +1152,7 @@ public class ConfigureReader {
         int cl = f.getFolderConstraint();
         if (cl == 0) {
             return true;
-        }
-        else {
+        } else {
             if (account != null) {
                 if (cl == 1) {
                     if (f.getFolderCreator().equals(account)) {
@@ -1219,77 +1195,8 @@ public class ConfigureReader {
      */
     public void startAccountRealTimeUpdateListener() {
         if (accountPropertiesUpdateDaemonRunnable == null) {
-            Path confPath = Paths.get(confdir);// 获取配置文件存放路径以对其中的变动进行监听
-            accountPropertiesUpdateDaemonRunnable = () -> {
-                try {
-                    while (true) {
-                        WatchService ws = confPath.getFileSystem().newWatchService();
-                        confPath.register(ws, StandardWatchEventKinds.ENTRY_MODIFY,
-                                StandardWatchEventKinds.ENTRY_DELETE, StandardWatchEventKinds.ENTRY_CREATE);
-                        WatchKey wk = ws.take();
-                        List<WatchEvent<?>> es = wk.pollEvents();
-                        for (WatchEvent<?> we : es) {
-                            if (ACCOUNT_PROPERTIES_FILE.equals(we.context().toString())) {
-                                AppSystem.out.println("正在更新账户配置信息...");
-                                final File accountProp = new File(this.confdir + ACCOUNT_PROPERTIES_FILE);
-                                if (accountProp.isFile() && accountProp.canRead()) {
-                                    final FileInputStream accountPropIn = new FileInputStream(accountProp);
-                                    synchronized (accountp) {
-                                        this.accountp.load(accountPropIn);
-                                    }
-                                    initIPRules();
-                                    initSignUpRules();
-                                    AppSystem.out.println("账户配置更新完成，已加载最新配置。");
-                                }
-                                else {
-                                    accountp.clear();
-                                    AppSystem.out.println("警告：账户配置文件已被删除或无法读取，账户信息已清空。");
-                                }
-                            }
-                        }
-                    }
-                }
-                catch (Exception e) {
-                    AppSystem.out.println("错误：用户配置文件更改监听失败，该功能已失效，kiftd无法实时更新用户配置（可尝试重启程序以恢复该功能）。");
-                }
-            };
+            initAccountRunnable();
             AppSystem.pool.execute(accountPropertiesUpdateDaemonRunnable);
-//            accountPropertiesUpdateDaemonRunnable = new Thread(
-//                    () -> {
-//                try {
-//                    while (true) {
-//                        WatchService ws = confPath.getFileSystem().newWatchService();
-//                        confPath.register(ws, StandardWatchEventKinds.ENTRY_MODIFY,
-//                                StandardWatchEventKinds.ENTRY_DELETE, StandardWatchEventKinds.ENTRY_CREATE);
-//                        WatchKey wk = ws.take();
-//                        List<WatchEvent<?>> es = wk.pollEvents();
-//                        for (WatchEvent<?> we : es) {
-//                            if (ACCOUNT_PROPERTIES_FILE.equals(we.context().toString())) {
-//                                AppSystem.out.println("正在更新账户配置信息...");
-//                                final File accountProp = new File(this.confdir + ACCOUNT_PROPERTIES_FILE);
-//                                if (accountProp.isFile() && accountProp.canRead()) {
-//                                    final FileInputStream accountPropIn = new FileInputStream(accountProp);
-//                                    synchronized (accountp) {
-//                                        this.accountp.load(accountPropIn);
-//                                    }
-//                                    initIPRules();
-//                                    initSignUpRules();
-//                                    AppSystem.out.println("账户配置更新完成，已加载最新配置。");
-//                                }
-//                                else {
-//                                    accountp.clear();
-//                                    AppSystem.out.println("警告：账户配置文件已被删除或无法读取，账户信息已清空。");
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//                catch (Exception e) {
-//                    AppSystem.out.println("错误：用户配置文件更改监听失败，该功能已失效，kiftd无法实时更新用户配置（可尝试重启程序以恢复该功能）。");
-//                }
-//            });
-//            accountPropertiesUpdateDaemonRunnable.setDaemon(true);
-//            accountPropertiesUpdateDaemonRunnable.start();
         }
     }
 
@@ -1336,8 +1243,7 @@ public class ConfigureReader {
         String defaultMaxSizeP = accountp.getProperty("defaultMaxSize");
         if (account == null) {
             return getMaxSizeByString(defaultMaxSizeP);
-        }
-        else {
+        } else {
             String accountMaxSizeP = accountp.getProperty(account + ".maxSize");
             return accountMaxSizeP == null ? getMaxSizeByString(defaultMaxSizeP) : getMaxSizeByString(accountMaxSizeP);
         }
@@ -1396,8 +1302,7 @@ public class ConfigureReader {
                         r = Integer.parseInt(in.trim());
                         break;
                 }
-            }
-            else {
+            } else {
                 r = Integer.parseInt(in.trim());
             }
         }
@@ -1420,8 +1325,7 @@ public class ConfigureReader {
         String defaultMaxRateP = accountp.getProperty("defaultMaxRate");
         if (account == null) {
             return getMaxRateByString(defaultMaxRateP);
-        }
-        else {
+        } else {
             String accountMaxRateP = accountp.getProperty(account + ".maxRate");
             return accountMaxRateP == null ? getMaxRateByString(defaultMaxRateP) : getMaxRateByString(accountMaxRateP);
         }
@@ -1475,8 +1379,7 @@ public class ConfigureReader {
                         r = Integer.parseInt(in.trim());
                         break;
                 }
-            }
-            else {
+            } else {
                 r = Integer.parseInt(in.trim());
             }
         }
@@ -1651,8 +1554,7 @@ public class ConfigureReader {
             this.allowSignUp = true;
             this.signUpAuth = signUpAuth;
             this.signUpGroup = signUpGroup;
-        }
-        else {
+        } else {
             this.allowSignUp = false;
         }
     }
@@ -1744,5 +1646,43 @@ public class ConfigureReader {
      */
     public boolean isEnableDownloadByZip() {
         return enableDownloadByZip;
+    }
+
+    private void initAccountRunnable() {
+        // 获取配置文件存放路径以对其中的变动进行监听
+        Path confPath = Paths.get(confdir);
+        accountPropertiesUpdateDaemonRunnable = () -> {
+            try {
+                while (true) {
+                    WatchService ws = confPath.getFileSystem().newWatchService();
+                    confPath.register(ws, StandardWatchEventKinds.ENTRY_MODIFY,
+                            StandardWatchEventKinds.ENTRY_DELETE, StandardWatchEventKinds.ENTRY_CREATE);
+                    WatchKey wk = ws.take();
+                    List<WatchEvent<?>> es = wk.pollEvents();
+                    for (WatchEvent<?> we : es) {
+                        if (ACCOUNT_PROPERTIES_FILE.equals(we.context().toString())) {
+                            AppSystem.out.println("正在更新账户配置信息...");
+                            final File accountProp = new File(this.confdir + ACCOUNT_PROPERTIES_FILE);
+                            if (accountProp.isFile() && accountProp.canRead()) {
+                                final FileInputStream accountPropIn = new FileInputStream(accountProp);
+                                synchronized (accountp) {
+                                    this.accountp.load(accountPropIn);
+                                }
+                                initIPRules();
+                                initSignUpRules();
+                                AppSystem.out.println("账户配置更新完成，已加载最新配置。");
+                            }
+                            else {
+                                accountp.clear();
+                                AppSystem.out.println("警告：账户配置文件已被删除或无法读取，账户信息已清空。");
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception e) {
+                AppSystem.out.println("错误：用户配置文件更改监听失败，该功能已失效，kiftd无法实时更新用户配置（可尝试重启程序以恢复该功能）。");
+            }
+        };
     }
 }

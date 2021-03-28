@@ -115,34 +115,7 @@ public class FsProgressDialog extends DiskDynamicWindow {
         pBar.setValue(0);
         message.setText("请稍候...");
         //启动监听线程用于监听进度，该线程结束后会自动关闭窗口。
-//        Thread lt = new Thread(() ->
-//        {
-//            while (listen) {
-//                pBar.setValue(FileSystemManager.per);
-//                message.setText(FileSystemManager.message);
-//                try {
-//                    Thread.sleep(16);
-//                }
-//                catch (InterruptedException e) {
-//                    listen = false;
-//                }
-//            }
-//            window.dispose();
-//        });
-//        lt.start();
-        AppSystem.pool.execute(() -> {
-            while (listen) {
-                pBar.setValue(FileSystemManager.per);
-                message.setText(FileSystemManager.message);
-                try {
-                    Thread.sleep(16);
-                }
-                catch (InterruptedException e) {
-                    listen = false;
-                }
-            }
-            window.dispose();
-        });
+        AppSystem.pool.execute(this::runShow);
         //必须先开启监听，否则将阻塞线程;
         window.setVisible(true);
     }
@@ -176,4 +149,17 @@ public class FsProgressDialog extends DiskDynamicWindow {
         return new FsProgressDialog();
     }
 
+    private void runShow() {
+        while (listen) {
+            pBar.setValue(FileSystemManager.per);
+            message.setText(FileSystemManager.message);
+            try {
+                Thread.sleep(16);
+            }
+            catch (InterruptedException e) {
+                listen = false;
+            }
+        }
+        window.dispose();
+    }
 }

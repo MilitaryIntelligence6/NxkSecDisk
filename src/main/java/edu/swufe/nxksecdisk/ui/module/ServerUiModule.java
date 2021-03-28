@@ -55,7 +55,7 @@ public class ServerUiModule extends DiskDynamicWindow {
 
     private static JButton setting;
 
-    private static JButton fileIOUtil;
+    private static JButton fileIoUtil;
 
     private static JButton exit;
 
@@ -155,46 +155,13 @@ public class ServerUiModule extends DiskDynamicWindow {
                     }
                 }
             });
-            exit.addActionListener(new ActionListener() {
-
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    // TODO 自动生成的方法存根
-                    exit();
-                }
+            exit.addActionListener(e -> {
+                exit();
             });
-            filesViewer.addActionListener((e) ->
-            {
+            filesViewer.addActionListener(e -> {
                 filesViewer.setEnabled(false);
-                fileIOUtil.setEnabled(false);
-                AppSystem.pool.execute(() -> {
-                    try {
-                        fsViewer = FsViewer.getInstance();
-                        fsViewer.show();
-                    }
-                    catch (SQLException e1) {
-                        // TODO 自动生成的 catch 块
-                        JOptionPane.showMessageDialog(window, "错误：无法打开文件，文件系统可能已损坏，您可以尝试重启应用。", "错误",
-                                JOptionPane.ERROR_MESSAGE);
-                    }
-                    filesViewer.setEnabled(true);
-                    fileIOUtil.setEnabled(true);
-                });
-//                Thread t = new Thread(
-//               () -> {
-//                    try {
-//                        fsViewer = FsViewer.getInstance();
-//                        fsViewer.show();
-//                    }
-//                    catch (SQLException e1) {
-//                        // TODO 自动生成的 catch 块
-//                        JOptionPane.showMessageDialog(window, "错误：无法打开文件，文件系统可能已损坏，您可以尝试重启应用。", "错误",
-//                                JOptionPane.ERROR_MESSAGE);
-//                    }
-//                    filesViewer.setEnabled(true);
-//                    fileIOUtil.setEnabled(true);
-//                });
-//                t.start();
+                fileIoUtil.setEnabled(false);
+                AppSystem.pool.execute(this::runFileView);
             });
             show.addActionListener(e -> show());
             pMenu.add(exit);
@@ -251,7 +218,7 @@ public class ServerUiModule extends DiskDynamicWindow {
         buttonBox.add(start = new JButton("开启(Start)>>"));
         buttonBox.add(stop = new JButton("关闭(Stop)||"));
         buttonBox.add(restart = new JButton("重启(Restart)~>"));
-        buttonBox.add(fileIOUtil = new JButton("文件(Files)[*]"));
+        buttonBox.add(fileIoUtil = new JButton("文件(Files)[*]"));
         buttonBox.add(setting = new JButton("设置(Setting)[/]"));
         buttonBox.add(exit = new JButton("退出(Exit)[X]"));
         window.add(buttonBox);
@@ -273,35 +240,7 @@ public class ServerUiModule extends DiskDynamicWindow {
             @Override
             public void insertUpdate(DocumentEvent e) {
                 // TODO 自动生成的方法存根
-                AppSystem.pool.execute(() -> {
-                            if (out.getLineCount() >= 1000) {
-                                int end = 0;
-                                try {
-                                    end = out.getLineEndOffset(100);
-                                }
-                                catch (Exception exc) {
-                                    exc.printStackTrace();
-                                }
-                                out.replaceRange("", 0, end);
-                            }
-                            out.setCaretPosition(out.getText().length());
-                        }
-                );
-//                Thread t = new Thread(() ->
-//                {
-//                    if (out.getLineCount() >= 1000) {
-//                        int end = 0;
-//                        try {
-//                            end = out.getLineEndOffset(100);
-//                        }
-//                        catch (Exception exc) {
-//                            exc.printStackTrace();
-//                        }
-//                        out.replaceRange("", 0, end);
-//                    }
-//                    out.setCaretPosition(out.getText().length());
-//                });
-//                t.start();
+                AppSystem.pool.execute(ServerUiModule.this::runInsertUpdate);
             }
 
             @Override
@@ -322,191 +261,37 @@ public class ServerUiModule extends DiskDynamicWindow {
         stop.setEnabled(false);
         restart.setEnabled(false);
         setting.setEnabled(false);
-        start.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // TODO 自动生成的方法存根
-                start.setEnabled(false);
-                setting.setEnabled(false);
-                fileIOUtil.setEnabled(false);
-                if (filesViewer != null) {
-                    filesViewer.setEnabled(false);
-                }
-                println("启动服务器...");
-                if (startServer != null) {
-                    serverStatusLab.setText(S_STARTING);
-                    AppSystem.pool.execute(() -> {
-                        if (startServer.start()) {
-                            println("启动完成。正在检查服务器状态...");
-                            if (serverStatus.getServerStatus()) {
-                                println("KIFT服务器已经启动，可以正常访问了。");
-                            } else {
-                                println("KIFT服务器未能成功启动，请检查设置或查看异常信息。");
-                            }
-                        } else {
-                            if (ConfigureReader.getInstance().getPropertiesStatus() != 0) {
-                                switch (ConfigureReader.getInstance().getPropertiesStatus()) {
-                                    case ConfigureReader.INVALID_PORT: {
-                                        println("KIFT无法启动：端口设置无效。");
-                                        break;
-                                    }
-                                    case ConfigureReader.INVALID_BUFFER_SIZE: {
-                                        println("KIFT无法启动：缓存设置无效。");
-                                        break;
-                                    }
-                                    case ConfigureReader.INVALID_FILE_SYSTEM_PATH: {
-                                        println("KIFT无法启动：文件系统路径或某一扩展存储区设置无效。");
-                                        break;
-                                    }
-                                    case ConfigureReader.INVALID_LOG: {
-                                        println("KIFT无法启动：日志设置无效。");
-                                        break;
-                                    }
-                                    case ConfigureReader.INVALID_VC: {
-                                        println("KIFT无法启动：登录验证码设置无效。");
-                                        break;
-                                    }
-                                    case ConfigureReader.INVALID_MUST_LOGIN_SETTING: {
-                                        println("KIFT无法启动：必须登入设置无效。");
-                                        break;
-                                    }
-                                    case ConfigureReader.INVALID_CHANGE_PASSWORD_SETTING: {
-                                        println("KIFT无法启动：用户修改账户密码设置无效。");
-                                        break;
-                                    }
-                                    case ConfigureReader.INVALID_FILE_CHAIN_SETTING: {
-                                        println("KIFT无法启动：永久资源链接设置无效。");
-                                        break;
-                                    }
-                                    default: {
-                                        println("KIFT无法启动，请检查设置或查看异常信息。");
-                                        break;
-                                    }
-                                }
-                            } else {
-                                println("KIFT无法启动，请检查设置或查看异常信息。");
-                            }
-                            serverStatusLab.setText(S_STOP);
-                        }
-                        updateServerStatus();
-                    });
-
-//                    Thread t = new Thread(() ->
-//                    {
-//                        if (startServer.start()) {
-//                            println("启动完成。正在检查服务器状态...");
-//                            if (serverStatus.getServerStatus()) {
-//                                println("KIFT服务器已经启动，可以正常访问了。");
-//                            }
-//                            else {
-//                                println("KIFT服务器未能成功启动，请检查设置或查看异常信息。");
-//                            }
-//                        }
-//                        else {
-//                            if (ConfigureReader.getInstance().getPropertiesStatus() != 0) {
-//                                switch (ConfigureReader.getInstance().getPropertiesStatus()) {
-//                                    case ConfigureReader.INVALID_PORT: {
-//                                        println("KIFT无法启动：端口设置无效。");
-//                                        break;
-//                                    }
-//                                    case ConfigureReader.INVALID_BUFFER_SIZE: {
-//                                        println("KIFT无法启动：缓存设置无效。");
-//                                        break;
-//                                    }
-//                                    case ConfigureReader.INVALID_FILE_SYSTEM_PATH: {
-//                                        println("KIFT无法启动：文件系统路径或某一扩展存储区设置无效。");
-//                                        break;
-//                                    }
-//                                    case ConfigureReader.INVALID_LOG: {
-//                                        println("KIFT无法启动：日志设置无效。");
-//                                        break;
-//                                    }
-//                                    case ConfigureReader.INVALID_VC: {
-//                                        println("KIFT无法启动：登录验证码设置无效。");
-//                                        break;
-//                                    }
-//                                    case ConfigureReader.INVALID_MUST_LOGIN_SETTING: {
-//                                        println("KIFT无法启动：必须登入设置无效。");
-//                                        break;
-//                                    }
-//                                    case ConfigureReader.INVALID_CHANGE_PASSWORD_SETTING: {
-//                                        println("KIFT无法启动：用户修改账户密码设置无效。");
-//                                        break;
-//                                    }
-//                                    case ConfigureReader.INVALID_FILE_CHAIN_SETTING: {
-//                                        println("KIFT无法启动：永久资源链接设置无效。");
-//                                        break;
-//                                    }
-//                                    default: {
-//                                        println("KIFT无法启动，请检查设置或查看异常信息。");
-//                                        break;
-//                                    }
-//                                }
-//                            }
-//                            else {
-//                                println("KIFT无法启动，请检查设置或查看异常信息。");
-//                            }
-//                            serverStatusLab.setText(S_STOP);
-//                        }
-//                        updateServerStatus();
-//                    });
-//                    t.start();
-                }
+        start.addActionListener(e -> {
+            // TODO 自动生成的方法存根
+            start.setEnabled(false);
+            setting.setEnabled(false);
+            fileIoUtil.setEnabled(false);
+            if (filesViewer != null) {
+                filesViewer.setEnabled(false);
+            }
+            println("启动服务器...");
+            if (startServer != null) {
+                serverStatusLab.setText(S_STARTING);
+                AppSystem.pool.execute(this::runBoot);
             }
         });
         stop.addActionListener(e -> {
             // TODO 自动生成的方法存根
             stop.setEnabled(false);
             restart.setEnabled(false);
-            fileIOUtil.setEnabled(false);
+            fileIoUtil.setEnabled(false);
             if (filesViewer != null) {
                 filesViewer.setEnabled(false);
             }
             println("关闭服务器...");
-            AppSystem.pool.execute(() -> {
-                if (closeServer != null) {
-                    serverStatusLab.setText(S_STOPPING);
-                    if (closeServer.close()) {
-                        println("关闭完成。正在检查服务器状态...");
-                        if (serverStatus.getServerStatus()) {
-                            println("KIFT服务器未能成功关闭，如有需要，可以强制关闭程序（不安全）。");
-                        } else {
-                            println("KIFT服务器已经关闭，停止所有访问。");
-                        }
-                    } else {
-                        println("KIFT服务器无法关闭，请手动结束本程序。");
-                    }
-                    updateServerStatus();
-                }
-            });
-//                Thread t = new Thread(() ->
-//                {
-//                    if (closeServer != null) {
-//                        serverStatusLab.setText(S_STOPPING);
-//                        if (closeServer.close()) {
-//                            println("关闭完成。正在检查服务器状态...");
-//                            if (serverStatus.getServerStatus()) {
-//                                println("KIFT服务器未能成功关闭，如有需要，可以强制关闭程序（不安全）。");
-//                            }
-//                            else {
-//                                println("KIFT服务器已经关闭，停止所有访问。");
-//                            }
-//                        }
-//                        else {
-//                            println("KIFT服务器无法关闭，请手动结束本程序。");
-//                        }
-//                        updateServerStatus();
-//                    }
-//                });
-//                t.start();
+            AppSystem.pool.execute(this::runClose);
         });
         exit.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
                 // TODO 自动生成的方法存根
-                fileIOUtil.setEnabled(false);
+                fileIoUtil.setEnabled(false);
                 if (filesViewer != null) {
                     filesViewer.setEnabled(false);
                 }
@@ -520,40 +305,11 @@ public class ServerUiModule extends DiskDynamicWindow {
                 // TODO 自动生成的方法存根
                 stop.setEnabled(false);
                 restart.setEnabled(false);
-                fileIOUtil.setEnabled(false);
+                fileIoUtil.setEnabled(false);
                 if (filesViewer != null) {
                     filesViewer.setEnabled(false);
                 }
-                AppSystem.pool.execute(() -> {
-                    println("正在重启服务器...");
-                    if (closeServer.close()) {
-                        if (startServer.start()) {
-                            println("重启成功，可以正常访问了。");
-                        } else {
-                            println("错误：服务器已关闭但未能重新启动，请尝试手动启动服务器。");
-                        }
-                    } else {
-                        println("错误：无法关闭服务器，请尝试手动关闭。");
-                    }
-                    updateServerStatus();
-                });
-//                Thread t = new Thread(() ->
-//                {
-//                    println("正在重启服务器...");
-//                    if (closeServer.close()) {
-//                        if (startServer.start()) {
-//                            println("重启成功，可以正常访问了。");
-//                        }
-//                        else {
-//                            println("错误：服务器已关闭但未能重新启动，请尝试手动启动服务器。");
-//                        }
-//                    }
-//                    else {
-//                        println("错误：无法关闭服务器，请尝试手动关闭。");
-//                    }
-//                    updateServerStatus();
-//                });
-//                t.start();
+                AppSystem.pool.execute(ServerUiModule.this::runReboot);
             }
         });
         setting.addActionListener(new ActionListener() {
@@ -562,46 +318,15 @@ public class ServerUiModule extends DiskDynamicWindow {
                 // TODO 自动生成的方法存根
                 settingWindow = SettingWindow.getInstance();
                 AppSystem.pool.execute(settingWindow::show);
-//                Thread t = new Thread(settingWindow::show);
-//                t.start();
             }
         });
-        fileIOUtil.addActionListener((e) ->
+        fileIoUtil.addActionListener((e) ->
         {
-            fileIOUtil.setEnabled(false);
+            fileIoUtil.setEnabled(false);
             if (filesViewer != null) {
                 filesViewer.setEnabled(false);
             }
-            AppSystem.pool.execute(() -> {
-                try {
-                    fsViewer = FsViewer.getInstance();
-                    fsViewer.show();
-                }
-                catch (SQLException e1) {
-                    // TODO 自动生成的 catch 块
-                    AppSystem.out.println("错误：无法读取文件，文件系统可能已经损坏，您可以尝试重启应用。");
-                }
-                fileIOUtil.setEnabled(true);
-                if (filesViewer != null) {
-                    filesViewer.setEnabled(true);
-                }
-            });
-//            Thread t = new Thread(() ->
-//            {
-//                try {
-//                    fsViewer = FsViewer.getInstance();
-//                    fsViewer.show();
-//                }
-//                catch (SQLException e1) {
-//                    // TODO 自动生成的 catch 块
-//                    AppSystem.out.println("错误：无法读取文件，文件系统可能已经损坏，您可以尝试重启应用。");
-//                }
-//                fileIOUtil.setEnabled(true);
-//                if (filesViewer != null) {
-//                    filesViewer.setEnabled(true);
-//                }
-//            });
-//            t.start();
+            AppSystem.pool.execute(this::runReadSql);
         });
         modifyComponentSize(window);
         init();
@@ -646,91 +371,7 @@ public class ServerUiModule extends DiskDynamicWindow {
 
     public void updateServerStatus() {
         if (serverStatus != null) {
-            AppSystem.pool.execute(() -> {
-                if (serverStatus.getServerStatus()) {
-                    serverStatusLab.setText(S_START);
-                    start.setEnabled(false);
-                    stop.setEnabled(true);
-                    restart.setEnabled(true);
-                    setting.setEnabled(false);
-                } else {
-                    serverStatusLab.setText(S_STOP);
-                    start.setEnabled(true);
-                    stop.setEnabled(false);
-                    restart.setEnabled(false);
-                    setting.setEnabled(true);
-                }
-                fileIOUtil.setEnabled(true);
-                if (filesViewer != null) {
-                    filesViewer.setEnabled(true);
-                }
-                portStatusLab.setText(serverStatus.getPort() + "");
-                if (serverStatus.getLogLevel() != null) {
-                    switch (serverStatus.getLogLevel()) {
-                        case EVENT: {
-                            logLevelLab.setText(L_ALL);
-                            break;
-                        }
-                        case NONE: {
-                            logLevelLab.setText(L_NONE);
-                            break;
-                        }
-                        case RUNTIME_EXCEPTION: {
-                            logLevelLab.setText(L_EXCEPTION);
-                            break;
-                        }
-                        default: {
-                            logLevelLab.setText("无法获取(?)");
-                            break;
-                        }
-                    }
-                }
-                bufferSizeLab.setText(serverStatus.getBufferSize() / 1024 + " KB");
-            });
-//            Thread t = new Thread(() ->
-//            {
-//                if (serverStatus.getServerStatus()) {
-//                    serverStatusLab.setText(S_START);
-//                    start.setEnabled(false);
-//                    stop.setEnabled(true);
-//                    restart.setEnabled(true);
-//                    setting.setEnabled(false);
-//                }
-//                else {
-//                    serverStatusLab.setText(S_STOP);
-//                    start.setEnabled(true);
-//                    stop.setEnabled(false);
-//                    restart.setEnabled(false);
-//                    setting.setEnabled(true);
-//                }
-//                fileIOUtil.setEnabled(true);
-//                if (filesViewer != null) {
-//                    filesViewer.setEnabled(true);
-//                }
-//                portStatusLab.setText(serverStatus.getPort() + "");
-//                if (serverStatus.getLogLevel() != null) {
-//                    switch (serverStatus.getLogLevel()) {
-//                        case EVENT: {
-//                            logLevelLab.setText(L_ALL);
-//                            break;
-//                        }
-//                        case NONE: {
-//                            logLevelLab.setText(L_NONE);
-//                            break;
-//                        }
-//                        case RUNTIME_EXCEPTION: {
-//                            logLevelLab.setText(L_EXCEPTION);
-//                            break;
-//                        }
-//                        default: {
-//                            logLevelLab.setText("无法获取(?)");
-//                            break;
-//                        }
-//                    }
-//                }
-//                bufferSizeLab.setText(serverStatus.getBufferSize() / 1024 + " KB");
-//            });
-//            t.start();
+            AppSystem.pool.execute(this::runUpdateStatus);
         }
     }
 
@@ -742,22 +383,7 @@ public class ServerUiModule extends DiskDynamicWindow {
         setting.setEnabled(false);
         this.println("退出程序...");
         if (closeServer != null) {
-            AppSystem.pool.execute(() -> {
-                if (serverStatus.getServerStatus()) {
-                    closeServer.close();
-                }
-                System.exit(0);
-                return;
-            });
-//            final Thread t = new Thread(() ->
-//            {
-//                if (serverStatus.getServerStatus()) {
-//                    closeServer.close();
-//                }
-//                System.exit(0);
-//                return;
-//            });
-//            t.start();
+            AppSystem.pool.execute(this::runExit);
         } else {
             System.exit(0);
         }
@@ -785,5 +411,184 @@ public class ServerUiModule extends DiskDynamicWindow {
 
     public static void setUpdateSetting(final UpdateSetting updateSetting) {
         SettingWindow.updateSetting = updateSetting;
+    }
+
+    private void runInsertUpdate() {
+        if (out.getLineCount() >= 1000) {
+            int end = 0;
+            try {
+                end = out.getLineEndOffset(100);
+            }
+            catch (Exception exc) {
+                exc.printStackTrace();
+            }
+            out.replaceRange("", 0, end);
+        }
+        out.setCaretPosition(out.getText().length());
+    }
+
+    private void runBoot() {
+        if (startServer.start()) {
+            println("启动完成。正在检查服务器状态...");
+            if (serverStatus.getServerStatus()) {
+                println("KIFT服务器已经启动，可以正常访问了。");
+            } else {
+                println("KIFT服务器未能成功启动，请检查设置或查看异常信息。");
+            }
+        } else {
+            if (ConfigureReader.getInstance().getPropertiesStatus() != 0) {
+                switch (ConfigureReader.getInstance().getPropertiesStatus()) {
+                    case ConfigureReader.INVALID_PORT: {
+                        println("KIFT无法启动：端口设置无效。");
+                        break;
+                    }
+                    case ConfigureReader.INVALID_BUFFER_SIZE: {
+                        println("KIFT无法启动：缓存设置无效。");
+                        break;
+                    }
+                    case ConfigureReader.INVALID_FILE_SYSTEM_PATH: {
+                        println("KIFT无法启动：文件系统路径或某一扩展存储区设置无效。");
+                        break;
+                    }
+                    case ConfigureReader.INVALID_LOG: {
+                        println("KIFT无法启动：日志设置无效。");
+                        break;
+                    }
+                    case ConfigureReader.INVALID_VC: {
+                        println("KIFT无法启动：登录验证码设置无效。");
+                        break;
+                    }
+                    case ConfigureReader.INVALID_MUST_LOGIN_SETTING: {
+                        println("KIFT无法启动：必须登入设置无效。");
+                        break;
+                    }
+                    case ConfigureReader.INVALID_CHANGE_PASSWORD_SETTING: {
+                        println("KIFT无法启动：用户修改账户密码设置无效。");
+                        break;
+                    }
+                    case ConfigureReader.INVALID_FILE_CHAIN_SETTING: {
+                        println("KIFT无法启动：永久资源链接设置无效。");
+                        break;
+                    }
+                    default: {
+                        println("KIFT无法启动，请检查设置或查看异常信息。");
+                        break;
+                    }
+                }
+            } else {
+                println("KIFT无法启动，请检查设置或查看异常信息。");
+            }
+            serverStatusLab.setText(S_STOP);
+        }
+        updateServerStatus();
+    }
+
+    private void runClose() {
+        if (closeServer != null) {
+            serverStatusLab.setText(S_STOPPING);
+            if (closeServer.close()) {
+                println("关闭完成。正在检查服务器状态...");
+                if (serverStatus.getServerStatus()) {
+                    println("KIFT服务器未能成功关闭，如有需要，可以强制关闭程序（不安全）。");
+                } else {
+                    println("KIFT服务器已经关闭，停止所有访问。");
+                }
+            } else {
+                println("KIFT服务器无法关闭，请手动结束本程序。");
+            }
+            updateServerStatus();
+        }
+    }
+
+    private void runReboot() {
+        println("正在重启服务器...");
+        if (closeServer.close()) {
+            if (startServer.start()) {
+                println("重启成功，可以正常访问了。");
+            } else {
+                println("错误：服务器已关闭但未能重新启动，请尝试手动启动服务器。");
+            }
+        } else {
+            println("错误：无法关闭服务器，请尝试手动关闭。");
+        }
+        updateServerStatus();
+    }
+
+    private void runReadSql() {
+        try {
+            fsViewer = FsViewer.getInstance();
+            fsViewer.show();
+        }
+        catch (SQLException e1) {
+            e1.printStackTrace();
+            AppSystem.out.println("错误：无法读取文件，文件系统可能已经损坏，您可以尝试重启应用。");
+        }
+        fileIoUtil.setEnabled(true);
+        if (filesViewer != null) {
+            filesViewer.setEnabled(true);
+        }
+    }
+
+    private void runUpdateStatus() {
+        if (serverStatus.getServerStatus()) {
+            serverStatusLab.setText(S_START);
+            start.setEnabled(false);
+            stop.setEnabled(true);
+            restart.setEnabled(true);
+            setting.setEnabled(false);
+        } else {
+            serverStatusLab.setText(S_STOP);
+            start.setEnabled(true);
+            stop.setEnabled(false);
+            restart.setEnabled(false);
+            setting.setEnabled(true);
+        }
+        fileIoUtil.setEnabled(true);
+        if (filesViewer != null) {
+            filesViewer.setEnabled(true);
+        }
+        portStatusLab.setText(serverStatus.getPort() + "");
+        if (serverStatus.getLogLevel() != null) {
+            switch (serverStatus.getLogLevel()) {
+                case EVENT: {
+                    logLevelLab.setText(L_ALL);
+                    break;
+                }
+                case NONE: {
+                    logLevelLab.setText(L_NONE);
+                    break;
+                }
+                case RUNTIME_EXCEPTION: {
+                    logLevelLab.setText(L_EXCEPTION);
+                    break;
+                }
+                default: {
+                    logLevelLab.setText("无法获取(?)");
+                    break;
+                }
+            }
+        }
+        bufferSizeLab.setText(serverStatus.getBufferSize() / 1024 + " KB");
+    }
+
+    private void runExit() {
+        if (serverStatus.getServerStatus()) {
+            closeServer.close();
+        }
+        System.exit(0);
+    }
+
+    private void runFileView() {
+        try {
+            fsViewer = FsViewer.getInstance();
+            fsViewer.show();
+        }
+        catch (SQLException e1) {
+            // TODO 自动生成的 catch 块
+            JOptionPane.showMessageDialog(window, "错误：无法打开文件，文件系统可能已损坏，您可以尝试重启应用。", "错误",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+        filesViewer.setEnabled(true);
+        fileIoUtil.setEnabled(true);
     }
 }

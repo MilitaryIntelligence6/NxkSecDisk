@@ -69,12 +69,7 @@ public class FolderUtil {
      * @author 青阳龙野(kohgylw)
      */
     public void deleteAllChildFolder(final String folderId) {
-        AppSystem.pool.execute(
-                () -> this.iterationDeleteFolder(folderId)
-        );
-//        final Thread deleteChildFolderThread = new Thread(
-//                () -> this.iterationDeleteFolder(folderId));
-//        deleteChildFolderThread.start();
+        AppSystem.pool.execute(() -> this.iterationDeleteFolder(folderId));
     }
 
     private void iterationDeleteFolder(final String folderId) {

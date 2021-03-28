@@ -103,7 +103,7 @@ public class ConsoleLauncher {
                     break;
                 }
                 case "-console": {
-                    this.startKiftdByConsole();
+                    this.startDiskByConsole();
                     break;
                 }
                 case "-start": {
@@ -119,37 +119,19 @@ public class ConsoleLauncher {
         }
     }
 
-    private void startKiftdByConsole() {
+    private void startDiskByConsole() {
         AppSystem.out.println(" 青阳网络文件系统-kiftd 控制台模式[Console model]");
         AppSystem.out.println("Character encoding with UTF-8");
-        AppSystem.pool.execute(() -> {
-                    AppSystem.out.println("正在初始化服务器...");
-                    if (ConfigureReader.getInstance().getPropertiesStatus() == 0) {
-                        this.awaiting();
-                    }
-                    return;
-                }
-        );
-//        final Thread t = new Thread(() ->
-//        {
-//            AppSystem.out.println("正在初始化服务器...");
-//            if (ConfigureReader.getInstance().getPropertiesStatus() == 0) {
-//                this.awaiting();
-//            }
-//            return;
-//        });
-//        t.start();
+        AppSystem.pool.execute(this::runInit);
     }
 
     private void startServer() {
         AppSystem.out.println("执行命令：启动服务器...");
         if (ConsoleLauncher.appController.started()) {
             AppSystem.out.println("错误：服务器已经启动了。您可以使用 -status 命令查看服务器运行状态或使用 -stop 命令停止服务器。");
-        }
-        else if (ConsoleLauncher.appController.start()) {
+        } else if (ConsoleLauncher.appController.start()) {
             AppSystem.out.println("kiftd服务器已启动，可以正常访问了，您可以使用 -status 指令查看运行状态。");
-        }
-        else {
+        } else {
             if (ConfigureReader.getInstance().getPropertiesStatus() != 0) {
                 switch (ConfigureReader.getInstance().getPropertiesStatus()) {
                     case ConfigureReader.INVALID_PORT: {
@@ -177,8 +159,7 @@ public class ConsoleLauncher {
                         break;
                     }
                 }
-            }
-            else {
+            } else {
                 AppSystem.out.println("错误：kiftd服务器未能启动，请重试或检查设置。");
             }
         }
@@ -200,16 +181,13 @@ public class ConsoleLauncher {
             if (ConsoleLauncher.appController.stop()) {
                 if (ConsoleLauncher.appController.start()) {
                     AppSystem.out.println("服务器重启成功，可以正常访问了。");
-                }
-                else {
+                } else {
                     AppSystem.out.println("错误：无法重新启动服务器，请尝试手动启动。");
                 }
-            }
-            else {
+            } else {
                 AppSystem.out.println("错误：无法关闭服务器，请尝试手动关闭。");
             }
-        }
-        else {
+        } else {
             AppSystem.out.println("错误：服务器尚未启动。您可以使用 -start 命令启动服务器或使用 -status 命令查看服务器运行状态。");
         }
     }
@@ -219,122 +197,21 @@ public class ConsoleLauncher {
         if (ConsoleLauncher.appController.started()) {
             if (ConsoleLauncher.appController.stop()) {
                 AppSystem.out.println("服务器已关闭，停止所有访问。");
-            }
-            else {
+            } else {
                 AppSystem.out.println("错误：无法关闭服务器，您可以尝试强制关闭。");
             }
-        }
-        else {
+        } else {
             AppSystem.out.println("错误：服务器尚未启动。您可以使用 -start 命令启动服务器或使用 -exit 命令退出应用。");
         }
     }
 
     private void awaiting() {
-        AppSystem.pool.execute(() -> {
-            reader = new Scanner(System.in);
-            AppSystem.out.printf("命令帮助：\r\n%s\r\n", commandTips);
-            try {
-                while (true) {
-                    AppSystem.out.println("kiftd: console$ ");
-                    String command = reader.nextLine();
-                    switch (command) {
-                        case "-start": {
-                            startServer();
-                            break;
-                        }
-                        case "-stop": {
-                            stopServer();
-                            break;
-                        }
-                        case "-restart": {
-                            restartServer();
-                            break;
-                        }
-                        case "-status": {
-                            printServerStatus();
-                            break;
-                        }
-                        case "-files": {
-                            fileSystemManagerModel();
-                            break;
-                        }
-                        case "-exit": {
-                            reader.close();
-                            exit();
-                            return;
-                        }
-                        case "help":
-                        case "--help":
-                        case "-help": {
-                            AppSystem.out.printf("命令帮助：\r\n%s", commandTips);
-                            break;
-                        }
-                        default: {
-                            AppSystem.out.printf("错误：无法识别的指令。\r\n%s", commandTips);
-                            break;
-                        }
-                    }
-                }
-            }
-            catch (Exception e) {
-                AppSystem.out.println("错误：读取命令时出现意外导致程序退出，请重启kiftd。");
-            }
-        });
-//        Thread t = new Thread(() ->
-//        {
-//            reader = new Scanner(System.in);
-//            AppSystem.out.printf("命令帮助：\r\n%s\r\n", commandTips);
-//            try {
-//                while (true) {
-//                    AppSystem.out.println("kiftd: console$ ");
-//                    String command = reader.nextLine();
-//                    switch (command) {
-//                        case "-start": {
-//                            startServer();
-//                            break;
-//                        }
-//                        case "-stop": {
-//                            stopServer();
-//                            break;
-//                        }
-//                        case "-restart": {
-//                            restartServer();
-//                            break;
-//                        }
-//                        case "-status": {
-//                            printServerStatus();
-//                            break;
-//                        }
-//                        case "-files": {
-//                            fileSystemManagerModel();
-//                            break;
-//                        }
-//                        case "-exit": {
-//                            reader.close();
-//                            exit();
-//                            return;
-//                        }
-//                        case "help":
-//                        case "--help":
-//                        case "-help": {
-//                            AppSystem.out.printf("命令帮助：\r\n%s", commandTips);
-//                            break;
-//                        }
-//                        default: {
-//                            AppSystem.out.printf("错误：无法识别的指令。\r\n%s", commandTips);
-//                            break;
-//                        }
-//                    }
-//                }
-//            }
-//            catch (Exception e) {
-//                AppSystem.out.println("错误：读取命令时出现意外导致程序退出，请重启kiftd。");
-//            }
-//        });
-//        t.start();
+        AppSystem.pool.execute(this::runConsoleArgs);
     }
 
-    // 打印服务器状态
+    /**
+     * 打印服务器状态;
+     */
     private void printServerStatus() {
         AppSystem.out.printf("服务器状态：\r\n<Port>端口号:%d\r\n<LogLevel>日志等级:%s\r\n<BufferSize>缓冲区大小:%d " +
                         "B\r\n<FileSystemPath>文件系统存储路径：%s\r\n<MustLogin>是否必须登录：%s\r\n<Running>运行状态：%s",
@@ -492,8 +369,7 @@ public class ConsoleLauncher {
                 List<Folder> folders = FileSystemManager.getInstance().getFoldersByParentId(parent);
                 if (path.endsWith("/") || folders.parallelStream().anyMatch((e) -> e.getFolderName().equals(fname))) {
                     return folders.parallelStream().filter((e) -> e.getFolderName().equals(fname)).findFirst().get();
-                }
-                else {
+                } else {
                     return FileSystemManager.getInstance().selectNodesByFolderId(parent).parallelStream()
                             .filter((e) -> e.getFileName().equals(fname)).findFirst().get();
                 }
@@ -514,8 +390,7 @@ public class ConsoleLauncher {
         if ("../".equals(fname) || "..".equals(fname)) {
             if (currentFolder.getCurrent().getFolderId().equals("root")) {
                 return "root";
-            }
-            else {
+            } else {
                 return currentFolder.getCurrent().getFolderParent();
             }
         }
@@ -554,8 +429,7 @@ public class ConsoleLauncher {
         if ("../".equals(fname) || "..".equals(fname)) {
             if (currentFolder.getCurrent().getFolderId().equals("root")) {
                 return "root";
-            }
-            else {
+            } else {
                 return currentFolder.getCurrent().getFolderParent();
             }
         }
@@ -567,8 +441,7 @@ public class ConsoleLauncher {
             try {
                 if (index >= 1 && index <= currentFolder.getFolders().size()) {
                     return currentFolder.getFolders().get(index - 1).getFolderId();
-                }
-                else {
+                } else {
                     return currentFolder.getFiles().get(index - currentFolder.getFolders().size() - 1).getFileId();
                 }
             }
@@ -611,14 +484,12 @@ public class ConsoleLauncher {
                 importPath = "/ROOT";
                 path = FileSystemManager.getInstance().selectFolderById("root");
                 target = new File(importTarget);
-            }
-            else if (args.length == 3 || args.length == 4) {
+            } else if (args.length == 3 || args.length == 4) {
                 importPath = args[1];
                 importTarget = args[2];
                 target = new File(importTarget);
                 path = getPath(importPath);
-            }
-            else {
+            } else {
                 AppSystem.out.println("错误：导入失败，必须指定导入目标（示例：“-import /ROOT/ /home/your/import/file.txt”）。");
                 return;
             }
@@ -649,22 +520,18 @@ public class ConsoleLauncher {
                             return;
                         }
                     }
-                }
-                else if (args.length == 2) {
+                } else if (args.length == 2) {
                     type = FileSystemManager.COVER;
-                }
-                else {
+                } else {
                     AppSystem.out.println("错误：导入失败，导入路径下存在相同的文件或文件夹（请增加以下参数：[-C]覆盖 [-B]保留两者）。");
                     return;
                 }
-            }
-            else {
+            } else {
                 type = "cancel";
             }
             if (FileSystemManager.getInstance().importFrom(files, folderId, type)) {
                 return;
-            }
-            else {
+            } else {
                 AppSystem.out.println("错误：导入失败，可能导入全部文件。");
             }
         }
@@ -755,14 +622,12 @@ public class ConsoleLauncher {
                 exportTarget = "/ROOT";
                 path = new File(exportPath);
                 target = FileSystemManager.getInstance().selectFolderById("root");
-            }
-            else if (args.length == 3 || args.length == 4) {
+            } else if (args.length == 3 || args.length == 4) {
                 exportTarget = args[1];
                 exportPath = args[2];
                 target = getPath(exportTarget);
                 path = new File(exportPath);
-            }
-            else {
+            } else {
                 AppSystem.out.println("错误：导出失败，必须指定导出路径（示例：“-export /ROOT/ /home/your/export/folder”）。");
                 return;
             }
@@ -780,12 +645,10 @@ public class ConsoleLauncher {
             if (target instanceof Node) {
                 foldersId = new String[]{};
                 filesId = new String[]{((Node) target).getFileId()};
-            }
-            else if (target instanceof Folder) {
+            } else if (target instanceof Folder) {
                 foldersId = new String[]{((Folder) target).getFolderId()};
                 filesId = new String[]{};
-            }
-            else {
+            } else {
                 AppSystem.out.println("错误：导出失败，出现意外错误。");
                 return;
             }
@@ -805,22 +668,18 @@ public class ConsoleLauncher {
                             return;
                         }
                     }
-                }
-                else if (args.length == 2) {
+                } else if (args.length == 2) {
                     type = FileSystemManager.COVER;
-                }
-                else {
+                } else {
                     AppSystem.out.println("错误：导出失败，导出路径下存在相同的文件或文件夹（请增加以下参数：[-C]覆盖 [-B]保留两者）。");
                     return;
                 }
-            }
-            else {
+            } else {
                 type = "cancel";
             }
             if (FileSystemManager.getInstance().exportTo(foldersId, filesId, path, type)) {
                 return;
-            }
-            else {
+            } else {
                 AppSystem.out.println("错误：导出失败，可能导出全部文件。");
             }
         }
@@ -842,12 +701,10 @@ public class ConsoleLauncher {
         if (args.length == 1) {
             path = args[0];
             id = currentFolder.getCurrent().getFolderId();
-        }
-        else if (args.length == 2) {
+        } else if (args.length == 2) {
             id = getSelectFolderOrFileId(args[0]);
             path = args[1];
-        }
-        else {
+        } else {
             AppSystem.out.println("错误：导出失败，输入参数不正确。");
             return;
         }
@@ -865,12 +722,10 @@ public class ConsoleLauncher {
                         || currentFolder.getFolders().parallelStream().anyMatch((e) -> e.getFolderId().equals(id))) {
                     foldersId = new String[]{id};
                     filesId = new String[]{};
-                }
-                else if (currentFolder.getFiles().parallelStream().anyMatch((e) -> e.getFileId().equals(id))) {
+                } else if (currentFolder.getFiles().parallelStream().anyMatch((e) -> e.getFileId().equals(id))) {
                     foldersId = new String[]{};
                     filesId = new String[]{id};
-                }
-                else {
+                } else {
                     AppSystem.out.println("错误：要导出的文件（或文件夹）不合法，只允许在当前文件夹内的选择（" + path + "）。");
                     return;
                 }
@@ -912,8 +767,7 @@ public class ConsoleLauncher {
                 }
                 AppSystem.out.println("错误：无法导出该文件（或文件夹），请重试。");
             }
-        }
-        else {
+        } else {
             AppSystem.out.println("错误：导出失败，导出的目标必须是一个文件夹（" + path + "）。");
         }
     }
@@ -941,13 +795,11 @@ public class ConsoleLauncher {
                     worker.execute(pl);
                     if (FileSystemManager.getInstance().delete(new String[]{id}, new String[]{})) {
                         AppSystem.out.println("删除完毕。");
-                    }
-                    else {
+                    } else {
                         AppSystem.out.println("删除失败，可能未能删除该文件夹，请重试。");
                     }
                     pl.c = false;
-                }
-                else {
+                } else {
                     AppSystem.out.println("已取消删除。");
                 }
                 return;
@@ -959,13 +811,11 @@ public class ConsoleLauncher {
                     worker.execute(pl);
                     if (FileSystemManager.getInstance().delete(new String[]{}, new String[]{id})) {
                         AppSystem.out.println("删除完毕。");
-                    }
-                    else {
+                    } else {
                         AppSystem.out.println("删除失败，可能未能删除该文件，请重试。");
                     }
                     pl.c = false;
-                }
-                else {
+                } else {
                     AppSystem.out.println("已取消删除。");
                 }
                 return;
@@ -1056,6 +906,64 @@ public class ConsoleLauncher {
                     break;
                 }
             }
+        }
+    }
+
+    private void runInit() {
+        AppSystem.out.println("正在初始化服务器...");
+        if (ConfigureReader.getInstance().getPropertiesStatus() == 0) {
+            this.awaiting();
+        }
+    }
+
+    private void runConsoleArgs() {
+        reader = new Scanner(System.in);
+        AppSystem.out.printf("命令帮助：\r\n%s\r\n", commandTips);
+        try {
+            while (true) {
+                AppSystem.out.println("kiftd: console$ ");
+                String command = reader.nextLine();
+                switch (command) {
+                    case "-start": {
+                        startServer();
+                        break;
+                    }
+                    case "-stop": {
+                        stopServer();
+                        break;
+                    }
+                    case "-restart": {
+                        restartServer();
+                        break;
+                    }
+                    case "-status": {
+                        printServerStatus();
+                        break;
+                    }
+                    case "-files": {
+                        fileSystemManagerModel();
+                        break;
+                    }
+                    case "-exit": {
+                        reader.close();
+                        exit();
+                        return;
+                    }
+                    case "help":
+                    case "--help":
+                    case "-help": {
+                        AppSystem.out.printf("命令帮助：\r\n%s", commandTips);
+                        break;
+                    }
+                    default: {
+                        AppSystem.out.printf("错误：无法识别的指令。\r\n%s", commandTips);
+                        break;
+                    }
+                }
+            }
+        }
+        catch (Exception e) {
+            AppSystem.out.println("错误：读取命令时出现意外导致程序退出，请重启kiftd。");
         }
     }
 }
