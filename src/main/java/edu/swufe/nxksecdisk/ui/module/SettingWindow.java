@@ -106,7 +106,7 @@ public class SettingWindow extends DiskDynamicWindow {
         final JPanel mlbox = new JPanel(new FlowLayout(1));
         mlbox.setBorder(new EmptyBorder(interval, 0, interval, 0));
         final JLabel mltitle = new JLabel("必须登入(must login)：");
-        (SettingWindow.mlInput = new JComboBox<String>()).addItem(ML_OPEN);
+        (SettingWindow.mlInput = new JComboBox<>()).addItem(ML_OPEN);
         SettingWindow.mlInput.addItem(ML_CLOSE);
         SettingWindow.mlInput.setPreferredSize(new Dimension((int) (170 * proportion), (int) (20 * proportion)));
         mlbox.add(mltitle);
@@ -143,7 +143,7 @@ public class SettingWindow extends DiskDynamicWindow {
         final JPanel logbox = new JPanel(new FlowLayout(1));
         logbox.setBorder(new EmptyBorder(interval, 0, interval, 0));
         final JLabel logtitle = new JLabel("日志等级(port)：");
-        (SettingWindow.logLevelInput = new JComboBox<String>()).addItem("记录全部(ALL)");
+        (SettingWindow.logLevelInput = new JComboBox<>()).addItem("记录全部(ALL)");
         SettingWindow.logLevelInput.addItem("仅异常(EXCEPTION)");
         SettingWindow.logLevelInput.addItem("不记录(NONE)");
         SettingWindow.logLevelInput.setPreferredSize(new Dimension((int) (170 * proportion), (int) (20 * proportion)));
@@ -153,7 +153,7 @@ public class SettingWindow extends DiskDynamicWindow {
         final JPanel cpbox = new JPanel(new FlowLayout(1));
         cpbox.setBorder(new EmptyBorder(interval, 0, interval, 0));
         final JLabel cptitle = new JLabel("用户修改密码(change password)：");
-        (SettingWindow.changePwdInput = new JComboBox<String>()).addItem(CHANGE_PWD_CLOSE);
+        (SettingWindow.changePwdInput = new JComboBox<>()).addItem(CHANGE_PWD_CLOSE);
         SettingWindow.changePwdInput.addItem(CHANGE_PWD_OPEN);
         SettingWindow.changePwdInput.setPreferredSize(new Dimension((int) (170 * proportion), (int) (20 * proportion)));
         cpbox.add(cptitle);
@@ -162,7 +162,7 @@ public class SettingWindow extends DiskDynamicWindow {
         final JPanel scbox = new JPanel(new FlowLayout(1));
         cpbox.setBorder(new EmptyBorder(interval, 0, interval, 0));
         final JLabel sctitle = new JLabel("永久资源链接(file chain)：");
-        (SettingWindow.showChainInput = new JComboBox<String>()).addItem(SHOW_CHAIN_CLOSE);
+        (SettingWindow.showChainInput = new JComboBox<>()).addItem(SHOW_CHAIN_CLOSE);
         SettingWindow.showChainInput.addItem(SHOW_CHAIN_OPEN);
         SettingWindow.showChainInput.setPreferredSize(new Dimension((int) (170 * proportion), (int) (20 * proportion)));
         scbox.add(sctitle);
@@ -194,135 +194,122 @@ public class SettingWindow extends DiskDynamicWindow {
         buttonbox.add(SettingWindow.update);
         buttonbox.add(SettingWindow.cancel);
         SettingWindow.window.add(buttonbox);
-        SettingWindow.cancel.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                window.setVisible(false);
+        SettingWindow.cancel.addActionListener(e -> window.setVisible(false));
+        SettingWindow.update.addActionListener(e -> {
+            // 仅在服务器停止时才可以进行修改
+            if (serverStatus.getServerStatus()) {
+                getServerStatus();
             }
-        });
-        SettingWindow.update.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // 仅在服务器停止时才可以进行修改
-                if (serverStatus.getServerStatus()) {
-                    getServerStatus();
-                }
-                else {
-                    Thread t = new Thread(() ->
-                    {
-                        if (updateSetting != null) {
-                            try {
-                                ServerSetting ss = new ServerSetting();
-                                ss.setPort(Integer.parseInt(portInput.getText()));
-                                ss.setBuffSize(Integer.parseInt(bufferInput.getText()) * 1024);
-                                ss.setFsPath(chooserPath.getAbsolutePath());
-                                List<ExtendStores> ess = new ArrayList<>();
-                                for (FileSystemPath fsp : extendStores) {
-                                    ExtendStores es = new ExtendStores();
-                                    es.setIndex(fsp.getIndex());
-                                    es.setPath(fsp.getPath());
-                                    ess.add(es);
+            else {
+                Thread t = new Thread(() ->
+                {
+                    if (updateSetting != null) {
+                        try {
+                            ServerSetting ss = new ServerSetting();
+                            ss.setPort(Integer.parseInt(portInput.getText()));
+                            ss.setBuffSize(Integer.parseInt(bufferInput.getText()) * 1024);
+                            ss.setFsPath(chooserPath.getAbsolutePath());
+                            List<ExtendStores> ess = new ArrayList<>();
+                            for (FileSystemPath fsp : extendStores) {
+                                ExtendStores es = new ExtendStores();
+                                es.setIndex(fsp.getIndex());
+                                es.setPath(fsp.getPath());
+                                ess.add(es);
+                            }
+                            ss.setExtendStores(ess);
+                            switch (logLevelInput.getSelectedIndex()) {
+                                case 0: {
+                                    ss.setLog(LogLevel.EVENT);
+                                    break;
                                 }
-                                ss.setExtendStores(ess);
-                                switch (logLevelInput.getSelectedIndex()) {
-                                    case 0: {
-                                        ss.setLog(LogLevel.EVENT);
-                                        break;
-                                    }
-                                    case 1: {
-                                        ss.setLog(LogLevel.RUNTIME_EXCEPTION);
-                                        break;
-                                    }
-                                    case 2: {
-                                        ss.setLog(LogLevel.NONE);
-                                        break;
-                                    }
-                                    default: {
-                                        // 注意，当选择未知的日志等级时，不做任何操作
-                                        break;
-                                    }
+                                case 1: {
+                                    ss.setLog(LogLevel.RUNTIME_EXCEPTION);
+                                    break;
                                 }
-                                switch (mlInput.getSelectedIndex()) {
-                                    case 0: {
-                                        ss.setMustLogin(true);
-                                        break;
-                                    }
-                                    case 1: {
-                                        ss.setMustLogin(false);
-                                        break;
-                                    }
-                                    default: {
-                                        break;
-                                    }
+                                case 2: {
+                                    ss.setLog(LogLevel.NONE);
+                                    break;
                                 }
-                                switch (changePwdInput.getSelectedIndex()) {
-                                    case 0: {
-                                        ss.setChangePassword(false);
-                                        break;
-                                    }
-                                    case 1: {
-                                        ss.setChangePassword(true);
-                                        break;
-                                    }
-                                    default: {
-                                        break;
-                                    }
-                                }
-                                switch (showChainInput.getSelectedIndex()) {
-                                    case 0: {
-                                        ss.setFileChain(false);
-                                        break;
-                                    }
-                                    case 1: {
-                                        ss.setFileChain(true);
-                                        break;
-                                    }
-                                    default: {
-                                        break;
-                                    }
-                                }
-                                switch (vcInput.getSelectedIndex()) {
-                                    case 0: {
-                                        ss.setVc(VcLevel.STANDARD);
-                                        break;
-                                    }
-                                    case 1: {
-                                        ss.setVc(VcLevel.SIMPLIFIED);
-                                        break;
-                                    }
-                                    case 2: {
-                                        ss.setVc(VcLevel.CLOSE);
-                                        break;
-                                    }
-                                    default:
-                                        break;
-                                }
-                                if (updateSetting.update(ss)) {
-                                    ServerUiModule.getInstance().updateServerStatus();
-                                    window.setVisible(false);
+                                default: {
+                                    // 注意，当选择未知的日志等级时，不做任何操作
+                                    break;
                                 }
                             }
-                            catch (Exception exc) {
-                                AppSystem.out.println(exc.getMessage());
-                                AppSystem.out.println("错误：无法更新服务器设置");
+                            switch (mlInput.getSelectedIndex()) {
+                                case 0: {
+                                    ss.setMustLogin(true);
+                                    break;
+                                }
+                                case 1: {
+                                    ss.setMustLogin(false);
+                                    break;
+                                }
+                                default: {
+                                    break;
+                                }
+                            }
+                            switch (changePwdInput.getSelectedIndex()) {
+                                case 0: {
+                                    ss.setChangePassword(false);
+                                    break;
+                                }
+                                case 1: {
+                                    ss.setChangePassword(true);
+                                    break;
+                                }
+                                default: {
+                                    break;
+                                }
+                            }
+                            switch (showChainInput.getSelectedIndex()) {
+                                case 0: {
+                                    ss.setFileChain(false);
+                                    break;
+                                }
+                                case 1: {
+                                    ss.setFileChain(true);
+                                    break;
+                                }
+                                default: {
+                                    break;
+                                }
+                            }
+                            switch (vcInput.getSelectedIndex()) {
+                                case 0: {
+                                    ss.setVc(VcLevel.STANDARD);
+                                    break;
+                                }
+                                case 1: {
+                                    ss.setVc(VcLevel.SIMPLIFIED);
+                                    break;
+                                }
+                                case 2: {
+                                    ss.setVc(VcLevel.CLOSE);
+                                    break;
+                                }
+                                default:
+                                    break;
+                            }
+                            if (updateSetting.update(ss)) {
+                                ServerUiModule.getInstance().updateServerStatus();
+                                window.setVisible(false);
                             }
                         }
-                        else {
-                            window.setVisible(false);
+                        catch (Exception exc) {
+                            AppSystem.out.println(exc.getMessage());
+                            AppSystem.out.println("错误：无法更新服务器设置");
                         }
-                    });
-                    t.start();
-                }
+                    }
+                    else {
+                        window.setVisible(false);
+                    }
+                });
+                t.start();
             }
         });
-        SettingWindow.changeFileSystemPath.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                fileSystemPathViewer = FileSystemPathViewer.getInstance();
-                fileSystemPathViewer.show();
-            }
+        SettingWindow.changeFileSystemPath.addActionListener(e -> {
+            fileSystemPathViewer = FileSystemPathViewer.getInstance();
+            fileSystemPathViewer.show();
         });
         modifyComponentSize(window);
     }
