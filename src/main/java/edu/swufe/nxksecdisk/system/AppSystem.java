@@ -12,26 +12,20 @@ import edu.swufe.nxksecdisk.server.util.LogUtil;
  */
 public final class AppSystem {
 
-    public static IOutputStream out = null;
+    public static final IOutputStream out = requireOutStream();
 
     public static final LogUtil log = null;
 
-    static {
-        initOutStream();
-    }
-
-    private static void initOutStream() {
+    private static IOutputStream requireOutStream() {
         switch (DynamicConfig.getLauncherMode()) {
             case CONSOLE: {
-                out = StdOutStream.getInstance();
-                break;
+                return StdOutStream.getInstance();
             }
             case UI: {
-                out = UiOutStream.getInstance();
-                break;
+                return UiOutStream.getInstance();
             }
             default: {
-                break;
+                throw new RuntimeException("unknown launcher mode");
             }
         }
     }
