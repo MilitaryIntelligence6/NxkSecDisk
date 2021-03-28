@@ -33,7 +33,7 @@ public class ServerUiModule extends DiskDynamicWindow {
 
     private static TrayIcon trayIcon;
 
-    private static JTextArea out;
+    private static final JTextArea out = new JTextArea();
 
     private static SettingWindow settingWindow;
 
@@ -245,7 +245,8 @@ public class ServerUiModule extends DiskDynamicWindow {
         window.add(buttonBox);
         final JPanel outputBox = new JPanel(new FlowLayout(1));
         outputBox.add(new JLabel("[输出信息(Server Message)]："));
-        (out = new JTextArea()).setLineWrap(true);
+
+        out.setLineWrap(true);
         out.setRows(3 + (int) (proportion));
         out.setSize((int) (292 * proportion), 100);
         out.setEditable(false);
@@ -255,7 +256,6 @@ public class ServerUiModule extends DiskDynamicWindow {
             @Override
             public void removeUpdate(DocumentEvent e) {
                 // TODO 自动生成的方法存根
-
             }
 
             @Override
@@ -287,10 +287,10 @@ public class ServerUiModule extends DiskDynamicWindow {
         });
         outputBox.add(new JScrollPane(out));
         window.add(outputBox);
-        final JPanel bottombox = new JPanel(new FlowLayout(1));
-        bottombox.setBorder(new EmptyBorder(0, 0, (int) (-30 * proportion), 0));
-        bottombox.add(new JLabel("--青阳龙野@kohgylw--"));
-        window.add(bottombox);
+        final JPanel bottomBox = new JPanel(new FlowLayout(1));
+        bottomBox.setBorder(new EmptyBorder(0, 0, (int) (-30 * proportion), 0));
+        bottomBox.add(new JLabel("--青阳龙野@kohgylw--"));
+        window.add(bottomBox);
         start.setEnabled(false);
         stop.setEnabled(false);
         restart.setEnabled(false);
