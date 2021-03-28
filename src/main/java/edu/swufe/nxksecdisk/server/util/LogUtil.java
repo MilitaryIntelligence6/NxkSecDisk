@@ -111,8 +111,7 @@ public class LogUtil {
             // 方便下方使用终态操作;
             String a = account;
             String ip = ipAddrGetter.getIpAddr(request);
-            writerThread.execute(() ->
-            {
+            writerThread.execute(() -> {
                 List<Folder> l = folderUtil.getParentList(f.getFolderId());
                 StringBuilder pl = new StringBuilder();
                 for (Folder i : l) {
@@ -137,7 +136,10 @@ public class LogUtil {
      * 写入重命名文件夹信息
      * </p>
      */
-    public void writeRenameFolderEvent(HttpServletRequest request, Folder f, String newName, String newConstraint) {
+    public void writeRenameFolderEvent(HttpServletRequest request,
+                                       Folder f,
+                                       String newName,
+                                       String newConstraint) {
         if (ConfigureReader.getInstance().inspectLogLevel(LogLevel.EVENT)) {
             String account = (String) request.getSession().getAttribute("ACCOUNT");
             if (account == null || account.length() == 0) {

@@ -9,17 +9,10 @@ final class UiOutStream implements IOutputStream {
 
     private volatile static UiOutStream instance = null;
 
-    private static ServerUiModule serverUi;
+    private static final ServerUiModule out = requireOutUi();
 
     private UiOutStream() {
-        try {
-            UiOutStream.serverUi = ServerUiModule.getInstance();
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-            System.err.printf("ERROR: 错误：无法以UI模式输出信息，自动切换至命令模式输出。详细信息：%s%n",
-                    e.getMessage());
-        }
+
     }
 
     public static UiOutStream getInstance() {
@@ -33,13 +26,25 @@ final class UiOutStream implements IOutputStream {
         return instance;
     }
 
+    private static ServerUiModule requireOutUi() {
+        try {
+            return ServerUiModule.getInstance();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            System.err.printf("ERROR: 错误：无法以UI模式输出信息，自动切换至命令模式输出。详细信息：%s%n",
+                    e.getMessage());
+        }
+        throw new RuntimeException("ui init failed");
+    }
+
     @Override
     public void println(final String context) {
-        serverUi.println(context);
+        out.println(context);
     }
 
     @Override
     public void printf(final String context, Object... args) {
-        serverUi.printf(context, args);
+        out.printf(context, args);
     }
 }
