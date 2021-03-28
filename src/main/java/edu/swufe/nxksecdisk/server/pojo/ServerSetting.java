@@ -5,8 +5,11 @@ import edu.swufe.nxksecdisk.server.enumeration.VcLevel;
 
 import java.util.List;
 
-public class ServerSetting
-{
+/**
+ * @author Administrator
+ */
+public class ServerSetting {
+
     private boolean mustLogin;
 
     private VcLevel vc;
@@ -25,93 +28,75 @@ public class ServerSetting
 
     private List<ExtendStores> extendStores;
 
-    public boolean isMustLogin()
-    {
+    public boolean isMustLogin() {
         return this.mustLogin;
     }
 
-    public void setMustLogin(final boolean mustLogin)
-    {
+    public void setMustLogin(final boolean mustLogin) {
         this.mustLogin = mustLogin;
     }
 
-    public int getBuffSize()
-    {
+    public int getBuffSize() {
         return this.buffSize;
     }
 
-    public void setBuffSize(final int buffSize)
-    {
+    public void setBuffSize(final int buffSize) {
         this.buffSize = buffSize;
     }
 
-    public LogLevel getLog()
-    {
+    public LogLevel getLog() {
         return this.log;
     }
 
-    public void setLog(final LogLevel log)
-    {
+    public void setLog(final LogLevel log) {
         this.log = log;
     }
 
-    public int getPort()
-    {
+    public int getPort() {
         return this.port;
     }
 
-    public void setPort(final int port)
-    {
+    public void setPort(final int port) {
         this.port = port;
     }
 
-    public String getFsPath()
-    {
+    public String getFsPath() {
         return this.fsPath;
     }
 
-    public void setFsPath(final String fsPath)
-    {
+    public void setFsPath(final String fsPath) {
         this.fsPath = fsPath;
     }
 
-    public VcLevel getVc()
-    {
+    public VcLevel getVc() {
         return this.vc;
     }
 
-    public void setVc(VcLevel vc)
-    {
+    public void setVc(VcLevel vc) {
         this.vc = vc;
     }
 
-    public List<ExtendStores> getExtendStores()
-    {
+    public List<ExtendStores> getExtendStores() {
         return extendStores;
     }
 
-    public void setExtendStores(List<ExtendStores> extendStores)
-    {
+    public void setExtendStores(List<ExtendStores> extendStores) {
         this.extendStores = extendStores;
     }
 
-    public boolean isOpenFileChain()
-    {
+    public boolean isOpenFileChain() {
         return fileChain;
     }
 
-    public void setFileChain(boolean fileChain)
-    {
+    public void setFileChain(boolean fileChain) {
         this.fileChain = fileChain;
     }
 
-    public boolean isAllowChangePassword()
-    {
+    public boolean isAllowChangePassword() {
         return changePassword;
     }
 
-    public void setChangePassword(boolean changePassword)
-    {
+    public void setChangePassword(boolean changePassword) {
         this.changePassword = changePassword;
     }
 }

@@ -7,29 +7,25 @@ package edu.swufe.nxksecdisk.server.model;
  * @author 青阳龙野(kohgylw)
  * @version 1.0
  */
-public class Property
-{
+public class Property {
+
     private String propertyKey;
 
     private String propertyValue;
 
-    public String getPropertyKey()
-    {
+    public String getPropertyKey() {
         return propertyKey;
     }
 
-    public void setPropertyKey(String propertyKey)
-    {
+    public void setPropertyKey(String propertyKey) {
         this.propertyKey = propertyKey;
     }
 
-    public String getPropertyValue()
-    {
+    public String getPropertyValue() {
         return propertyValue;
     }
 
-    public void setPropertyValue(String propertyValue)
-    {
+    public void setPropertyValue(String propertyValue) {
         this.propertyValue = propertyValue;
     }
 

@@ -18,8 +18,8 @@ import java.util.Arrays;
  * @version 1.0
  */
 @Component
-public class TxtCharsetGetter
-{
+public class TxtCharsetGetter {
+
     /**
      * <h2>获取文本输入流的编码集</h2>
      * <p>
@@ -30,8 +30,7 @@ public class TxtCharsetGetter
      * @return java.lang.String 可能性最高的编码集名称
      * @author 青阳龙野(kohgylw)
      */
-    public String getTxtCharset(InputStream in) throws Exception
-    {
+    public String getTxtCharset(InputStream in) throws Exception {
         int lang = nsPSMDetector.CHINESE;
         nsDetector det = new nsDetector(lang);
         CharsetDetectionObserverImpl cdoi = new CharsetDetectionObserverImpl();
@@ -40,16 +39,12 @@ public class TxtCharsetGetter
         byte[] buf = new byte[1024];
         int len;
         boolean isAscii = true;
-        while ((len = imp.read(buf, 0, buf.length)) != -1)
-        {
-            if (isAscii)
-            {
+        while ((len = imp.read(buf, 0, buf.length)) != -1) {
+            if (isAscii) {
                 isAscii = det.isAscii(buf, len);
             }
-            if (!isAscii)
-            {
-                if (det.DoIt(buf, len, false))
-                {
+            if (!isAscii) {
+                if (det.DoIt(buf, len, false)) {
                     break;
                 }
             }
@@ -57,19 +52,15 @@ public class TxtCharsetGetter
         imp.close();
         in.close();
         det.DataEnd();
-        if (isAscii)
-        {
+        if (isAscii) {
             return "ASCII";
         }
-        else if (cdoi.getCharset() != null)
-        {
+        else if (cdoi.getCharset() != null) {
             return cdoi.getCharset();
         }
-        else
-        {
+        else {
             String[] prob = det.getProbableCharsets();
-            if (prob != null && prob.length > 0)
-            {
+            if (prob != null && prob.length > 0) {
                 return prob[0];
             }
             return "GBK";
@@ -88,36 +79,29 @@ public class TxtCharsetGetter
      * @return java.lang.String 可能性最高的编码集名称
      * @author 青阳龙野(kohgylw)
      */
-    public String getTxtCharset(byte[] buf, int offset, int length) throws Exception
-    {
+    public String getTxtCharset(byte[] buf, int offset, int length) throws Exception {
         int lang = nsPSMDetector.CHINESE;
         nsDetector det = new nsDetector(lang);
         CharsetDetectionObserverImpl cdoi = new CharsetDetectionObserverImpl();
         det.Init(cdoi);
         boolean isAscii = true;
         byte[] array = Arrays.copyOfRange(buf, offset, (offset + length));
-        if (isAscii)
-        {
+        if (isAscii) {
             isAscii = det.isAscii(array, length);
         }
-        if (!isAscii)
-        {
+        if (!isAscii) {
             det.DoIt(array, length, false);
         }
         det.DataEnd();
-        if (isAscii)
-        {
+        if (isAscii) {
             return "ASCII";
         }
-        else if (cdoi.getCharset() != null)
-        {
+        else if (cdoi.getCharset() != null) {
             return cdoi.getCharset();
         }
-        else
-        {
+        else {
             String[] prob = det.getProbableCharsets();
-            if (prob != null && prob.length > 0)
-            {
+            if (prob != null && prob.length > 0) {
                 return prob[0];
             }
             return "GBK";

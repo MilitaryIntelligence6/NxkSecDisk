@@ -10,8 +10,8 @@ import java.awt.event.WindowListener;
 /**
  * @author Administrator
  */
-public class FsProgressDialog extends DiskDynamicWindow
-{
+public class FsProgressDialog extends DiskDynamicWindow {
+
     /**
      * 窗体
      */
@@ -33,59 +33,50 @@ public class FsProgressDialog extends DiskDynamicWindow
     private static JButton cancel;
 
     /**
-     *  是否继续监听
+     * 是否继续监听
      */
     private static boolean listen;
 
-    private FsProgressDialog()
-    {
+    private FsProgressDialog() {
         setUIFont();//自动设置字体大小
         (window = new JDialog(FsViewer.window, "执行中...")).setModal(true);
         window.setSize(380, 120);
         window.setLocation(200, 200);
         window.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
-        window.addWindowListener(new WindowListener()
-        {
+        window.addWindowListener(new WindowListener() {
             @Override
-            public void windowOpened(WindowEvent e)
-            {
+            public void windowOpened(WindowEvent e) {
                 // TODO 自动生成的方法存根
             }
 
             @Override
-            public void windowIconified(WindowEvent e)
-            {
+            public void windowIconified(WindowEvent e) {
                 // TODO 自动生成的方法存根
             }
 
             @Override
-            public void windowDeiconified(WindowEvent e)
-            {
+            public void windowDeiconified(WindowEvent e) {
                 // TODO 自动生成的方法存根
             }
 
             @Override
-            public void windowDeactivated(WindowEvent e)
-            {
+            public void windowDeactivated(WindowEvent e) {
                 // TODO 自动生成的方法存根
             }
 
             @Override
-            public void windowClosing(WindowEvent e)
-            {
+            public void windowClosing(WindowEvent e) {
                 // TODO 自动生成的方法存根
                 canncel();
             }
 
             @Override
-            public void windowClosed(WindowEvent e)
-            {
+            public void windowClosed(WindowEvent e) {
                 // TODO 自动生成的方法存根
             }
 
             @Override
-            public void windowActivated(WindowEvent e)
-            {
+            public void windowActivated(WindowEvent e) {
                 // TODO 自动生成的方法存根
             }
         });
@@ -118,24 +109,20 @@ public class FsProgressDialog extends DiskDynamicWindow
      *
      * @author 青阳龙野(kohgylw)
      */
-    protected void show()
-    {
+    protected void show() {
         listen = true;
         pBar.setValue(0);
         message.setText("请稍候...");
         //启动监听线程用于监听进度，该线程结束后会自动关闭窗口。
         Thread lt = new Thread(() ->
         {
-            while (listen)
-            {
+            while (listen) {
                 pBar.setValue(FileSystemManager.per);
                 message.setText(FileSystemManager.message);
-                try
-                {
+                try {
                     Thread.sleep(16);
                 }
-                catch (InterruptedException e)
-                {
+                catch (InterruptedException e) {
                     listen = false;
                 }
             }
@@ -151,16 +138,13 @@ public class FsProgressDialog extends DiskDynamicWindow
      *
      * @author 青阳龙野(kohgylw)
      */
-    protected void close()
-    {
+    protected void close() {
         listen = false;
     }
 
     //终止当前操作
-    private void canncel()
-    {
-        if (JOptionPane.showConfirmDialog(window, "操作仍在进行中，确认要立即终止？", "警告", JOptionPane.YES_NO_OPTION) == 0)
-        {
+    private void canncel() {
+        if (JOptionPane.showConfirmDialog(window, "操作仍在进行中，确认要立即终止？", "警告", JOptionPane.YES_NO_OPTION) == 0) {
             FileSystemManager.getInstance().cannel();
             window.dispose();
         }
@@ -173,8 +157,7 @@ public class FsProgressDialog extends DiskDynamicWindow
      * @return kohgylw.kiftd.ui.module.FSProgressDialog 新的窗口对象
      * @author 青阳龙野(kohgylw)
      */
-    protected static FsProgressDialog getNewInstance()
-    {
+    protected static FsProgressDialog getNewInstance() {
         return new FsProgressDialog();
     }
 

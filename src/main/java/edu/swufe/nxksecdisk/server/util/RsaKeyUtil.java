@@ -10,9 +10,12 @@ import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 
+/**
+ * @author Administrator
+ */
 @Component
-public class RsaKeyUtil
-{
+public class RsaKeyUtil {
+
     public static final int KEY_SIZE = 1024;
 
     private Key publicKey;
@@ -25,11 +28,9 @@ public class RsaKeyUtil
 
     private String privateKeyStr;
 
-    public RsaKeyUtil()
-    {
+    public RsaKeyUtil() {
         this.encoder = Base64.getEncoder();
-        try
-        {
+        try {
             final KeyPairGenerator g = KeyPairGenerator.getInstance("RSA");
             g.initialize(KEY_SIZE);
             final KeyPair pair = g.genKeyPair();
@@ -38,20 +39,17 @@ public class RsaKeyUtil
             this.publicKeyStr = new String(this.encoder.encode(this.publicKey.getEncoded()), StandardCharsets.UTF_8);
             this.privateKeyStr = new String(this.encoder.encode(this.privateKey.getEncoded()), StandardCharsets.UTF_8);
         }
-        catch (NoSuchAlgorithmException e)
-        {
+        catch (NoSuchAlgorithmException e) {
             AppSystem.out.println(e.getMessage());
             AppSystem.out.println("错误：RSA密钥生成失败。");
         }
     }
 
-    public String getPublicKey()
-    {
+    public String getPublicKey() {
         return this.publicKeyStr;
     }
 
-    public String getPrivateKey()
-    {
+    public String getPrivateKey() {
         return this.privateKeyStr;
     }
 }

@@ -1,8 +1,8 @@
 package edu.swufe.nxksecdisk.server.controller;
 
-import edu.swufe.nxksecdisk.system.AppSystem;
 import edu.swufe.nxksecdisk.server.util.FileBlockUtil;
 import edu.swufe.nxksecdisk.server.util.LogUtil;
+import edu.swufe.nxksecdisk.system.AppSystem;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -12,8 +12,8 @@ import javax.annotation.Resource;
  * @author Administrator
  */
 @ControllerAdvice
-public class ErrorController
-{
+public class ErrorController {
+
     @Resource
     private FileBlockUtil fileBlockUtil;
 
@@ -21,8 +21,7 @@ public class ErrorController
     private LogUtil logUtil;
 
     @ExceptionHandler({Exception.class})
-    public void handleException(final Exception e)
-    {
+    public void handleException(final Exception e) {
         this.logUtil.writeException(e);
         this.fileBlockUtil.checkFileBlocks();
         e.printStackTrace();

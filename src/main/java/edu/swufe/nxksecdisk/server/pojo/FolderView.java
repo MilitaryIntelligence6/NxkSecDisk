@@ -15,8 +15,8 @@ import java.util.List;
  * @author 青阳龙野(kohgylw)
  * @version 1.0
  */
-public class FolderView
-{
+public class FolderView {
+
     private Folder folder;
 
     private List<Folder> parentList;
@@ -56,153 +56,123 @@ public class FolderView
      */
     private int selectStep;
 
-    public Folder getFolder()
-    {
+    public Folder getFolder() {
         return this.folder;
     }
 
-    public void setFolder(final Folder folder)
-    {
+    public void setFolder(final Folder folder) {
         this.folder = folder;
     }
 
-    public List<Folder> getParentList()
-    {
+    public List<Folder> getParentList() {
         return this.parentList;
     }
 
-    public void setParentList(final List<Folder> parentList)
-    {
+    public void setParentList(final List<Folder> parentList) {
         this.parentList = parentList;
     }
 
-    public List<Folder> getFolderList()
-    {
+    public List<Folder> getFolderList() {
         return this.folderList;
     }
 
-    public void setFolderList(final List<Folder> folderList)
-    {
+    public void setFolderList(final List<Folder> folderList) {
         this.folderList = folderList;
     }
 
-    public List<Node> getFileList()
-    {
+    public List<Node> getFileList() {
         return this.fileList;
     }
 
-    public void setFileList(final List<Node> fileList)
-    {
+    public void setFileList(final List<Node> fileList) {
         this.fileList = fileList;
     }
 
-    public List<String> getAuthList()
-    {
+    public List<String> getAuthList() {
         return this.authList;
     }
 
-    public void setAuthList(final List<String> authList)
-    {
+    public void setAuthList(final List<String> authList) {
         this.authList = authList;
     }
 
-    public String getAccount()
-    {
+    public String getAccount() {
         return this.account;
     }
 
-    public void setAccount(final String account)
-    {
+    public void setAccount(final String account) {
         this.account = account;
     }
 
-    public String getPublishTime()
-    {
+    public String getPublishTime() {
         return this.publishTime;
     }
 
-    public void setPublishTime(final String publishTime)
-    {
+    public void setPublishTime(final String publishTime) {
         this.publishTime = publishTime;
     }
 
-    public String getAllowChangePassword()
-    {
+    public String getAllowChangePassword() {
         return allowChangePassword;
     }
 
-    public void setAllowChangePassword(String allowChangePassword)
-    {
+    public void setAllowChangePassword(String allowChangePassword) {
         this.allowChangePassword = allowChangePassword;
     }
 
-    public String getShowFileChain()
-    {
+    public String getShowFileChain() {
         return showFileChain;
     }
 
-    public void setShowFileChain(String showFileChain)
-    {
+    public void setShowFileChain(String showFileChain) {
         this.showFileChain = showFileChain;
     }
 
-    public String getAllowSignUp()
-    {
+    public String getAllowSignUp() {
         return allowSignUp;
     }
 
-    public void setAllowSignUp(String allowSignUp)
-    {
+    public void setAllowSignUp(String allowSignUp) {
         this.allowSignUp = allowSignUp;
     }
 
-    public long getFoldersOffset()
-    {
+    public long getFoldersOffset() {
         return foldersOffset;
     }
 
-    public void setFoldersOffset(long foldersOffset)
-    {
+    public void setFoldersOffset(long foldersOffset) {
         this.foldersOffset = foldersOffset;
     }
 
-    public long getFilesOffset()
-    {
+    public long getFilesOffset() {
         return filesOffset;
     }
 
-    public void setFilesOffset(long filesOffset)
-    {
+    public void setFilesOffset(long filesOffset) {
         this.filesOffset = filesOffset;
     }
 
-    public int getSelectStep()
-    {
+    public int getSelectStep() {
         return selectStep;
     }
 
-    public void setSelectStep(int selectStep)
-    {
+    public void setSelectStep(int selectStep) {
         this.selectStep = selectStep;
     }
 
-    public boolean isEnableDownloadZip()
-    {
+    public boolean isEnableDownloadZip() {
         return enableDownloadZip;
     }
 
-    public void setEnableDownloadZip(boolean enableDownloadZip)
-    {
+    public void setEnableDownloadZip(boolean enableDownloadZip) {
         this.enableDownloadZip = enableDownloadZip;
     }
 
-    public boolean isEnableFfmpeg()
-    {
+    public boolean isEnableFfmpeg() {
         return enableFfmpeg;
     }
 
-    public void setEnableFfmpeg(boolean enableFfmpeg)
-    {
+    public void setEnableFfmpeg(boolean enableFfmpeg) {
         this.enableFfmpeg = enableFfmpeg;
     }
 

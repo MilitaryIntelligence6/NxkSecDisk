@@ -6,7 +6,7 @@ import edu.swufe.nxksecdisk.server.listener.ServerInitListener;
 import edu.swufe.nxksecdisk.server.mapper.FolderMapper;
 import edu.swufe.nxksecdisk.server.mapper.NodeMapper;
 import edu.swufe.nxksecdisk.server.model.Folder;
-import edu.swufe.nxksecdisk.server.pojo.CreateNewFolderByNameRespons;
+import edu.swufe.nxksecdisk.server.pojo.CreateNewFolderByNameResponds;
 import edu.swufe.nxksecdisk.server.service.FolderService;
 import edu.swufe.nxksecdisk.server.util.*;
 import org.springframework.stereotype.Service;
@@ -19,8 +19,8 @@ import java.util.Map;
 import java.util.UUID;
 
 @Service
-public class FolderServiceImpl implements FolderService
-{
+public class FolderServiceImpl implements FolderService {
+
     @Resource
     private FolderMapper folderMapper;
 
@@ -37,107 +37,84 @@ public class FolderServiceImpl implements FolderService
     private Gson gson;
 
     @Override
-    public String newFolder(final HttpServletRequest request)
-    {
+    public String newFolder(final HttpServletRequest request) {
         final String parentId = request.getParameter("parentId");
         final String folderName = request.getParameter("folderName");
         final String folderConstraint = request.getParameter("folderConstraint");
         final String account = (String) request.getSession().getAttribute("ACCOUNT");
-        if (parentId == null || folderName == null || parentId.length() <= 0 || folderName.length() <= 0)
-        {
+        if (parentId == null || folderName == null || parentId.length() <= 0 || folderName.length() <= 0) {
             return "errorParameter";
         }
-        if (!TextFormateUtil.instance().matcherFolderName(folderName) || folderName.indexOf(".") == 0)
-        {
+        if (!TextFormatUtil.getInstance().matcherFolderName(folderName) || folderName.indexOf(".") == 0) {
             return "errorParameter";
         }
         final Folder parentFolder = this.folderMapper.queryById(parentId);
-        if (parentFolder == null || !ConfigureReader.getInstance().accessFolder(parentFolder, account))
-        {
+        if (parentFolder == null || !ConfigureReader.getInstance().accessFolder(parentFolder, account)) {
             return "errorParameter";
         }
         if (!ConfigureReader.getInstance().authorized(account, AccountAuth.CREATE_NEW_FOLDER,
-                folderUtil.getAllFoldersId(parentId)))
-        {
+                folderUtil.getAllFoldersId(parentId))) {
             return "noAuthorized";
         }
-        if (folderMapper.queryByParentId(parentId).parallelStream().anyMatch((e) -> e.getFolderName().equals(folderName)))
-        {
+        if (folderMapper.queryByParentId(parentId).parallelStream().anyMatch((e) -> e.getFolderName().equals(folderName))) {
             return "nameOccupied";
         }
-        if (folderMapper.countByParentId(parentId) >= FileNodeUtil.MAXIMUM_NUM_OF_SINGLE_FOLDER)
-        {
+        if (folderMapper.countByParentId(parentId) >= FileNodeUtil.MAXIMUM_NUM_OF_SINGLE_FOLDER) {
             return "foldersTotalOutOfLimit";
         }
         Folder f = new Folder();
         // 设置子文件夹约束等级，不允许子文件夹的约束等级比父文件夹低
         int pc = parentFolder.getFolderConstraint();
-        if (folderConstraint != null)
-        {
-            try
-            {
+        if (folderConstraint != null) {
+            try {
                 int ifc = Integer.parseInt(folderConstraint);
-                if (ifc != 0 && account == null)
-                {
+                if (ifc != 0 && account == null) {
                     return "errorParameter";
                 }
-                if (ifc < pc)
-                {
+                if (ifc < pc) {
                     return "errorParameter";
                 }
-                else
-                {
+                else {
                     f.setFolderConstraint(ifc);
                 }
             }
-            catch (Exception e)
-            {
+            catch (Exception e) {
                 return "errorParameter";
             }
         }
-        else
-        {
+        else {
             return "errorParameter";
         }
         f.setFolderId(UUID.randomUUID().toString());
         f.setFolderName(folderName);
         f.setFolderCreationDate(ServerTimeUtil.accurateToDay());
-        if (account != null)
-        {
+        if (account != null) {
             f.setFolderCreator(account);
         }
-        else
-        {
+        else {
             f.setFolderCreator("匿名用户");
         }
         f.setFolderParent(parentId);
         int i = 0;
-        while (true)
-        {
-            try
-            {
+        while (true) {
+            try {
                 final int r = this.folderMapper.insertNewFolder(f);
-                if (r > 0)
-                {
-                    if (folderUtil.isValidFolder(f))
-                    {
+                if (r > 0) {
+                    if (folderUtil.isValidFolder(f)) {
                         this.logUtil.writeCreateFolderEvent(request, f);
                         return "createFolderSuccess";
                     }
-                    else
-                    {
+                    else {
                         return "cannotCreateFolder";
                     }
                 }
                 break;
             }
-            catch (Exception e)
-            {
+            catch (Exception e) {
                 f.setFolderId(UUID.randomUUID().toString());
                 i++;
             }
-            if (i >= 10)
-            {
+            if (i >= 10) {
                 break;
             }
         }
@@ -146,39 +123,34 @@ public class FolderServiceImpl implements FolderService
 
     /**
      * 删除目录的实现方法
+     *
      * @param request
      * @return
      */
     @Override
-    public String deleteFolder(final HttpServletRequest request)
-    {
+    public String deleteFolder(final HttpServletRequest request) {
         final String folderId = request.getParameter("folderId");
         final String account = (String) request.getSession().getAttribute("ACCOUNT");
         // 检查删除目标的ID参数是否正确
-        if (folderId == null || folderId.length() == 0 || "root".equals(folderId))
-        {
+        if (folderId == null || folderId.length() == 0 || "root".equals(folderId)) {
             return "errorParameter";
         }
         final Folder folder = this.folderMapper.queryById(folderId);
-        if (folder == null)
-        {
+        if (folder == null) {
             return "deleteFolderSuccess";
         }
         // 检查删除者是否具备删除目标的访问许可
-        if (!ConfigureReader.getInstance().accessFolder(folder, account))
-        {
+        if (!ConfigureReader.getInstance().accessFolder(folder, account)) {
             return "noAuthorized";
         }
         // 检查权限
         if (!ConfigureReader.getInstance().authorized(account, AccountAuth.DELETE_FILE_OR_FOLDER,
-                folderUtil.getAllFoldersId(folder.getFolderParent())))
-        {
+                folderUtil.getAllFoldersId(folder.getFolderParent()))) {
             return "noAuthorized";
         }
         // 执行迭代删除
         final List<Folder> l = this.folderUtil.getParentList(folderId);
-        if (this.folderMapper.deleteById(folderId) > 0)
-        {
+        if (this.folderMapper.deleteById(folderId) > 0) {
             folderUtil.deleteAllChildFolder(folderId);
             this.logUtil.writeDeleteFolderEvent(request, folder, l);
             ServerInitListener.needCheck = true;
@@ -189,73 +161,60 @@ public class FolderServiceImpl implements FolderService
 
     /**
      * 对编辑目录的实现;
+     *
      * @param request
      * @return
      */
     @Override
-    public String renameFolder(final HttpServletRequest request)
-    {
+    public String renameFolder(final HttpServletRequest request) {
         final String folderId = request.getParameter("folderId");
         final String newName = request.getParameter("newName");
         final String folderConstraint = request.getParameter("folderConstraint");
         final String account = (String) request.getSession().getAttribute("ACCOUNT");
         if (folderId == null || folderId.length() == 0 || newName == null || newName.length() == 0
-                || "root".equals(folderId))
-        {
+                || "root".equals(folderId)) {
             return "errorParameter";
         }
-        if (!TextFormateUtil.instance().matcherFolderName(newName) || newName.indexOf(".") == 0)
-        {
+        if (!TextFormatUtil.getInstance().matcherFolderName(newName) || newName.indexOf(".") == 0) {
             return "errorParameter";
         }
         final Folder folder = this.folderMapper.queryById(folderId);
-        if (folder == null)
-        {
+        if (folder == null) {
             return "errorParameter";
         }
-        if (!ConfigureReader.getInstance().accessFolder(folder, account))
-        {
+        if (!ConfigureReader.getInstance().accessFolder(folder, account)) {
             return "noAuthorized";
         }
         if (!ConfigureReader.getInstance().authorized(account, AccountAuth.RENAME_FILE_OR_FOLDER,
-                folderUtil.getAllFoldersId(folder.getFolderParent())))
-        {
+                folderUtil.getAllFoldersId(folder.getFolderParent()))) {
             return "noAuthorized";
         }
         final Folder parentFolder = this.folderMapper.queryById(folder.getFolderParent());
         int pc = parentFolder.getFolderConstraint();
-        if (folderConstraint != null)
-        {
-            try
-            {
+        if (folderConstraint != null) {
+            try {
                 int ifc = Integer.parseInt(folderConstraint);
-                if (ifc > 0 && account == null)
-                {
+                if (ifc > 0 && account == null) {
                     return "errorParameter";
                 }
-                if (ifc < pc)
-                {
+                if (ifc < pc) {
                     return "errorParameter";
                 }
-                else
-                {
+                else {
                     Map<String, Object> map = new HashMap<>();
                     map.put("newConstraint", ifc);
                     map.put("folderId", folderId);
                     folderMapper.updateFolderConstraintById(map);
                     folderUtil.changeChildFolderConstraint(folderId, ifc);
-                    if (!folder.getFolderName().equals(newName))
-                    {
+                    if (!folder.getFolderName().equals(newName)) {
                         if (folderMapper.queryByParentId(parentFolder.getFolderId()).parallelStream()
-                                .anyMatch((e) -> e.getFolderName().equals(newName)))
-                        {
+                                .anyMatch((e) -> e.getFolderName().equals(newName))) {
                             return "nameOccupied";
                         }
                         Map<String, String> map2 = new HashMap<String, String>();
                         map2.put("folderId", folderId);
                         map2.put("newName", newName);
-                        if (this.folderMapper.updateFolderNameById(map2) == 0)
-                        {
+                        if (this.folderMapper.updateFolderNameById(map2) == 0) {
                             return "errorParameter";
                         }
                     }
@@ -263,55 +222,45 @@ public class FolderServiceImpl implements FolderService
                     return "renameFolderSuccess";
                 }
             }
-            catch (Exception e)
-            {
+            catch (Exception e) {
                 return "errorParameter";
             }
         }
-        else
-        {
+        else {
             return "errorParameter";
         }
     }
 
     @Override
-    public String deleteFolderByName(HttpServletRequest request)
-    {
+    public String deleteFolderByName(HttpServletRequest request) {
         final String parentId = request.getParameter("parentId");
         final String folderName = request.getParameter("folderName");
         final String account = (String) request.getSession().getAttribute("ACCOUNT");
-        if (parentId == null || parentId.length() == 0)
-        {
+        if (parentId == null || parentId.length() == 0) {
             return "deleteError";
         }
         Folder p = folderMapper.queryById(parentId);
-        if (p == null)
-        {
+        if (p == null) {
             return "deleteError";
         }
         if (!ConfigureReader.getInstance().authorized(account, AccountAuth.DELETE_FILE_OR_FOLDER,
-                folderUtil.getAllFoldersId(parentId)) || !ConfigureReader.getInstance().accessFolder(p, account))
-        {
+                folderUtil.getAllFoldersId(parentId)) || !ConfigureReader.getInstance().accessFolder(p, account)) {
             return "deleteError";
         }
         final Folder[] repeatFolders = this.folderMapper.queryByParentId(parentId).parallelStream()
                 .filter((f) -> f.getFolderName()
                         .equals(folderName))
                 .toArray(Folder[]::new);
-        for (Folder rf : repeatFolders)
-        {
-            if (!ConfigureReader.getInstance().accessFolder(rf, account))
-            {
+        for (Folder rf : repeatFolders) {
+            if (!ConfigureReader.getInstance().accessFolder(rf, account)) {
                 return "deleteError";
             }
             final List<Folder> l = this.folderUtil.getParentList(rf.getFolderId());
-            if (this.folderMapper.deleteById(rf.getFolderId()) > 0)
-            {
+            if (this.folderMapper.deleteById(rf.getFolderId()) > 0) {
                 folderUtil.deleteAllChildFolder(rf.getFolderId());
                 this.logUtil.writeDeleteFolderEvent(request, rf, l);
             }
-            else
-            {
+            else {
                 return "deleteError";
             }
         }
@@ -320,124 +269,100 @@ public class FolderServiceImpl implements FolderService
     }
 
     @Override
-    public String createNewFolderByName(HttpServletRequest request)
-    {
+    public String createNewFolderByName(HttpServletRequest request) {
         final String parentId = request.getParameter("parentId");
         final String folderName = request.getParameter("folderName");
         final String folderConstraint = request.getParameter("folderConstraint");
         final String account = (String) request.getSession().getAttribute("ACCOUNT");
-        CreateNewFolderByNameRespons cnfbnr = new CreateNewFolderByNameRespons();
-        if (parentId == null || folderName == null || parentId.length() <= 0 || folderName.length() <= 0)
-        {
+        CreateNewFolderByNameResponds cnfbnr = new CreateNewFolderByNameResponds();
+        if (parentId == null || folderName == null || parentId.length() <= 0 || folderName.length() <= 0) {
             cnfbnr.setResult("error");
             return gson.toJson(cnfbnr);
         }
-        if (folderName.equals(".") || folderName.equals(".."))
-        {
+        if (folderName.equals(".") || folderName.equals("..")) {
             cnfbnr.setResult("error");
             return gson.toJson(cnfbnr);
         }
         final Folder parentFolder = this.folderMapper.queryById(parentId);
-        if (parentFolder == null || !ConfigureReader.getInstance().accessFolder(parentFolder, account))
-        {
+        if (parentFolder == null || !ConfigureReader.getInstance().accessFolder(parentFolder, account)) {
             cnfbnr.setResult("error");
             return gson.toJson(cnfbnr);
         }
         if (!ConfigureReader.getInstance().authorized(account, AccountAuth.CREATE_NEW_FOLDER,
-                folderUtil.getAllFoldersId(parentId)))
-        {
+                folderUtil.getAllFoldersId(parentId))) {
             cnfbnr.setResult("error");
             return gson.toJson(cnfbnr);
         }
-        if (folderMapper.countByParentId(parentId) >= FileNodeUtil.MAXIMUM_NUM_OF_SINGLE_FOLDER)
-        {
+        if (folderMapper.countByParentId(parentId) >= FileNodeUtil.MAXIMUM_NUM_OF_SINGLE_FOLDER) {
             cnfbnr.setResult("foldersTotalOutOfLimit");
             return gson.toJson(cnfbnr);
         }
         Folder f = new Folder();
-        if (folderMapper.queryByParentId(parentId).parallelStream().anyMatch((e) -> e.getFolderName().equals(folderName)))
-        {
+        if (folderMapper.queryByParentId(parentId).parallelStream().anyMatch((e) -> e.getFolderName().equals(folderName))) {
             f.setFolderName(FileNodeUtil.getNewFolderName(folderName, folderMapper.queryByParentId(parentId)));
         }
-        else
-        {
+        else {
             cnfbnr.setResult("error");
             return gson.toJson(cnfbnr);
         }
         // 设置子文件夹约束等级，不允许子文件夹的约束等级比父文件夹低
         int pc = parentFolder.getFolderConstraint();
-        if (folderConstraint != null)
-        {
-            try
-            {
+        if (folderConstraint != null) {
+            try {
                 int ifc = Integer.parseInt(folderConstraint);
-                if (ifc != 0 && account == null)
-                {
+                if (ifc != 0 && account == null) {
                     cnfbnr.setResult("error");
                     return gson.toJson(cnfbnr);
                 }
-                if (ifc < pc)
-                {
+                if (ifc < pc) {
                     cnfbnr.setResult("error");
                     return gson.toJson(cnfbnr);
                 }
-                else
-                {
+                else {
                     f.setFolderConstraint(ifc);
                 }
             }
-            catch (Exception e)
-            {
+            catch (Exception e) {
                 cnfbnr.setResult("error");
                 return gson.toJson(cnfbnr);
             }
         }
-        else
-        {
+        else {
             cnfbnr.setResult("error");
             return gson.toJson(cnfbnr);
         }
         f.setFolderId(UUID.randomUUID().toString());
         f.setFolderCreationDate(ServerTimeUtil.accurateToDay());
-        if (account != null)
-        {
+        if (account != null) {
             f.setFolderCreator(account);
         }
-        else
-        {
+        else {
             f.setFolderCreator("匿名用户");
         }
         f.setFolderParent(parentId);
         int i = 0;
-        while (true)
-        {
-            try
-            {
+        while (true) {
+            try {
                 final int r = this.folderMapper.insertNewFolder(f);
-                if (r > 0)
-                {
-                    if (folderUtil.isValidFolder(f))
-                    {
+                if (r > 0) {
+                    if (folderUtil.isValidFolder(f)) {
                         this.logUtil.writeCreateFolderEvent(request, f);
                         cnfbnr.setResult("success");
                         cnfbnr.setNewName(f.getFolderName());
                         return gson.toJson(cnfbnr);
                     }
-                    else
-                    {
+                    else {
                         cnfbnr.setResult("error");
                         return gson.toJson(cnfbnr);
                     }
                 }
                 break;
             }
-            catch (Exception e)
-            {
+            catch (Exception e) {
                 f.setFolderId(UUID.randomUUID().toString());
                 i++;
             }
-            if (i >= 10)
-            {
+            if (i >= 10) {
                 break;
             }
         }

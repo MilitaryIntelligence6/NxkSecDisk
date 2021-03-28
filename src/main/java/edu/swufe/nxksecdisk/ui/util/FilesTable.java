@@ -21,9 +21,10 @@ import java.util.List;
  * @author 青阳龙野(kohgylw)
  * @version 1.0
  */
-public class FilesTable extends JTable
-{
-    private static final String[] columns = new String[]{"名称", "创建日期", "大小（MB）", "创建者"};
+public class FilesTable extends JTable {
+
+    private static final String[] COLUMN_ARRAY = new String[]
+            {"名称", "创建日期", "大小（MB）", "创建者"};
 
     /**
      * 当前显示的文件夹列表;
@@ -34,56 +35,44 @@ public class FilesTable extends JTable
 
     private static final long serialVersionUID = -3436472714356711024L;
 
-    public FilesTable()
-    {
+    public FilesTable() {
         // TODO 自动生成的构造函数存根
-        super(new Object[][]{}, columns);
+        super(new Object[][]{}, COLUMN_ARRAY);
     }
 
     @Override
-    public boolean isCellEditable(int row, int column)
-    {
+    public boolean isCellEditable(int row, int column) {
         // TODO 自动生成的方法存根
         return false;
     }
 
-    public void updateValues(List<Folder> folders, List<Node> files)
-    {
-        Runnable doUpdate = new Runnable()
-        {
+    public void updateValues(List<Folder> folders, List<Node> files) {
+        Runnable doUpdate = new Runnable() {
             @Override
-            public void run()
-            {
+            public void run() {
                 // TODO 自动生成的方法存根
-                try
-                {
-                    setModel(new TableModel()
-                    {
+                try {
+                    setModel(new TableModel() {
                         @Override
-                        public void setValueAt(Object aValue, int rowIndex, int columnIndex)
-                        {
+                        public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
                             // TODO 自动生成的方法存根
                         }
 
                         @Override
-                        public void removeTableModelListener(TableModelListener l)
-                        {
+                        public void removeTableModelListener(TableModelListener l) {
                             // TODO 自动生成的方法存根
                         }
 
                         @Override
-                        public boolean isCellEditable(int rowIndex, int columnIndex)
-                        {
+                        public boolean isCellEditable(int rowIndex, int columnIndex) {
                             // TODO 自动生成的方法存根
                             return false;
                         }
 
                         @Override
-                        public Object getValueAt(int rowIndex, int columnIndex)
-                        {
+                        public Object getValueAt(int rowIndex, int columnIndex) {
                             // TODO 自动生成的方法存根
-                            switch (columnIndex)
-                            {
+                            switch (columnIndex) {
                                 case 0:
                                     return rowIndex < folders.size() ? "/" + folders.get(rowIndex).getFolderName()
                                             : files.get(rowIndex - folders.size()).getFileName();
@@ -102,36 +91,31 @@ public class FilesTable extends JTable
                         }
 
                         @Override
-                        public int getRowCount()
-                        {
+                        public int getRowCount() {
                             long totalSize = folders.size() + files.size();
                             return totalSize > MAX_LIST_LIMIT ? MAX_LIST_LIMIT : (int) totalSize;
                         }
 
                         @Override
-                        public String getColumnName(int columnIndex)
-                        {
+                        public String getColumnName(int columnIndex) {
                             // TODO 自动生成的方法存根
-                            return columns[columnIndex];
+                            return COLUMN_ARRAY[columnIndex];
                         }
 
                         @Override
-                        public int getColumnCount()
-                        {
+                        public int getColumnCount() {
                             // TODO 自动生成的方法存根
-                            return columns.length;
+                            return COLUMN_ARRAY.length;
                         }
 
                         @Override
-                        public Class<?> getColumnClass(int columnIndex)
-                        {
+                        public Class<?> getColumnClass(int columnIndex) {
                             // TODO 自动生成的方法存根
                             return Object.class;
                         }
 
                         @Override
-                        public void addTableModelListener(TableModelListener l)
-                        {
+                        public void addTableModelListener(TableModelListener l) {
                             // TODO 自动生成的方法存根
                         }
                     });
@@ -139,8 +123,7 @@ public class FilesTable extends JTable
                     validate();
                     FilesTable.folders = folders;
                 }
-                catch (Exception e)
-                {
+                catch (Exception e) {
                     // TODO: handle exception
                 }
             }
@@ -153,49 +136,40 @@ public class FilesTable extends JTable
         t.start();
     }
 
-    private void setRowFontColor()
-    {
-        DefaultTableCellRenderer dtcr = new DefaultTableCellRenderer()
-        {
+    private void setRowFontColor() {
+        DefaultTableCellRenderer dtcr = new DefaultTableCellRenderer() {
             /**  */
             private static final long serialVersionUID = 5132133158132959506L;
 
             @Override
-            protected void setValue(Object value)
-            {
+            protected void setValue(Object value) {
                 // TODO 自动生成的方法存根
-                if (value instanceof String && ((String) value).startsWith("/"))
-                {
+                if (value instanceof String && ((String) value).startsWith("/")) {
                     setForeground(Color.BLUE);
                 }
-                else
-                {
+                else {
                     setForeground(Color.black);
                 }
                 setText((String) value);
             }
         };
-        DefaultTableCellRenderer dtcr2 = new DefaultTableCellRenderer()
-        {
+        DefaultTableCellRenderer dtcr2 = new DefaultTableCellRenderer() {
             /**  */
             private static final long serialVersionUID = 5132133158132959506L;
 
             @Override
-            protected void setValue(Object value)
-            {
+            protected void setValue(Object value) {
                 // TODO 自动生成的方法存根
-                if (value instanceof String && ((String) value).equals("0"))
-                {
+                if (value instanceof String && ((String) value).equals("0")) {
                     setText((String) "<1");
                 }
-                else
-                {
+                else {
                     setText((String) value);
                 }
             }
         };
-        getColumn(columns[0]).setCellRenderer(dtcr);
-        getColumn(columns[2]).setCellRenderer(dtcr2);
+        getColumn(COLUMN_ARRAY[0]).setCellRenderer(dtcr);
+        getColumn(COLUMN_ARRAY[2]).setCellRenderer(dtcr2);
     }
 
     /**
@@ -208,13 +182,10 @@ public class FilesTable extends JTable
      * @return kohgylw.kiftd.util.file_system_manager.pojo.Folder 被双击的文件夹
      * @author 青阳龙野(kohgylw)
      */
-    public Folder getDoubleClickFolder(MouseEvent e)
-    {
-        if (e.getClickCount() == 2)
-        {
+    public Folder getDoubleClickFolder(MouseEvent e) {
+        if (e.getClickCount() == 2) {
             int row = rowAtPoint(e.getPoint());
-            if (row >= 0 && row < folders.size())
-            {
+            if (row >= 0 && row < folders.size()) {
                 return folders.get(row);
             }
         }

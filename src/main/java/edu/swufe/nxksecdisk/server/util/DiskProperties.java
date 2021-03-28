@@ -14,8 +14,8 @@ import java.util.*;
  * @author 青阳龙野(kohgylw)
  * @version 1.0
  */
-public class KiftdProperties
-{
+public class DiskProperties {
+
     /**
      * 保存载入的整个文本信息；
      */
@@ -30,8 +30,7 @@ public class KiftdProperties
      * 用于存储每一行文本信息的包装类;
      * FIXME 消灭内部类;
      */
-    private class LineContext
-    {
+    private class LineContext {
         /**
          * 键;
          */
@@ -47,18 +46,15 @@ public class KiftdProperties
          */
         private String text;
 
-        private LineContext(String key, String value, String text)
-        {
+        private LineContext(String key, String value, String text) {
             this.key = key;
             this.value = value;
             this.text = text;
         }
 
         @Override
-        public boolean equals(Object obj)
-        {
-            if (key == null)
-            {
+        public boolean equals(Object obj) {
+            if (key == null) {
                 return false;
             }
             return key.equals(obj);
@@ -75,10 +71,8 @@ public class KiftdProperties
      * @return 查询到的值，若传入的键无对应值或键为null则返回null
      * @author 青阳龙野(kohgylw)
      */
-    public String getProperty(String key)
-    {
-        if (key != null)
-        {
+    public String getProperty(String key) {
+        if (key != null) {
             return properties.get(key);
         }
         // 否则返回null;
@@ -96,8 +90,7 @@ public class KiftdProperties
      * @return 查询到的值，若传入的键无对应值或键为null则返回null
      * @author 青阳龙野(kohgylw)
      */
-    public String getProperty(String key, String defaultValue)
-    {
+    public String getProperty(String key, String defaultValue) {
         String value = getProperty(key);
         return value == null ? defaultValue : value;
     }
@@ -112,15 +105,11 @@ public class KiftdProperties
      * @param value java.lang.String 新配置值
      * @author 青阳龙野(kohgylw)
      */
-    public void setProperty(String key, String value)
-    {
-        if (key != null)
-        {
+    public void setProperty(String key, String value) {
+        if (key != null) {
             properties.put(key, value);
-            for (LineContext lc : contexts)
-            {
-                if (key.equals(lc.key))
-                {
+            for (LineContext lc : contexts) {
+                if (key.equals(lc.key)) {
                     lc.value = value;
                     return;
                 }
@@ -139,41 +128,33 @@ public class KiftdProperties
      * @param in java.io.InputStream 输入流，必须为文本输入流
      * @author 青阳龙野(kohgylw)
      */
-    public void load(InputStream in) throws IOException
-    {
+    public void load(InputStream in) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(in, "8859_1"));
         String lineStr = null;
         // 按行读取文本
         clear();
-        while ((lineStr = reader.readLine()) != null && contexts.size() < Integer.MAX_VALUE)
-        {
-            if (lineStr.startsWith("#"))
-            {
+        while ((lineStr = reader.readLine()) != null && contexts.size() < Integer.MAX_VALUE) {
+            if (lineStr.startsWith("#")) {
                 // 保存为注释;
                 contexts.add(new LineContext(null, null, lineStr));
             }
-            else
-            {
+            else {
                 int delimit0 = lineStr.indexOf("=");
                 // 兼容Properties的“:”分割规则，但保存时将统一改为“=”;
                 int delimit1 = lineStr.indexOf(":");
                 // 判断第一个出现的分隔符的位置;
                 int delimitIndex = -1;
-                if (delimit0 >= 0)
-                {
+                if (delimit0 >= 0) {
                     delimitIndex = delimit0;
                 }
-                if (delimit1 >= 0 && delimit1 < delimit0)
-                {
+                if (delimit1 >= 0 && delimit1 < delimit0) {
                     delimitIndex = delimit1;
                 }
-                if (delimitIndex >= 0)
-                {
+                if (delimitIndex >= 0) {
                     // 保存为键值对;
                     setProperty(lineStr.substring(0, delimitIndex), lineStr.substring(delimitIndex + 1));
                 }
-                else
-                {
+                else {
                     // 保存为其他文本;
                     contexts.add(new LineContext(null, null, lineStr));
                 }
@@ -192,25 +173,20 @@ public class KiftdProperties
      * @param header java.lang.String 标题头，若传入null则不添加此项
      * @author 青阳龙野(kohgylw)
      */
-    public void store(OutputStream out, String header) throws IOException
-    {
+    public void store(OutputStream out, String header) throws IOException {
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out, "8859_1"));
-        if (header != null)
-        {
+        if (header != null) {
             writer.write("#" + header);
             writer.newLine();
             writer.write("#" + new Date().toString());
             writer.newLine();
         }
-        for (LineContext line : contexts)
-        {
-            if (line.key != null)
-            {
+        for (LineContext line : contexts) {
+            if (line.key != null) {
                 writer.write(String.format("%s=%s", line.key, line.value));
                 writer.newLine();
             }
-            else
-            {
+            else {
                 writer.write(line.text);
                 writer.newLine();
             }
@@ -227,8 +203,7 @@ public class KiftdProperties
      * @return java.util.List<java.lang.String> 所有的配置项
      * @author 青阳龙野(kohgylw)
      */
-    public Set<String> stringPropertieNames()
-    {
+    public Set<String> stringPropertieNames() {
         return properties.keySet();
     }
 
@@ -241,15 +216,11 @@ public class KiftdProperties
      * @param key java.lang.String 键名
      * @author 青阳龙野(kohgylw)
      */
-    public void removeProperty(String key)
-    {
-        if (key != null)
-        {
+    public void removeProperty(String key) {
+        if (key != null) {
             properties.remove(key);
-            for (Iterator<LineContext> itor = contexts.iterator(); itor.hasNext(); )
-            {
-                if (key.equals(itor.next().key))
-                {
+            for (Iterator<LineContext> itor = contexts.iterator(); itor.hasNext(); ) {
+                if (key.equals(itor.next().key)) {
                     itor.remove();
                 }
             }
@@ -264,8 +235,7 @@ public class KiftdProperties
      *
      * @author 青阳龙野(kohgylw)
      */
-    public void clear()
-    {
+    public void clear() {
         contexts.clear();
         properties.clear();
     }

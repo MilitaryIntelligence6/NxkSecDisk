@@ -12,12 +12,16 @@ import javax.servlet.http.HttpServletRequest;
  * @version 1.0
  */
 @Component
-public class IpAddrGetter
-{
+public class IpAddrGetter {
+
     /**
      * 可能的转发标识请求头名称;
      */
-    private String[] ipAddrHeaders = {"X-Forwarded-For", "Proxy-Client-IP", "WL-Proxy-Client-IP", "HTTP_CLIENT_IP",
+    private String[] ipAddrHeaders = {
+            "X-Forwarded-For",
+            "Proxy-Client-IP",
+            "WL-Proxy-Client-IP",
+            "HTTP_CLIENT_IP",
             "HTTP_X_FORWARDED_FOR"};
 
     /**
@@ -30,34 +34,26 @@ public class IpAddrGetter
      * @return java.lang.String 请求来源IP地址
      * @author 青阳龙野(kohgylw)
      */
-    public String getIpAddr(HttpServletRequest request)
-    {
-        if (ConfigureReader.getInstance().isIpXFFAnalysis())
-        {
-            for (String ipAddrHeader : ipAddrHeaders)
-            {
+    public String getIpAddr(HttpServletRequest request) {
+        if (ConfigureReader.getInstance().isIpXFFAnalysis()) {
+            for (String ipAddrHeader : ipAddrHeaders) {
                 String ipAddress = request.getHeader(ipAddrHeader);
-                if (ipAddress != null && ipAddress.length() > 0 && !"unknown".equalsIgnoreCase(ipAddress))
-                {
+                if (ipAddress != null && ipAddress.length() > 0 && !"unknown".equalsIgnoreCase(ipAddress)) {
                     int indexOfIpSeparator = ipAddress.indexOf(",");
-                    if (indexOfIpSeparator >= 0)
-                    {
+                    if (indexOfIpSeparator >= 0) {
                         return ipAddress.substring(0, indexOfIpSeparator).trim();
                     }
-                    else
-                    {
+                    else {
                         return ipAddress.trim();
                     }
                 }
             }
         }
         String remoteAddr = request.getRemoteAddr();
-        if (remoteAddr != null)
-        {
+        if (remoteAddr != null) {
             return request.getRemoteAddr().trim();
         }
-        else
-        {
+        else {
             return "获取失败";
         }
     }

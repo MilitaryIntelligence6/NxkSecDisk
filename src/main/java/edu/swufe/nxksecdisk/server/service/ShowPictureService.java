@@ -3,8 +3,11 @@ package edu.swufe.nxksecdisk.server.service;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public interface ShowPictureService
-{
+/**
+ * @author Administrator
+ */
+public interface ShowPictureService {
+
     String getPreviewPictureJson(final HttpServletRequest request);
 
     /**

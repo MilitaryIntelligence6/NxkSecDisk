@@ -12,29 +12,25 @@ package edu.swufe.nxksecdisk.server.pojo;
  * @author 青阳龙野(kohgylw)
  * @version 1.0
  */
-public class CreateNewFolderByNameRespons
-{
+public class CreateNewFolderByNameResponds {
+
     private String result;
 
     private String newName;
 
-    public String getResult()
-    {
+    public String getResult() {
         return result;
     }
 
-    public void setResult(String result)
-    {
+    public void setResult(String result) {
         this.result = result;
     }
 
-    public String getNewName()
-    {
+    public String getNewName() {
         return newName;
     }
 
-    public void setNewName(String newName)
-    {
+    public void setNewName(String newName) {
         this.newName = newName;
     }
 

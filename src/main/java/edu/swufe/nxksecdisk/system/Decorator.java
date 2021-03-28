@@ -9,14 +9,14 @@ import edu.swufe.nxksecdisk.server.util.ServerTimeUtil;
  * @Description TODO
  * @CreateTime 2021年03月27日 18:35:00
  */
-public final class Decorator
-{
+public final class Decorator {
+
     private static final StringBuffer buffer = new StringBuffer();
 
-    private Decorator() {}
+    private Decorator() {
+    }
 
-    private static void clear()
-    {
+    private static void clear() {
         // builder 的话要加锁;
 //        lock.lock();
 //        try
@@ -32,8 +32,7 @@ public final class Decorator
         buffer.delete(0, buffer.length());
     }
 
-    public static String decorateDate(String context)
-    {
+    public static String decorateDate(String context) {
         clear();
         return buffer
                 .append("[")

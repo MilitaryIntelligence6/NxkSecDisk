@@ -4,15 +4,18 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-public interface AccountService
-{
-    String checkLoginRequest(final HttpServletRequest request, final HttpSession session);
+public interface AccountService {
+
+    String checkLoginRequest(final HttpServletRequest request,
+                             final HttpSession session);
 
     void logout(final HttpSession session);
 
     String getPublicKey();
 
-    void getNewLoginVerCode(final HttpServletRequest request, final HttpServletResponse response, final HttpSession session);
+    void getNewLoginVerCode(final HttpServletRequest request,
+                            final HttpServletResponse response,
+                            final HttpSession session);
 
     /**
      * <h2>应答响应逻辑</h2>

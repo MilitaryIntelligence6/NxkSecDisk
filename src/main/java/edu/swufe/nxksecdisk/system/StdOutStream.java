@@ -1,7 +1,5 @@
 package edu.swufe.nxksecdisk.system;
 
-import edu.swufe.nxksecdisk.server.util.ServerTimeUtil;
-
 /**
  * @author Military Intelligence 6 root
  * @version 1.0.0
@@ -9,20 +7,17 @@ import edu.swufe.nxksecdisk.server.util.ServerTimeUtil;
  * @Description TODO
  * @CreateTime 2021年03月28日 13:05:00
  */
-final class StdOutStream implements IOutputStream
-{
-    private static StdOutStream instance = null;
+final class StdOutStream implements IOutputStream {
 
-    private StdOutStream() {}
+    private volatile static StdOutStream instance = null;
 
-    public static StdOutStream getInstance()
-    {
-        if (instance == null)
-        {
-            synchronized (StdOutStream.class)
-            {
-                if (instance == null)
-                {
+    private StdOutStream() {
+    }
+
+    public static StdOutStream getInstance() {
+        if (instance == null) {
+            synchronized (StdOutStream.class) {
+                if (instance == null) {
                     instance = new StdOutStream();
                 }
             }
@@ -31,14 +26,12 @@ final class StdOutStream implements IOutputStream
     }
 
     @Override
-    public void println(String context)
-    {
+    public void println(String context) {
         System.out.println(Decorator.decorateDate(context));
     }
 
     @Override
-    public void printf(String context, Object... args)
-    {
+    public void printf(String context, Object... args) {
         System.out.printf(Decorator.decorateDate(context),
                 args);
     }

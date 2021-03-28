@@ -23,9 +23,9 @@ import java.util.Date;
 /**
  * @author Administrator
  */
-public class ServerUiModule extends DiskDynamicWindow
-{
-    private static ServerUiModule instance;
+public class ServerUiModule extends DiskDynamicWindow {
+
+    private volatile static ServerUiModule instance;
 
     protected static JFrame window;
 
@@ -94,28 +94,23 @@ public class ServerUiModule extends DiskDynamicWindow
 
     private static MenuItem filesViewer;
 
-    private ServerUiModule() throws Exception
-    {
+    private ServerUiModule() throws Exception {
         setUIFont();
         (ServerUiModule.window = new JFrame("kiftd-服务器控制台")).setSize(originSizeWidth, originSizeHeight);
         ServerUiModule.window.setLocation(100, 100);
         ServerUiModule.window.setResizable(false);
-        try
-        {
+        try {
             ServerUiModule.window.setIconImage(
                     ImageIO.read(this.getClass().getResourceAsStream("/icon/icon.png")));
         }
-        catch (NullPointerException | IOException e)
-        {
+        catch (NullPointerException | IOException e) {
             e.printStackTrace();
         }
-        if (SystemTray.isSupported())
-        {
+        if (SystemTray.isSupported()) {
             ServerUiModule.window.setDefaultCloseOperation(1);
             ServerUiModule.tray = SystemTray.getSystemTray();
             String iconType = "/icon/icon_tray.png";
-            if (System.getProperty("os.name").toLowerCase().indexOf("window") >= 0)
-            {
+            if (System.getProperty("os.name").toLowerCase().indexOf("window") >= 0) {
                 iconType = "/icon/icon_tray_w.png";
             }
             (ServerUiModule.trayIcon = new TrayIcon(ImageIO.read(this.getClass().getResourceAsStream(iconType))))
@@ -125,53 +120,44 @@ public class ServerUiModule extends DiskDynamicWindow
             final MenuItem exit = new MenuItem("退出(Exit)");
             filesViewer = new MenuItem("文件...(Files)");
             final MenuItem show = new MenuItem("显示主窗口(Show)");
-            trayIcon.addMouseListener(new MouseListener()
-            {
+            trayIcon.addMouseListener(new MouseListener() {
 
                 @Override
-                public void mouseReleased(MouseEvent e)
-                {
+                public void mouseReleased(MouseEvent e) {
                     // TODO 自动生成的方法存根
 
                 }
 
                 @Override
-                public void mousePressed(MouseEvent e)
-                {
+                public void mousePressed(MouseEvent e) {
                     // TODO 自动生成的方法存根
 
                 }
 
                 @Override
-                public void mouseExited(MouseEvent e)
-                {
+                public void mouseExited(MouseEvent e) {
                     // TODO 自动生成的方法存根
 
                 }
 
                 @Override
-                public void mouseEntered(MouseEvent e)
-                {
+                public void mouseEntered(MouseEvent e) {
                     // TODO 自动生成的方法存根
 
                 }
 
                 @Override
-                public void mouseClicked(MouseEvent e)
-                {
+                public void mouseClicked(MouseEvent e) {
                     // TODO 自动生成的方法存根
-                    if (e.getClickCount() == 2)
-                    {
+                    if (e.getClickCount() == 2) {
                         show();
                     }
                 }
             });
-            exit.addActionListener(new ActionListener()
-            {
+            exit.addActionListener(new ActionListener() {
 
                 @Override
-                public void actionPerformed(ActionEvent e)
-                {
+                public void actionPerformed(ActionEvent e) {
                     // TODO 自动生成的方法存根
                     exit();
                 }
@@ -182,13 +168,11 @@ public class ServerUiModule extends DiskDynamicWindow
                 fileIOUtil.setEnabled(false);
                 Thread t = new Thread(() ->
                 {
-                    try
-                    {
+                    try {
                         ServerUiModule.fsViewer = FsViewer.getInstance();
                         fsViewer.show();
                     }
-                    catch (SQLException e1)
-                    {
+                    catch (SQLException e1) {
                         // TODO 自动生成的 catch 块
                         JOptionPane.showMessageDialog(window, "错误：无法打开文件，文件系统可能已损坏，您可以尝试重启应用。", "错误",
                                 JOptionPane.ERROR_MESSAGE);
@@ -198,12 +182,10 @@ public class ServerUiModule extends DiskDynamicWindow
                 });
                 t.start();
             });
-            show.addActionListener(new ActionListener()
-            {
+            show.addActionListener(new ActionListener() {
 
                 @Override
-                public void actionPerformed(ActionEvent e)
-                {
+                public void actionPerformed(ActionEvent e) {
                     // TODO 自动生成的方法存根
                     show();
                 }
@@ -216,8 +198,7 @@ public class ServerUiModule extends DiskDynamicWindow
             ServerUiModule.tray.add(ServerUiModule.trayIcon);
 
         }
-        else
-        {
+        else {
             ServerUiModule.window.setDefaultCloseOperation(1);
         }
         ServerUiModule.window.setLayout(new BoxLayout(ServerUiModule.window.getContentPane(), 3));
@@ -271,31 +252,25 @@ public class ServerUiModule extends DiskDynamicWindow
         out.setSize((int) (292 * proportion), 100);
         ServerUiModule.out.setEditable(false);
         ServerUiModule.out.setForeground(Color.RED);
-        ServerUiModule.out.getDocument().addDocumentListener(new DocumentListener()
-        {
+        ServerUiModule.out.getDocument().addDocumentListener(new DocumentListener() {
 
             @Override
-            public void removeUpdate(DocumentEvent e)
-            {
+            public void removeUpdate(DocumentEvent e) {
                 // TODO 自动生成的方法存根
 
             }
 
             @Override
-            public void insertUpdate(DocumentEvent e)
-            {
+            public void insertUpdate(DocumentEvent e) {
                 // TODO 自动生成的方法存根
                 Thread t = new Thread(() ->
                 {
-                    if (out.getLineCount() >= 1000)
-                    {
+                    if (out.getLineCount() >= 1000) {
                         int end = 0;
-                        try
-                        {
+                        try {
                             end = out.getLineEndOffset(100);
                         }
-                        catch (Exception exc)
-                        {
+                        catch (Exception exc) {
                         }
                         out.replaceRange("", 0, end);
                     }
@@ -305,8 +280,7 @@ public class ServerUiModule extends DiskDynamicWindow
             }
 
             @Override
-            public void changedUpdate(DocumentEvent e)
-            {
+            public void changedUpdate(DocumentEvent e) {
                 // TODO 自动生成的方法存根
                 out.selectAll();
                 out.setCaretPosition(out.getSelectedText().length());
@@ -323,44 +297,34 @@ public class ServerUiModule extends DiskDynamicWindow
         ServerUiModule.stop.setEnabled(false);
         ServerUiModule.restart.setEnabled(false);
         ServerUiModule.setting.setEnabled(false);
-        ServerUiModule.start.addActionListener(new ActionListener()
-        {
+        ServerUiModule.start.addActionListener(new ActionListener() {
 
             @Override
-            public void actionPerformed(ActionEvent e)
-            {
+            public void actionPerformed(ActionEvent e) {
                 // TODO 自动生成的方法存根
                 start.setEnabled(false);
                 setting.setEnabled(false);
                 fileIOUtil.setEnabled(false);
-                if (filesViewer != null)
-                {
+                if (filesViewer != null) {
                     filesViewer.setEnabled(false);
                 }
                 println("启动服务器...");
-                if (startServer != null)
-                {
+                if (startServer != null) {
                     serverStatusLab.setText(S_STARTING);
                     Thread t = new Thread(() ->
                     {
-                        if (startServer.start())
-                        {
+                        if (startServer.start()) {
                             println("启动完成。正在检查服务器状态...");
-                            if (ServerUiModule.serverStatus.getServerStatus())
-                            {
+                            if (ServerUiModule.serverStatus.getServerStatus()) {
                                 println("KIFT服务器已经启动，可以正常访问了。");
                             }
-                            else
-                            {
+                            else {
                                 println("KIFT服务器未能成功启动，请检查设置或查看异常信息。");
                             }
                         }
-                        else
-                        {
-                            if (ConfigureReader.getInstance().getPropertiesStatus() != 0)
-                            {
-                                switch (ConfigureReader.getInstance().getPropertiesStatus())
-                                {
+                        else {
+                            if (ConfigureReader.getInstance().getPropertiesStatus() != 0) {
+                                switch (ConfigureReader.getInstance().getPropertiesStatus()) {
                                     case ConfigureReader.INVALID_PORT:
                                         println("KIFT无法启动：端口设置无效。");
                                         break;
@@ -390,8 +354,7 @@ public class ServerUiModule extends DiskDynamicWindow
                                         break;
                                 }
                             }
-                            else
-                            {
+                            else {
                                 println("KIFT无法启动，请检查设置或查看异常信息。");
                             }
                             serverStatusLab.setText(S_STOP);
@@ -402,40 +365,32 @@ public class ServerUiModule extends DiskDynamicWindow
                 }
             }
         });
-        ServerUiModule.stop.addActionListener(new ActionListener()
-        {
+        ServerUiModule.stop.addActionListener(new ActionListener() {
 
             @Override
-            public void actionPerformed(ActionEvent e)
-            {
+            public void actionPerformed(ActionEvent e) {
                 // TODO 自动生成的方法存根
                 stop.setEnabled(false);
                 restart.setEnabled(false);
                 fileIOUtil.setEnabled(false);
-                if (filesViewer != null)
-                {
+                if (filesViewer != null) {
                     filesViewer.setEnabled(false);
                 }
                 println("关闭服务器...");
                 Thread t = new Thread(() ->
                 {
-                    if (closeServer != null)
-                    {
+                    if (closeServer != null) {
                         serverStatusLab.setText(S_STOPPING);
-                        if (closeServer.close())
-                        {
+                        if (closeServer.close()) {
                             println("关闭完成。正在检查服务器状态...");
-                            if (ServerUiModule.serverStatus.getServerStatus())
-                            {
+                            if (ServerUiModule.serverStatus.getServerStatus()) {
                                 println("KIFT服务器未能成功关闭，如有需要，可以强制关闭程序（不安全）。");
                             }
-                            else
-                            {
+                            else {
                                 println("KIFT服务器已经关闭，停止所有访问。");
                             }
                         }
-                        else
-                        {
+                        else {
                             println("KIFT服务器无法关闭，请手动结束本程序。");
                         }
                         updateServerStatus();
@@ -444,51 +399,41 @@ public class ServerUiModule extends DiskDynamicWindow
                 t.start();
             }
         });
-        ServerUiModule.exit.addActionListener(new ActionListener()
-        {
+        ServerUiModule.exit.addActionListener(new ActionListener() {
 
             @Override
-            public void actionPerformed(ActionEvent e)
-            {
+            public void actionPerformed(ActionEvent e) {
                 // TODO 自动生成的方法存根
                 fileIOUtil.setEnabled(false);
-                if (filesViewer != null)
-                {
+                if (filesViewer != null) {
                     filesViewer.setEnabled(false);
                 }
                 exit();
             }
         });
-        ServerUiModule.restart.addActionListener(new ActionListener()
-        {
+        ServerUiModule.restart.addActionListener(new ActionListener() {
 
             @Override
-            public void actionPerformed(ActionEvent e)
-            {
+            public void actionPerformed(ActionEvent e) {
                 // TODO 自动生成的方法存根
                 stop.setEnabled(false);
                 restart.setEnabled(false);
                 fileIOUtil.setEnabled(false);
-                if (filesViewer != null)
-                {
+                if (filesViewer != null) {
                     filesViewer.setEnabled(false);
                 }
                 Thread t = new Thread(() ->
                 {
                     println("正在重启服务器...");
-                    if (closeServer.close())
-                    {
-                        if (startServer.start())
-                        {
+                    if (closeServer.close()) {
+                        if (startServer.start()) {
                             println("重启成功，可以正常访问了。");
                         }
-                        else
-                        {
+                        else {
                             println("错误：服务器已关闭但未能重新启动，请尝试手动启动服务器。");
                         }
                     }
-                    else
-                    {
+                    else {
                         println("错误：无法关闭服务器，请尝试手动关闭。");
                     }
                     updateServerStatus();
@@ -496,11 +441,9 @@ public class ServerUiModule extends DiskDynamicWindow
                 t.start();
             }
         });
-        ServerUiModule.setting.addActionListener(new ActionListener()
-        {
+        ServerUiModule.setting.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e)
-            {
+            public void actionPerformed(ActionEvent e) {
                 // TODO 自动生成的方法存根
                 ServerUiModule.settingWindow = SettingWindow.getInstance();
                 Thread t = new Thread(() ->
@@ -513,25 +456,21 @@ public class ServerUiModule extends DiskDynamicWindow
         ServerUiModule.fileIOUtil.addActionListener((e) ->
         {
             ServerUiModule.fileIOUtil.setEnabled(false);
-            if (ServerUiModule.filesViewer != null)
-            {
+            if (ServerUiModule.filesViewer != null) {
                 ServerUiModule.filesViewer.setEnabled(false);
             }
             Thread t = new Thread(() ->
             {
-                try
-                {
+                try {
                     ServerUiModule.fsViewer = FsViewer.getInstance();
                     fsViewer.show();
                 }
-                catch (SQLException e1)
-                {
+                catch (SQLException e1) {
                     // TODO 自动生成的 catch 块
                     AppSystem.out.println("错误：无法读取文件，文件系统可能已经损坏，您可以尝试重启应用。");
                 }
                 ServerUiModule.fileIOUtil.setEnabled(true);
-                if (ServerUiModule.filesViewer != null)
-                {
+                if (ServerUiModule.filesViewer != null) {
                     ServerUiModule.filesViewer.setEnabled(true);
                 }
             });
@@ -541,35 +480,27 @@ public class ServerUiModule extends DiskDynamicWindow
         init();
     }
 
-    private void init()
-    {
+    private void init() {
         initDateFormat();
     }
 
-    private void initDateFormat()
-    {
+    private void initDateFormat() {
         sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
     }
 
-    public void show()
-    {
+    public void show() {
         ServerUiModule.window.setVisible(true);
         updateServerStatus();
     }
 
-    public static void setOnCloseServer(final OnCloseServer cs)
-    {
+    public static void setOnCloseServer(final OnCloseServer cs) {
         ServerUiModule.closeServer = cs;
     }
 
-    public static ServerUiModule getInstance() throws Exception
-    {
-        if (instance == null)
-        {
-            synchronized (ServerUiModule.class)
-            {
-                if (instance == null)
-                {
+    public static ServerUiModule getInstance() throws Exception {
+        if (instance == null) {
+            synchronized (ServerUiModule.class) {
+                if (instance == null) {
                     instance = new ServerUiModule();
                 }
             }
@@ -577,33 +508,27 @@ public class ServerUiModule extends DiskDynamicWindow
         return instance;
     }
 
-    public static void setStartServer(final OnStartServer ss)
-    {
+    public static void setStartServer(final OnStartServer ss) {
         ServerUiModule.startServer = ss;
     }
 
-    public static void setGetServerStatus(final GetServerStatus st)
-    {
+    public static void setGetServerStatus(final GetServerStatus st) {
         ServerUiModule.serverStatus = st;
         SettingWindow.serverStatus = st;
     }
 
-    public void updateServerStatus()
-    {
-        if (ServerUiModule.serverStatus != null)
-        {
+    public void updateServerStatus() {
+        if (ServerUiModule.serverStatus != null) {
             Thread t = new Thread(() ->
             {
-                if (ServerUiModule.serverStatus.getServerStatus())
-                {
+                if (ServerUiModule.serverStatus.getServerStatus()) {
                     ServerUiModule.serverStatusLab.setText(S_START);
                     ServerUiModule.start.setEnabled(false);
                     ServerUiModule.stop.setEnabled(true);
                     ServerUiModule.restart.setEnabled(true);
                     ServerUiModule.setting.setEnabled(false);
                 }
-                else
-                {
+                else {
                     ServerUiModule.serverStatusLab.setText(S_STOP);
                     ServerUiModule.start.setEnabled(true);
                     ServerUiModule.stop.setEnabled(false);
@@ -611,32 +536,25 @@ public class ServerUiModule extends DiskDynamicWindow
                     ServerUiModule.setting.setEnabled(true);
                 }
                 fileIOUtil.setEnabled(true);
-                if (filesViewer != null)
-                {
+                if (filesViewer != null) {
                     filesViewer.setEnabled(true);
                 }
                 ServerUiModule.portStatusLab.setText(ServerUiModule.serverStatus.getPort() + "");
-                if (ServerUiModule.serverStatus.getLogLevel() != null)
-                {
-                    switch (ServerUiModule.serverStatus.getLogLevel())
-                    {
-                        case EVENT:
-                        {
+                if (ServerUiModule.serverStatus.getLogLevel() != null) {
+                    switch (ServerUiModule.serverStatus.getLogLevel()) {
+                        case EVENT: {
                             ServerUiModule.logLevelLab.setText(L_ALL);
                             break;
                         }
-                        case NONE:
-                        {
+                        case NONE: {
                             ServerUiModule.logLevelLab.setText(L_NONE);
                             break;
                         }
-                        case RUNTIME_EXCEPTION:
-                        {
+                        case RUNTIME_EXCEPTION: {
                             ServerUiModule.logLevelLab.setText(L_EXCEPTION);
                             break;
                         }
-                        default:
-                        {
+                        default: {
                             ServerUiModule.logLevelLab.setText("无法获取(?)");
                             break;
                         }
@@ -648,20 +566,17 @@ public class ServerUiModule extends DiskDynamicWindow
         }
     }
 
-    private void exit()
-    {
+    private void exit() {
         ServerUiModule.start.setEnabled(false);
         ServerUiModule.stop.setEnabled(false);
         ServerUiModule.exit.setEnabled(false);
         ServerUiModule.restart.setEnabled(false);
         ServerUiModule.setting.setEnabled(false);
         this.println("退出程序...");
-        if (ServerUiModule.closeServer != null)
-        {
+        if (ServerUiModule.closeServer != null) {
             final Thread t = new Thread(() ->
             {
-                if (ServerUiModule.serverStatus.getServerStatus())
-                {
+                if (ServerUiModule.serverStatus.getServerStatus()) {
                     ServerUiModule.closeServer.close();
                 }
                 System.exit(0);
@@ -669,39 +584,32 @@ public class ServerUiModule extends DiskDynamicWindow
             });
             t.start();
         }
-        else
-        {
+        else {
             System.exit(0);
         }
     }
 
-    public void println(final String context)
-    {
+    public void println(final String context) {
         out.append(Decorator.decorateDate(context));
     }
 
-    public void printf(final String context, Object... args)
-    {
+    public void printf(final String context, Object... args) {
         out.append(String.format(Decorator.decorateDate(context), args));
     }
 
-    private String requireFormatDate()
-    {
-        if (ServerUiModule.serverTime != null)
-        {
+    private String requireFormatDate() {
+        if (ServerUiModule.serverTime != null) {
             final Date d = ServerUiModule.serverTime.get();
             return sdf.format(d);
         }
         return sdf.format(new Date());
     }
 
-    public static void setGetServerTime(final GetServerTime serverTime)
-    {
+    public static void setGetServerTime(final GetServerTime serverTime) {
         ServerUiModule.serverTime = serverTime;
     }
 
-    public static void setUpdateSetting(final UpdateSetting updateSetting)
-    {
+    public static void setUpdateSetting(final UpdateSetting updateSetting) {
         SettingWindow.updateSetting = updateSetting;
     }
 }

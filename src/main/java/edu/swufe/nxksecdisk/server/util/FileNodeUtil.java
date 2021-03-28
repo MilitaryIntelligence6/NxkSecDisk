@@ -22,12 +22,11 @@ import java.util.List;
  * @author 青阳龙野(kohgylw)
  * @version 1.0
  */
-public class FileNodeUtil
-{
-    private FileNodeUtil()
-    {
+public class FileNodeUtil {
+
+    private FileNodeUtil() {
     }
-    
+
     private static Connection conn;
 
     /**
@@ -48,31 +47,27 @@ public class FileNodeUtil
      *
      * @author 青阳龙野(kohgylw)
      */
-    public static void initNodeTableToDataBase()
-    {
+    public static void initNodeTableToDataBase() {
         AppSystem.out.println("初始化文件节点...");
-        try
-        {
-            if (conn == null)
-            {
+        try {
+            if (conn == null) {
                 Class.forName(ConfigureReader.getInstance().getFileNodePathDriver()).newInstance();
             }
             String newUrl = ConfigureReader.getInstance().getFileNodePathURL();
             // 判断当前位置是否初始化文件节点
-            if (url == null || !url.equals(newUrl))
-            {
+            if (url == null || !url.equals(newUrl)) {
                 conn = DriverManager.getConnection(newUrl, ConfigureReader.getInstance().getFileNodePathUserName(),
                         ConfigureReader.getInstance().getFileNodePathPassWord());
                 url = newUrl;
                 final Statement state1 = conn.createStatement();
                 state1.execute(
-                        "CREATE TABLE IF NOT EXISTS FOLDER(folder_id VARCHAR(128) PRIMARY KEY,  folder_name VARCHAR(128) NOT NULL,folder_creation_date VARCHAR(128) NOT NULL,  folder_creator VARCHAR(128) NOT NULL,folder_parent VARCHAR(128) NOT NULL,folder_constraint INT NOT NULL)");
+                        "CREATE TABLE IF NOT EXISTS FOLDER(folder_id VARCHAR(128) PRIMARY KEY,  folder_name VARCHAR" +
+                                "(128) NOT NULL,folder_creation_date VARCHAR(128) NOT NULL,  folder_creator VARCHAR" +
+                                "(128) NOT NULL,folder_parent VARCHAR(128) NOT NULL,folder_constraint INT NOT NULL)");
                 state1.executeQuery("SELECT count(*) FROM FOLDER WHERE folder_id = 'root'");
                 ResultSet rs = state1.getResultSet();
-                if (rs.next())
-                {
-                    if (rs.getInt(1) == 0)
-                    {
+                if (rs.next()) {
+                    if (rs.getInt(1) == 0) {
                         final Statement state11 = conn.createStatement();
                         state11.execute("INSERT INTO FOLDER VALUES('root', 'ROOT', '--', '--', 'null', 0)");
                     }
@@ -80,31 +75,30 @@ public class FileNodeUtil
                 state1.close();
                 final Statement state2 = conn.createStatement();
                 state2.execute(
-                        "CREATE TABLE IF NOT EXISTS FILE(file_id VARCHAR(128) PRIMARY KEY,file_name VARCHAR(128) NOT NULL,file_size VARCHAR(128) NOT NULL,file_parent_folder varchar(128) NOT NULL,file_creation_date varchar(128) NOT NULL,file_creator varchar(128) NOT NULL,file_path varchar(128) NOT NULL)");
+                        "CREATE TABLE IF NOT EXISTS FILE(file_id VARCHAR(128) PRIMARY KEY,file_name VARCHAR(128) NOT " +
+                                "NULL,file_size VARCHAR(128) NOT NULL,file_parent_folder varchar(128) NOT NULL," +
+                                "file_creation_date varchar(128) NOT NULL,file_creator varchar(128) NOT NULL," +
+                                "file_path varchar(128) NOT NULL)");
                 state2.close();
                 // 为了匹配之前的版本而设计的兼容性字段设置，后续可能会删除
-                if (!ConfigureReader.getInstance().useMySQL())
-                {
+                if (!ConfigureReader.getInstance().useMySQL()) {
                     final Statement state3 = conn.createStatement();
                     state3.execute(
                             "ALTER TABLE FOLDER ADD COLUMN IF NOT EXISTS folder_constraint INT NOT NULL DEFAULT 0");
                     state3.close();
                 }
                 // 为数据库生成索引，此处分为MySQL和H2两种操作
-                if (ConfigureReader.getInstance().useMySQL())
-                {
+                if (ConfigureReader.getInstance().useMySQL()) {
                     final Statement state4 = conn.createStatement();
                     ResultSet indexCount = state4.executeQuery("SHOW INDEX FROM FILE WHERE Key_name = 'file_index'");
-                    if (!indexCount.next())
-                    {
+                    if (!indexCount.next()) {
                         final Statement state41 = conn.createStatement();
                         state41.execute("CREATE INDEX file_index ON FILE (file_name)");
                         state41.close();
                     }
                     state4.close();
                 }
-                else
-                {
+                else {
                     final Statement state4 = conn.createStatement();
                     state4.execute("CREATE INDEX IF NOT EXISTS file_index ON FILE (file_name)");
                     state4.close();
@@ -112,13 +106,13 @@ public class FileNodeUtil
                 // 生成用于持久化保存的、系统自动生成的、和文件系统相关设置项的存储表
                 final Statement state5 = conn.createStatement();
                 state5.execute(
-                        "CREATE TABLE IF NOT EXISTS PROPERTIES(propertie_key VARCHAR(128) PRIMARY KEY,propertie_value VARCHAR(128) NOT NULL)");
+                        "CREATE TABLE IF NOT EXISTS PROPERTIES(propertie_key VARCHAR(128) PRIMARY KEY,propertie_value" +
+                                " VARCHAR(128) NOT NULL)");
                 state5.close();
             }
             AppSystem.out.println("文件节点初始化完毕。");
         }
-        catch (Exception e)
-        {
+        catch (Exception e) {
             AppSystem.out.println(e.getMessage());
             AppSystem.out.println("错误：文件节点初始化失败。");
         }
@@ -133,8 +127,7 @@ public class FileNodeUtil
      * @return java.sql.Connection 文件节点数据库的链接，除非程序关闭，否则该链接不应关闭。
      * @author 青阳龙野(kohgylw)
      */
-    public static Connection getNodeDBConnection()
-    {
+    public static Connection getNodeDBConnection() {
         return conn;
     }
 
@@ -151,24 +144,20 @@ public class FileNodeUtil
      * @return java.lang.String 新文件名
      * @author 青阳龙野(kohgylw)
      */
-    public static String getNewNodeName(String originalName, List<Node> nodes)
-    {
+    public static String getNewNodeName(String originalName, List<Node> nodes) {
         int i = 0;
         List<String> fileNames = Arrays
                 .asList(nodes.stream().parallel().map((t) -> t.getFileName()).toArray(String[]::new));
         String newName = originalName;
-        while (fileNames.contains(newName))
-        {
+        while (fileNames.contains(newName)) {
             i++;
-            if (originalName.indexOf(".") >= 0)
-            {
+            if (originalName.indexOf(".") >= 0) {
                 newName = String.format("%s (%d)%s",
                         originalName.substring(0, originalName.lastIndexOf(".")),
                         i,
                         originalName.substring(originalName.lastIndexOf(".")));
             }
-            else
-            {
+            else {
                 newName = String.format("%s (%d)",
                         originalName, i);
             }
@@ -187,14 +176,12 @@ public class FileNodeUtil
      * @return java.lang.String 新文件夹名
      * @author 青阳龙野(kohgylw)
      */
-    public static String getNewFolderName(String originalName, List<? extends Folder> folders)
-    {
+    public static String getNewFolderName(String originalName, List<? extends Folder> folders) {
         int i = 0;
         List<String> fileNames = Arrays
                 .asList(folders.stream().parallel().map((t) -> t.getFolderName()).toArray(String[]::new));
         String newName = originalName;
-        while (fileNames.contains(newName))
-        {
+        while (fileNames.contains(newName)) {
             i++;
             newName = originalName + " " + i;
         }
@@ -212,14 +199,12 @@ public class FileNodeUtil
      * @return java.lang.String 新文件夹名
      * @author 青阳龙野(kohgylw)
      */
-    public static String getNewFolderName(Folder folder, File parentfolder)
-    {
+    public static String getNewFolderName(Folder folder, File parentfolder) {
         int i = 0;
         List<String> fileNames = Arrays.asList(Arrays.stream(parentfolder.listFiles()).parallel()
                 .filter((e) -> e.isDirectory()).map((t) -> t.getName()).toArray(String[]::new));
         String newName = folder.getFolderName();
-        while (fileNames.contains(newName))
-        {
+        while (fileNames.contains(newName)) {
             i++;
             newName = folder.getFolderName() + " " + i;
         }
@@ -239,22 +224,18 @@ public class FileNodeUtil
      * @return java.lang.String 新文件名
      * @author 青阳龙野(kohgylw)
      */
-    public static String getNewNodeName(Node n, File folder)
-    {
+    public static String getNewNodeName(Node n, File folder) {
         int i = 0;
         List<String> fileNames = Arrays.asList(Arrays.stream(folder.listFiles()).parallel().filter((e) -> e.isFile())
                 .map((t) -> t.getName()).toArray(String[]::new));
         String newName = n.getFileName();
-        while (fileNames.contains(newName))
-        {
+        while (fileNames.contains(newName)) {
             i++;
-            if (n.getFileName().indexOf(".") >= 0)
-            {
+            if (n.getFileName().indexOf(".") >= 0) {
                 newName = n.getFileName().substring(0, n.getFileName().lastIndexOf(".")) + " (" + i + ")"
                         + n.getFileName().substring(n.getFileName().lastIndexOf("."));
             }
-            else
-            {
+            else {
                 newName = n.getFileName() + " (" + i + ")";
             }
         }

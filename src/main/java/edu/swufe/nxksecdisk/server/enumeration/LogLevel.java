@@ -4,8 +4,8 @@ package edu.swufe.nxksecdisk.server.enumeration;
 /**
  * @author Administrator
  */
-public enum LogLevel
-{
+public enum LogLevel {
+
     /**
      *
      */

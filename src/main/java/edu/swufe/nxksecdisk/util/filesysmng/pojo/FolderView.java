@@ -11,8 +11,8 @@ import java.util.List;
  * @author 青阳龙野(kohgylw)
  * @version 1.0
  */
-public class FolderView
-{
+public class FolderView {
+
     /**
      * 当前文件夹
      */
@@ -29,33 +29,27 @@ public class FolderView
     private List<Node> files;
 
 
-    public Folder getCurrent()
-    {
+    public Folder getCurrent() {
         return current;
     }
 
-    public void setCurrent(Folder current)
-    {
+    public void setCurrent(Folder current) {
         this.current = current;
     }
 
-    public List<Folder> getFolders()
-    {
+    public List<Folder> getFolders() {
         return folders;
     }
 
-    public void setFolders(List<Folder> folders)
-    {
+    public void setFolders(List<Folder> folders) {
         this.folders = folders;
     }
 
-    public List<Node> getFiles()
-    {
+    public List<Node> getFiles() {
         return files;
     }
 
-    public void setFiles(List<Node> files)
-    {
+    public void setFiles(List<Node> files) {
         this.files = files;
     }
 }

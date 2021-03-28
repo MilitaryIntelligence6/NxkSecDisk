@@ -19,8 +19,8 @@ import java.io.*;
  * @version 1.0
  */
 @Component
-public class TxtToPdfUtil
-{
+public class TxtToPdfUtil {
+
     @Resource
     private TxtCharsetGetter tcg;
 
@@ -35,8 +35,7 @@ public class TxtToPdfUtil
      * @throws Exception 无法完成转码
      * @author 青阳龙野(kohgylw)
      */
-    public void convertPdf(File in, OutputStream out) throws Exception
-    {
+    public void convertPdf(File in, OutputStream out) throws Exception {
         // 以A4页面显示文本;
         Rectangle rect = new Rectangle(PageSize.A4);
         Document doc = new Document(rect);
@@ -44,7 +43,8 @@ public class TxtToPdfUtil
         PdfWriter pw = PdfWriter.getInstance(doc, out);
         doc.open();
         BaseFont songFont = BaseFont.createFont(
-                ConfigureReader.getInstance().getPath() + File.separator + "fonts/wqy-zenhei.ttc,0", BaseFont.IDENTITY_H,
+                ConfigureReader.getInstance().getPath() + File.separator + "fonts/wqy-zenhei.ttc,0",
+                BaseFont.IDENTITY_H,
                 BaseFont.NOT_EMBEDDED);
         // 设置字体格式;
         Font font = new Font(songFont, 12, Font.NORMAL);
@@ -54,15 +54,13 @@ public class TxtToPdfUtil
         String charset = tcg.getTxtCharset(new FileInputStream(in));
         BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(in), charset));
         String line = null;
-        while ((line = reader.readLine()) != null)
-        {
+        while ((line = reader.readLine()) != null) {
             // 将文本逐行写入PDF段落;
             paragraph.add(line + "\n");
         }
         reader.close();
         // 避免因打开空文档可能造成的打开失败
-        if (paragraph.isEmpty())
-        {
+        if (paragraph.isEmpty()) {
             paragraph.add("");
         }
         // 写入段落至文档;

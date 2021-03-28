@@ -3,24 +3,33 @@ package edu.swufe.nxksecdisk.server.util;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class TextFormateUtil
-{
-    private static TextFormateUtil tfu;
+/**
+ * @author Administrator
+ */
+public class TextFormatUtil {
 
-    public static TextFormateUtil instance()
-    {
-        return TextFormateUtil.tfu;
+    private volatile static TextFormatUtil instance;
+
+    private TextFormatUtil() {}
+
+    public static TextFormatUtil getInstance() {
+        if (instance == null) {
+            synchronized (TextFormatUtil.class) {
+                if (instance == null) {
+                    instance = new TextFormatUtil();
+                }
+            }
+        }
+        return instance;
     }
 
-    public boolean matcherFolderName(final String folderName)
-    {
+    public boolean matcherFolderName(final String folderName) {
         final Pattern p = Pattern.compile("[|\\/*<>\"?&$:]+");
         final Matcher m = p.matcher(folderName);
         return !m.find();
     }
 
-    public boolean matcherFileName(final String fileName)
-    {
+    public boolean matcherFileName(final String fileName) {
         final Pattern p = Pattern.compile("[|\\/*<>\"?&$:]+");
         final Matcher m = p.matcher(fileName);
         return !m.find();
@@ -39,13 +48,11 @@ public class TextFormateUtil
      * @return boolean 判断结果，若包含转义符正斜杠则返回true
      * @author 青阳龙野(kohgylw)
      */
-    public boolean hasEscapes(String in)
-    {
+    public boolean hasEscapes(String in) {
         return in.indexOf("\\") >= 0;
     }
 
-    static
-    {
-        TextFormateUtil.tfu = new TextFormateUtil();
+    static {
+        TextFormatUtil.instance = new TextFormatUtil();
     }
 }

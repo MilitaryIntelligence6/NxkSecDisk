@@ -16,8 +16,8 @@ import java.nio.file.StandardCopyOption;
  * @author Administrator
  */
 @Component
-public class DiskFfmpegLocator extends FFMPEGLocator
-{
+public class DiskFfmpegLocator extends FFMPEGLocator {
+
     @Resource
     private LogUtil logUtil;
 
@@ -44,8 +44,7 @@ public class DiskFfmpegLocator extends FFMPEGLocator
      *
      * @author 青阳龙野(kohgylw)
      */
-    public DiskFfmpegLocator()
-    {
+    public DiskFfmpegLocator() {
         // 实例化过程，初始化一些系统相关的变量
         // 下面的变量用于判断操作系统，主要判断是Windows还是Mac，都不是的话就一律视作是各种Linux的发行版
         String os = System.getProperty("os.name").toLowerCase();
@@ -53,8 +52,7 @@ public class DiskFfmpegLocator extends FFMPEGLocator
         boolean isMac = os.contains("mac");
 
         dirFolder = new File(System.getProperty("java.io.tmpdir"), "jave/");
-        if (!dirFolder.exists())
-        {
+        if (!dirFolder.exists()) {
             dirFolder.mkdirs();
         }
 
@@ -66,8 +64,7 @@ public class DiskFfmpegLocator extends FFMPEGLocator
     }
 
     @Override
-    public String getFFMPEGExecutablePath()
-    {
+    public String getFFMPEGExecutablePath() {
         // 每次获得路径时再次初始化ffmpeg执行路径
         // 这里的目的在于避免运行中ffmpeg被删掉从而导致程序找不到它;
         return initFFMPEGExecutablePath();
@@ -80,13 +77,12 @@ public class DiskFfmpegLocator extends FFMPEGLocator
      * 2，根据版本判断程序是否就位；
      * 3，如果未就位则将程序拷贝到临时文件夹中；
      * 4，返回正确的程序路径或null;
+     *
      * @return
      */
-    private String initFFMPEGExecutablePath()
-    {
+    private String initFFMPEGExecutablePath() {
         // 首先判断是否启用了在线解码功能，若未启用则无需初始化ffmpeg执行路径
-        if (!ConfigureReader.getInstance().isEnableFFMPEG())
-        {
+        if (!ConfigureReader.getInstance().isEnableFFMPEG()) {
             enableFFmpeg = false;
             return null;
         }
@@ -94,19 +90,15 @@ public class DiskFfmpegLocator extends FFMPEGLocator
         File ffmpegFile;
         File customFFMPEGexef = new File(ConfigureReader.getInstance().getPath(), isWindows ? "ffmpeg.exe" : "ffmpeg");
         // 如果有，那么优先使用自定义的ffmpeg可执行文件。
-        if (customFFMPEGexef.isFile() && customFFMPEGexef.canRead())
-        {
+        if (customFFMPEGexef.isFile() && customFFMPEGexef.canRead()) {
             ffmpegFile = new File(dirFolder, customFFMPEGexef.getName());
             // 临时文件中是否已经拷贝好了ffmpeg可执行文件了？
-            if (!ffmpegFile.exists())
-            {
+            if (!ffmpegFile.exists()) {
                 // 没有？那将自定义的ffmpeg文件拷贝到临时目录中。
-                try
-                {
+                try {
                     Files.copy(customFFMPEGexef.toPath(), ffmpegFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                 }
-                catch (IOException e)
-                {
+                catch (IOException e) {
                     AppSystem.out.println("警告：自定义的ffmpeg引擎可执行文件无法读取，视频播放的在线解码功能将不可用。");
                     logUtil.writeException(e);
                     enableFFmpeg = false;
@@ -115,21 +107,17 @@ public class DiskFfmpegLocator extends FFMPEGLocator
                 // 已经有了？那么它应该准备好了
             }
         }
-        else
-        {
+        else {
             // 否则，使用内置的ffmpeg文件。
             // 临时文件中是否已经拷贝好了ffmpeg可执行文件了？
             ffmpegFile = new File(dirFolder, "ffmpeg-" + arch + "-" + MY_EXE_VERSION + suffix);
-            if (!ffmpegFile.exists())
-            {
+            if (!ffmpegFile.exists()) {
                 // 没有？那将自带的、对应操作系统的ffmpeg文件拷贝到临时目录中，如果没有对应自带的ffmpeg，那么会抛出异常
                 // 如果抛出异常，那么直接结束构造
-                try
-                {
+                try {
                     copyFile("ffmpeg-" + arch + suffix, ffmpegFile);
                 }
-                catch (NullPointerException e)
-                {
+                catch (NullPointerException e) {
                     AppSystem.out.println("警告：未能找到适合此操作系统的ffmpeg引擎可执行文件，视频播放的在线解码功能将不可用。");
                     logUtil.writeException(e);
                     enableFFmpeg = false;
@@ -140,16 +128,12 @@ public class DiskFfmpegLocator extends FFMPEGLocator
         }
 
         // 对于类Unix系统而言，还要确保临时目录授予可运行权限，以便jave运行时调用ffmpeg
-        if (!isWindows)
-        {
-            if (!ffmpegFile.canExecute())
-            {
-                try
-                {
+        if (!isWindows) {
+            if (!ffmpegFile.canExecute()) {
+                try {
                     Runtime.getRuntime().exec(new String[]{"/bin/chmod", "755", ffmpegFile.getAbsolutePath()});
                 }
-                catch (IOException e)
-                {
+                catch (IOException e) {
                     // 授予权限失败的话……好像也没啥好办法
                     logUtil.writeException(e);
                     enableFFmpeg = false;
@@ -165,39 +149,31 @@ public class DiskFfmpegLocator extends FFMPEGLocator
     }
 
     // 把文件从自带的jar包中拷贝出来，移入指定文件夹
-    private void copyFile(String path, File dest)
-    {
+    private void copyFile(String path, File dest) {
         String resourceName = "/ws/schild/jave/native/" + path;
-        try
-        {
-            if (!copy(getClass().getResourceAsStream(resourceName), dest.getAbsolutePath()))
-            {
+        try {
+            if (!copy(getClass().getResourceAsStream(resourceName), dest.getAbsolutePath())) {
                 throw new NullPointerException();
             }
         }
-        catch (NullPointerException ex)
-        {
+        catch (NullPointerException ex) {
             throw ex;
         }
     }
 
     // 以文件的形式把流存入指定文件夹内
-    private boolean copy(InputStream source, String destination)
-    {
+    private boolean copy(InputStream source, String destination) {
         boolean success = true;
-        try
-        {
+        try {
             Files.copy(source, Paths.get(destination), StandardCopyOption.REPLACE_EXISTING);
         }
-        catch (IOException ex)
-        {
+        catch (IOException ex) {
             success = false;
         }
         return success;
     }
 
-    public boolean isEnableFFmpeg()
-    {
+    public boolean isEnableFFmpeg() {
         return enableFFmpeg;
     }
 

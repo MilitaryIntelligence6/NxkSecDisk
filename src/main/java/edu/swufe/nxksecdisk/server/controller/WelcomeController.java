@@ -7,11 +7,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
  * @author Administrator
  */
 @Controller
-public class WelcomeController
-{
+public class WelcomeController {
+
     @RequestMapping({"/"})
-    public String home()
-    {
+    public String home() {
         return "redirect:/home.html";
     }
 }

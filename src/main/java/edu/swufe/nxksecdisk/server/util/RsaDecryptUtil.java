@@ -14,42 +14,36 @@ import java.util.Base64;
 /**
  * @author Administrator
  */
-public class RsaDecryptUtil
-{
+public class RsaDecryptUtil {
+
     private static Base64.Decoder decoder;
 
     private static KeyFactory keyFactory;
 
     private static Cipher cipher;
 
-    static
-    {
+    static {
         RsaDecryptUtil.decoder = Base64.getDecoder();
-        try
-        {
+        try {
             RsaDecryptUtil.keyFactory = KeyFactory.getInstance("RSA");
             RsaDecryptUtil.cipher = Cipher.getInstance("RSA");
         }
-        catch (NoSuchAlgorithmException | NoSuchPaddingException e)
-        {
+        catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
             e.printStackTrace();
         }
     }
 
-    public static String dncryption(final String context, final String privateKey)
-    {
+    public static String dncryption(final String context, final String privateKey) {
         final byte[] b = RsaDecryptUtil.decoder.decode(privateKey);
         final byte[] s = RsaDecryptUtil.decoder.decode(context.getBytes(StandardCharsets.UTF_8));
         final PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(b);
-        try
-        {
+        try {
             final PrivateKey key = RsaDecryptUtil.keyFactory.generatePrivate(spec);
             RsaDecryptUtil.cipher.init(2, key);
             final byte[] f = RsaDecryptUtil.cipher.doFinal(s);
             return new String(f);
         }
-        catch (Exception e)
-        {
+        catch (Exception e) {
             e.printStackTrace();
             AppSystem.out.println(e.getMessage());
             AppSystem.out.println("错误：RSA解密失败。");

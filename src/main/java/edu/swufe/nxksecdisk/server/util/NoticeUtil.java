@@ -22,8 +22,8 @@ import java.io.*;
  * @version 1.0
  */
 @Component
-public class NoticeUtil
-{
+public class NoticeUtil {
+
     /**
      * 公告信息的md5值，如未生成则返回null;
      */
@@ -47,8 +47,7 @@ public class NoticeUtil
     @Resource
     private TxtCharsetGetter txtCharsetGetter;
 
-    public NoticeUtil()
-    {
+    public NoticeUtil() {
         options = new MutableDataSet();
         options.setFrom(ParserEmulationProfile.MARKDOWN);
     }
@@ -63,16 +62,13 @@ public class NoticeUtil
      *
      * @author 青阳龙野(kohgylw)
      */
-    public void loadNotice()
-    {
+    public void loadNotice() {
         File noticeMD = new File(ConfigureReader.getInstance().getPath(), NOTICE_FILE_NAME);
         // 转化后的输出位置;
         File noticeHTML = new File(ConfigureReader.getInstance().getTemporaryfilePath(), NOTICE_OUTPUT_NAME);
-        if (noticeMD.isFile() && noticeMD.canRead())
-        {
+        if (noticeMD.isFile() && noticeMD.canRead()) {
             AppSystem.out.println("正在载入公告信息...");
-            try
-            {
+            try {
                 // 先判断公告信息文件的编码格式
                 String inputFileEncode = txtCharsetGetter.getTxtCharset(new FileInputStream(noticeMD));
                 // 将其转化为HTML格式并保存
@@ -83,8 +79,7 @@ public class NoticeUtil
                 BufferedWriter writer = new BufferedWriter(
                         new OutputStreamWriter(new FileOutputStream(noticeHTML), "UTF-8"));
                 String line = null;
-                while ((line = reader.readLine()) != null)
-                {
+                while ((line = reader.readLine()) != null) {
                     String html = renderer.render(parser.parse(line));
                     writer.write(html);
                     writer.newLine();
@@ -97,8 +92,7 @@ public class NoticeUtil
                 AppSystem.out.println("公告信息载入完成。");
                 return;
             }
-            catch (Exception e)
-            {
+            catch (Exception e) {
                 AppSystem.out.println("错误：公告文件载入失败，服务器将无法为用户显示公告内容。");
             }
         }
@@ -114,8 +108,7 @@ public class NoticeUtil
      * @return java.lang.String md5字符串或null。
      * @author 青阳龙野(kohgylw)
      */
-    public String getMd5()
-    {
+    public String getMd5() {
         return md5;
     }
 }

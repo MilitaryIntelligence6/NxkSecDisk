@@ -7,16 +7,18 @@ package edu.swufe.nxksecdisk.system;
  * @Description TODO
  * @CreateTime 2021年03月28日 12:35:00
  */
-public interface IOutputStream
-{
+public interface IOutputStream {
+
     /**
      * println;
+     *
      * @param context
      */
     void println(final String context);
 
     /**
      * printf;
+     *
      * @param context
      * @param args
      */

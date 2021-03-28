@@ -1,8 +1,11 @@
 package edu.swufe.nxksecdisk.ui.callback;
 
-import java.util.*;
+import java.util.Date;
 
-public interface GetServerTime
-{
+/**
+ * @author Administrator
+ */
+public interface GetServerTime {
+
     Date get();
 }

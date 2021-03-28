@@ -3,8 +3,8 @@ package edu.swufe.nxksecdisk.server.enumeration;
 /**
  * @author Administrator
  */
-public enum AccountAuth
-{
+public enum AccountAuth {
+
     /**
      * auth;
      */

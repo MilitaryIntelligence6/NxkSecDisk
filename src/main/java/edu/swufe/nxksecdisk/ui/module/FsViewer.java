@@ -1,9 +1,9 @@
 package edu.swufe.nxksecdisk.ui.module;
 
-import edu.swufe.nxksecdisk.system.AppSystem;
 import edu.swufe.nxksecdisk.server.exception.FilesTotalOutOfLimitException;
 import edu.swufe.nxksecdisk.server.exception.FoldersTotalOutOfLimitException;
 import edu.swufe.nxksecdisk.server.util.FileNodeUtil;
+import edu.swufe.nxksecdisk.system.AppSystem;
 import edu.swufe.nxksecdisk.ui.util.FilesTable;
 import edu.swufe.nxksecdisk.util.filesysmng.FileSystemManager;
 import edu.swufe.nxksecdisk.util.filesysmng.pojo.Folder;
@@ -34,8 +34,13 @@ import java.util.concurrent.Executors;
  * @author 青阳龙野(kohgylw)
  * @version 1.0
  */
-public class FsViewer extends DiskDynamicWindow
-{
+public class FsViewer extends DiskDynamicWindow {
+
+    /**
+     * 该窗口的唯一实例
+     */
+    private volatile static FsViewer instance;
+
     /**
      * 窗体对象
      */
@@ -77,11 +82,6 @@ public class FsViewer extends DiskDynamicWindow
     private FilesTable filesTable;
 
     /**
-     * 该窗口的唯一实例
-     */
-    private static FsViewer instance;
-
-    /**
      * 当前显示的视图
      */
     private static FolderView currentView;
@@ -96,8 +96,7 @@ public class FsViewer extends DiskDynamicWindow
      *
      * @throws SQLException
      */
-    private FsViewer() throws SQLException
-    {
+    private FsViewer() throws SQLException {
         setUIFont();
         worker = Executors.newSingleThreadExecutor();
         window = new JDialog(ServerUiModule.window, "kiftd-ROOT");
@@ -141,12 +140,10 @@ public class FsViewer extends DiskDynamicWindow
             disableAllButtons();
             worker.execute(() ->
             {
-                try
-                {
+                try {
                     getFolderView("root");
                 }
-                catch (Exception e1)
-                {
+                catch (Exception e1) {
                     // TODO 自动生成的 catch 块
                     JOptionPane.showMessageDialog(window, "出现意外错误：无法读取文件列表，请重试或重启应用。", "错误", JOptionPane.ERROR_MESSAGE);
                 }
@@ -158,12 +155,10 @@ public class FsViewer extends DiskDynamicWindow
             disableAllButtons();
             worker.execute(() ->
             {
-                try
-                {
+                try {
                     getFolderView(currentView.getCurrent().getFolderParent());
                 }
-                catch (Exception e1)
-                {
+                catch (Exception e1) {
                     // TODO 自动生成的 catch 块
                     JOptionPane.showMessageDialog(window, "出现意外错误：无法读取文件列表，请重试或重启应用。", "错误", JOptionPane.ERROR_MESSAGE);
                 }
@@ -178,16 +173,14 @@ public class FsViewer extends DiskDynamicWindow
             importChooer.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
             importChooer.setPreferredSize(fileChooserSize);
             importChooer.setDialogTitle("请选择...");
-            if (importChooer.showOpenDialog(null) == JFileChooser.APPROVE_OPTION)
-            {
+            if (importChooer.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
                 worker.execute(() ->
                 {
                     doImport(importChooer.getSelectedFiles());
                     enableAllButtons();
                 });
             }
-            else
-            {
+            else {
                 enableAllButtons();
             }
         });
@@ -197,8 +190,7 @@ public class FsViewer extends DiskDynamicWindow
             exportChooer.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
             exportChooer.setPreferredSize(fileChooserSize);
             exportChooer.setDialogTitle("导出到...");
-            if (exportChooer.showOpenDialog(null) == JFileChooser.APPROVE_OPTION)
-            {
+            if (exportChooer.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
                 disableAllButtons();
                 worker.execute(() ->
                 {
@@ -207,38 +199,31 @@ public class FsViewer extends DiskDynamicWindow
                     List<String> selectedNodes = new ArrayList<>();
                     List<String> selectedFolders = new ArrayList<>();
                     int borderIndex = currentView.getFolders().size();
-                    for (int i : selected)
-                    {
-                        if (i < borderIndex)
-                        {
+                    for (int i : selected) {
+                        if (i < borderIndex) {
                             selectedFolders.add(currentView.getFolders().get(i).getFolderId());
                         }
-                        else
-                        {
+                        else {
                             selectedNodes.add(currentView.getFiles().get(i - borderIndex).getFileId());
                         }
                     }
                     String[] folders = selectedFolders.toArray(new String[0]);
                     String[] nodes = selectedNodes.toArray(new String[0]);
                     int exi = 0;
-                    try
-                    {
+                    try {
                         exi = FileSystemManager.getInstance().hasExistsFilesOrFolders(folders, nodes, path);
                     }
-                    catch (Exception e2)
-                    {
+                    catch (Exception e2) {
                         JOptionPane.showMessageDialog(window, "出现意外错误，无法导出文件，请重试。", "错误", JOptionPane.ERROR_MESSAGE);
                         refresh();
                         enableAllButtons();
                         return;
                     }
                     String type = null;
-                    if (exi > 0)
-                    {
+                    if (exi > 0) {
                         switch (JOptionPane.showConfirmDialog(window,
                                 "该路径存在" + exi + "个同名文件或文件夹，您希望覆盖它们么？（“是”覆盖，“否”保留两者，“取消”终止导入）", "导入",
-                                JOptionPane.YES_NO_CANCEL_OPTION))
-                        {
+                                JOptionPane.YES_NO_CANCEL_OPTION)) {
                             case JOptionPane.YES_OPTION:
                                 type = FileSystemManager.COVER;
                                 break;
@@ -259,13 +244,11 @@ public class FsViewer extends DiskDynamicWindow
                         fsd.show();
                     });
                     deleteListenerDialog.start();
-                    try
-                    {
+                    try {
                         FileSystemManager.getInstance().exportTo(folders, nodes, path, type);
                         fsd.close();
                     }
-                    catch (Exception e1)
-                    {
+                    catch (Exception e1) {
                         // TODO 自动生成的 catch 块
                         fsd.close();
                         JOptionPane.showMessageDialog(window, "导出文件时失败，该操作已被中断，未能全部导出。", "错误",
@@ -280,28 +263,22 @@ public class FsViewer extends DiskDynamicWindow
         {
             disableAllButtons();
             if (JOptionPane.showConfirmDialog(window, "确认要删除这些文件么？警告：该操作无法恢复。", "删除",
-                    JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
-            {
+                    JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
                 int[] selected = filesTable.getSelectedRows();
                 worker.execute(() ->
                 {
-                    Runnable doDeleteThread = new Runnable()
-                    {
+                    Runnable doDeleteThread = new Runnable() {
                         @Override
-                        public void run()
-                        {
+                        public void run() {
                             // TODO 自动生成的方法存根
                             List<String> selectedNodes = new ArrayList<>();
                             List<String> selectedFolders = new ArrayList<>();
                             int borderIndex = currentView.getFolders().size();
-                            for (int i : selected)
-                            {
-                                if (i < borderIndex)
-                                {
+                            for (int i : selected) {
+                                if (i < borderIndex) {
                                     selectedFolders.add(currentView.getFolders().get(i).getFolderId());
                                 }
-                                else
-                                {
+                                else {
                                     selectedNodes.add(currentView.getFiles().get(i - borderIndex).getFileId());
                                 }
                             }
@@ -311,14 +288,12 @@ public class FsViewer extends DiskDynamicWindow
                                 fsd.show();
                             });
                             fsProgressDialogThread.start();
-                            try
-                            {
+                            try {
                                 FileSystemManager.getInstance().delete(selectedFolders.toArray(new String[0]),
                                         selectedNodes.toArray(new String[0]));
                                 fsd.close();
                             }
-                            catch (Exception e1)
-                            {
+                            catch (Exception e1) {
                                 // TODO 自动生成的 catch 块
                                 fsd.close();
                                 JOptionPane.showMessageDialog(window, "删除文件时失败，该操作已被中断，未能全部删除。", "错误",
@@ -332,8 +307,7 @@ public class FsViewer extends DiskDynamicWindow
                     SwingUtilities.invokeLater(doDeleteThread);
                 });
             }
-            else
-            {
+            else {
                 enableAllButtons();
             }
         });
@@ -350,64 +324,51 @@ public class FsViewer extends DiskDynamicWindow
         filesTable = new FilesTable();
         filesTable.setRowHeight((int) (16 * proportion));
         JScrollPane mianPane = new JScrollPane(filesTable);
-        filesTable.getSelectionModel().addListSelectionListener(new ListSelectionListener()
-        {
+        filesTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 
             @Override
-            public void valueChanged(ListSelectionEvent e)
-            {
+            public void valueChanged(ListSelectionEvent e) {
                 // TODO 自动生成的方法存根
-                if (filesTable.getSelectedRows().length > 0)
-                {
+                if (filesTable.getSelectedRows().length > 0) {
                     exportBtn.setEnabled(true);
                     deleteBtn.setEnabled(true);
                 }
-                else
-                {
+                else {
                     exportBtn.setEnabled(false);
                     deleteBtn.setEnabled(false);
                 }
             }
         });
         // 文件列表的双击监听（进入文件夹）
-        filesTable.addMouseListener(new MouseListener()
-        {
+        filesTable.addMouseListener(new MouseListener() {
             @Override
-            public void mouseReleased(MouseEvent e)
-            {
+            public void mouseReleased(MouseEvent e) {
             }
 
             @Override
-            public void mousePressed(MouseEvent e)
-            {
+            public void mousePressed(MouseEvent e) {
             }
 
             @Override
-            public void mouseExited(MouseEvent e)
-            {
+            public void mouseExited(MouseEvent e) {
             }
 
             @Override
-            public void mouseEntered(MouseEvent e)
-            {
+            public void mouseEntered(MouseEvent e) {
             }
 
             @Override
-            public void mouseClicked(MouseEvent e)
-            {
+            public void mouseClicked(MouseEvent e) {
                 // TODO 自动生成的方法存根
                 disableAllButtons();
                 worker.execute(() ->
                 {
                     Folder f = filesTable.getDoubleClickFolder(e);
-                    if (f != null)
-                    {
-                        try
-                        {
+                    if (f != null) {
+                        try {
                             getFolderView(f.getFolderId());
                         }
-                        catch (Exception e1)
-                        {
+                        catch (Exception e1) {
                             // TODO 自动生成的 catch 块
                         }
                     }
@@ -416,25 +377,20 @@ public class FsViewer extends DiskDynamicWindow
             }
         });
         // 文件列表的拖拽监听
-        DropTargetListener dtl = new DropTargetListener()
-        {
+        DropTargetListener dtl = new DropTargetListener() {
 
             @Override
-            public void dropActionChanged(DropTargetDragEvent dtde)
-            {
+            public void dropActionChanged(DropTargetDragEvent dtde) {
                 // TODO 自动生成的方法存根
 
             }
 
             @Override
-            public void drop(DropTargetDropEvent dtde)
-            {
+            public void drop(DropTargetDropEvent dtde) {
                 // TODO 自动生成的方法存根
-                if (dtde.isDataFlavorSupported(DataFlavor.javaFileListFlavor))
-                {
+                if (dtde.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
                     dtde.acceptDrop(DnDConstants.ACTION_COPY_OR_MOVE);
-                    try
-                    {
+                    try {
                         Object dropTarget = dtde.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
                         @SuppressWarnings("unchecked")
                         List<File> files = (List<File>) dropTarget;
@@ -446,16 +402,13 @@ public class FsViewer extends DiskDynamicWindow
                             enableAllButtons();
                         });
                     }
-                    catch (Exception e)
-                    {
+                    catch (Exception e) {
                         // TODO 自动生成的 catch 块
                         worker.execute(() ->
                         {
-                            Runnable refreshThread = new Runnable()
-                            {
+                            Runnable refreshThread = new Runnable() {
                                 @Override
-                                public void run()
-                                {
+                                public void run() {
                                     // TODO 自动生成的方法存根
                                     refresh();
                                 }
@@ -468,22 +421,19 @@ public class FsViewer extends DiskDynamicWindow
             }
 
             @Override
-            public void dragOver(DropTargetDragEvent dtde)
-            {
+            public void dragOver(DropTargetDragEvent dtde) {
                 // TODO 自动生成的方法存根
 
             }
 
             @Override
-            public void dragExit(DropTargetEvent dte)
-            {
+            public void dragExit(DropTargetEvent dte) {
                 // TODO 自动生成的方法存根
 
             }
 
             @Override
-            public void dragEnter(DropTargetDragEvent dtde)
-            {
+            public void dragEnter(DropTargetDragEvent dtde) {
                 // TODO 自动生成的方法存根
 
             }
@@ -494,14 +444,11 @@ public class FsViewer extends DiskDynamicWindow
     }
 
     // 刷新文件列表
-    private void refresh()
-    {
-        try
-        {
+    private void refresh() {
+        try {
             getFolderView(currentView.getCurrent().getFolderId());
         }
-        catch (Exception e1)
-        {
+        catch (Exception e1) {
             // TODO 自动生成的 catch 块
             JOptionPane.showMessageDialog(window, "无法刷新文件列表，请重试或返回根目录。", "错误", JOptionPane.ERROR_MESSAGE);
         }
@@ -516,25 +463,20 @@ public class FsViewer extends DiskDynamicWindow
      *
      * @author 青阳龙野(kohgylw)
      */
-    public void show()
-    {
+    public void show() {
         disableAllButtons();
         FileNodeUtil.initNodeTableToDataBase();
-        try
-        {
-            if (currentView == null)
-            {
+        try {
+            if (currentView == null) {
                 getFolderView("root");
             }
-            else
-            {
+            else {
                 refresh();
             }
             enableAllButtons();
             window.setVisible(true);
         }
-        catch (Exception e)
-        {
+        catch (Exception e) {
             // TODO 自动生成的 catch 块
             e.printStackTrace();
             AppSystem.out.println("错误：无法打开文件系统，该文件系统可能正在被另一个kiftd占用。");
@@ -547,31 +489,25 @@ public class FsViewer extends DiskDynamicWindow
      * @param folderId
      * @throws Exception
      */
-    private void getFolderView(String folderId) throws Exception
-    {
-        try
-        {
+    private void getFolderView(String folderId) throws Exception {
+        try {
             currentView = FileSystemManager.getInstance().requireFolderView(folderId);
             long maxTotalNum = currentView.getFiles().size() + currentView.getFolders().size();
-            if (maxTotalNum > FilesTable.MAX_LIST_LIMIT)
-            {
+            if (maxTotalNum > FilesTable.MAX_LIST_LIMIT) {
                 JOptionPane.showMessageDialog(window,
                         "文件夹列表的长度已超过最大限值（" + FilesTable.MAX_LIST_LIMIT + "），只能显示前" + FilesTable.MAX_LIST_LIMIT + "行。",
                         "警告", JOptionPane.WARNING_MESSAGE);
             }
-            if (currentView != null && currentView.getCurrent() != null)
-            {
+            if (currentView != null && currentView.getCurrent() != null) {
                 filesTable.updateValues(currentView.getFolders(), currentView.getFiles());
                 window.setTitle("kiftd-" + currentView.getCurrent().getFolderName());
             }
-            else
-            {
+            else {
                 // 浏览一个不存在的文件夹时自动返回根目录
                 getFolderView("root");
             }
         }
-        catch (Exception e)
-        {
+        catch (Exception e) {
             throw e;
         }
     }
@@ -585,14 +521,10 @@ public class FsViewer extends DiskDynamicWindow
      * @return kohgylw.kiftd.ui.module.FSViewer 该视图的唯一实例，程序中只会存在一个该窗口。
      * @author 青阳龙野(kohgylw)
      */
-    public static FsViewer getInstance() throws SQLException
-    {
-        if (instance == null)
-        {
-            synchronized (FsViewer.class)
-            {
-                if (instance == null)
-                {
+    public static FsViewer getInstance() throws SQLException {
+        if (instance == null) {
+            synchronized (FsViewer.class) {
+                if (instance == null) {
                     instance = new FsViewer();
                 }
             }
@@ -602,29 +534,25 @@ public class FsViewer extends DiskDynamicWindow
 
     /**
      * 执行导入任务;
+     *
      * @param files
      */
-    private void doImport(File[] files)
-    {
+    private void doImport(File[] files) {
         int exi = 0;
         String folderId = currentView.getCurrent().getFolderId();
-        try
-        {
+        try {
             exi = FileSystemManager.getInstance().hasExistsFilesOrFolders(files, folderId);
         }
-        catch (SQLException e1)
-        {
+        catch (SQLException e1) {
             // TODO 自动生成的 catch 块
             JOptionPane.showMessageDialog(window, "出现意外错误，无法导入文件，请刷新或重启应用后重试。", "错误", JOptionPane.ERROR_MESSAGE);
             refresh();
             return;
         }
         String type = null;
-        if (exi > 0)
-        {
+        if (exi > 0) {
             switch (JOptionPane.showConfirmDialog(window, "该路径存在" + exi + "个同名文件或文件夹，您希望覆盖它们么？（“是”覆盖，“否”保留两者，“取消”终止导入）",
-                    "导入", JOptionPane.YES_NO_CANCEL_OPTION))
-            {
+                    "导入", JOptionPane.YES_NO_CANCEL_OPTION)) {
                 case 0:
                     type = FileSystemManager.COVER;
                     break;
@@ -645,20 +573,16 @@ public class FsViewer extends DiskDynamicWindow
             fsd.show();
         });
         fspt.start();
-        try
-        {
+        try {
             FileSystemManager.getInstance().importFrom(files, folderId, type);
         }
-        catch (FoldersTotalOutOfLimitException e1)
-        {
+        catch (FoldersTotalOutOfLimitException e1) {
             JOptionPane.showMessageDialog(window, "导入失败，该文件夹内的文件夹数目已达上限，无法导入更多文件夹。", "错误", JOptionPane.ERROR_MESSAGE);
         }
-        catch (FilesTotalOutOfLimitException e2)
-        {
+        catch (FilesTotalOutOfLimitException e2) {
             JOptionPane.showMessageDialog(window, "导入失败，该文件夹内的文件数目已达上限，无法导入更多文件。", "错误", JOptionPane.ERROR_MESSAGE);
         }
-        catch (Exception e3)
-        {
+        catch (Exception e3) {
             JOptionPane.showMessageDialog(window, "导入失败，无法完成导入，该操作已被中断。", "错误", JOptionPane.ERROR_MESSAGE);
         }
         fsd.close();
@@ -666,8 +590,7 @@ public class FsViewer extends DiskDynamicWindow
     }
 
     // 锁定全部按钮避免重复操作
-    private void disableAllButtons()
-    {
+    private void disableAllButtons() {
         homeBtn.setEnabled(false);
         backToParentFolder.setEnabled(false);
         importBtn.setEnabled(false);
@@ -677,28 +600,24 @@ public class FsViewer extends DiskDynamicWindow
     }
 
     // 解锁可用按钮
-    private void enableAllButtons()
-    {
+    private void enableAllButtons() {
         // 针对一些常规按钮的解锁
         refreshBtn.setEnabled(true);
         importBtn.setEnabled(true);
         // 针对“导出”和“删除”两个按钮的解锁
-        if (filesTable.getSelectedRows().length > 0)
-        {
+        if (filesTable.getSelectedRows().length > 0) {
             exportBtn.setEnabled(true);
             deleteBtn.setEnabled(true);
         }
         // 针对“上一级”和“根目录”按钮的解锁
-        if (currentView != null && !"null".equals(currentView.getCurrent().getFolderParent()))
-        {
+        if (currentView != null && !"null".equals(currentView.getCurrent().getFolderParent())) {
             backToParentFolder.setEnabled(true);
             homeBtn.setEnabled(true);
         }
     }
 
     @Override
-    protected void finalize() throws Throwable
-    {
+    protected void finalize() throws Throwable {
         super.finalize();
         worker.shutdown();
     }

@@ -16,8 +16,8 @@ import java.util.stream.Collectors;
  * @author Administrator
  */
 @Component
-public class FolderUtil
-{
+public class FolderUtil {
+
     @Resource
     private FolderMapper folderMapper;
 
@@ -38,14 +38,11 @@ public class FolderUtil
      * 指定文件夹的所有父级文件夹列表，以kohgylw.kiftd.server.model.Folder形式封装。
      * @author 青阳龙野(kohgylw)
      */
-    public List<Folder> getParentList(final String fid)
-    {
+    public List<Folder> getParentList(final String fid) {
         Folder f = this.folderMapper.queryById(fid);
         final List<Folder> folderList = new ArrayList<Folder>();
-        if (f != null)
-        {
-            while (!f.getFolderParent().equals("null") && folderList.size() < Integer.MAX_VALUE)
-            {
+        if (f != null) {
+            while (!f.getFolderParent().equals("null") && folderList.size() < Integer.MAX_VALUE) {
                 f = this.folderMapper.queryById(f.getFolderParent());
                 folderList.add(f);
             }
@@ -54,8 +51,7 @@ public class FolderUtil
         return folderList;
     }
 
-    public List<String> getAllFoldersId(final String fid)
-    {
+    public List<String> getAllFoldersId(final String fid) {
         List<String> idList = new ArrayList<>();
         idList.addAll(getParentList(fid).parallelStream().map((e) -> e.getFolderId()).collect(Collectors.toList()));
         idList.add(fid);
@@ -71,28 +67,22 @@ public class FolderUtil
      * @param folderId java.lang.String 要删除的文件夹树的ID，不能为null。
      * @author 青阳龙野(kohgylw)
      */
-    public void deleteAllChildFolder(final String folderId)
-    {
+    public void deleteAllChildFolder(final String folderId) {
         final Thread deleteChildFolderThread = new Thread(() -> this.iterationDeleteFolder(folderId));
         deleteChildFolderThread.start();
     }
 
-    private void iterationDeleteFolder(final String folderId)
-    {
+    private void iterationDeleteFolder(final String folderId) {
         final List<Folder> cf = (List<Folder>) this.folderMapper.queryByParentId(folderId);
-        if (cf.size() > 0)
-        {
-            for (final Folder f : cf)
-            {
+        if (cf.size() > 0) {
+            for (final Folder f : cf) {
                 this.iterationDeleteFolder(f.getFolderId());
             }
         }
         final List<Node> files = (List<Node>) this.nodeMapper.queryByParentFolderId(folderId);
-        if (files.size() > 0)
-        {
+        if (files.size() > 0) {
             this.nodeMapper.deleteByParentFolderId(folderId);
-            for (final Node f2 : files)
-            {
+            for (final Node f2 : files) {
                 this.fileBlockUtil.deleteFromFileBlocks(f2);
             }
         }
@@ -100,98 +90,77 @@ public class FolderUtil
     }
 
     public Folder createNewFolder(final String parentId, String account, String folderName, String folderConstraint)
-            throws FoldersTotalOutOfLimitException
-    {
-        if (!ConfigureReader.getInstance().authorized(account, AccountAuth.CREATE_NEW_FOLDER, getAllFoldersId(parentId)))
-        {
+            throws FoldersTotalOutOfLimitException {
+        if (!ConfigureReader.getInstance().authorized(account, AccountAuth.CREATE_NEW_FOLDER,
+                getAllFoldersId(parentId))) {
             return null;
         }
-        if (parentId == null || folderName == null || parentId.length() <= 0 || folderName.length() <= 0)
-        {
+        if (parentId == null || folderName == null || parentId.length() <= 0 || folderName.length() <= 0) {
             return null;
         }
-        if (folderName.equals(".") || folderName.equals(".."))
-        {
+        if (folderName.equals(".") || folderName.equals("..")) {
             return null;
         }
         final Folder parentFolder = this.folderMapper.queryById(parentId);
-        if (parentFolder == null)
-        {
+        if (parentFolder == null) {
             return null;
         }
-        if (!ConfigureReader.getInstance().accessFolder(parentFolder, account))
-        {
+        if (!ConfigureReader.getInstance().accessFolder(parentFolder, account)) {
             return null;
         }
-        if (folderMapper.queryByParentId(parentId).parallelStream().anyMatch((e) -> e.getFolderName().equals(folderName)))
-        {
+        if (folderMapper.queryByParentId(parentId).parallelStream().anyMatch((e) -> e.getFolderName().equals(folderName))) {
             return null;
         }
-        if (folderMapper.countByParentId(parentId) >= FileNodeUtil.MAXIMUM_NUM_OF_SINGLE_FOLDER)
-        {
+        if (folderMapper.countByParentId(parentId) >= FileNodeUtil.MAXIMUM_NUM_OF_SINGLE_FOLDER) {
             throw new FoldersTotalOutOfLimitException();
         }
         Folder f = new Folder();
         // 设置子文件夹约束等级，不允许子文件夹的约束等级比父文件夹低
         int pc = parentFolder.getFolderConstraint();
-        if (folderConstraint != null)
-        {
-            try
-            {
+        if (folderConstraint != null) {
+            try {
                 int ifc = Integer.parseInt(folderConstraint);
-                if (ifc > 0 && account == null)
-                {
+                if (ifc > 0 && account == null) {
                     return null;
                 }
-                if (ifc < pc)
-                {
+                if (ifc < pc) {
                     return null;
                 }
-                else
-                {
+                else {
                     f.setFolderConstraint(ifc);
                 }
             }
-            catch (Exception e)
-            {
+            catch (Exception e) {
                 return null;
             }
         }
-        else
-        {
+        else {
             return null;
         }
         f.setFolderId(UUID.randomUUID().toString());
         f.setFolderName(folderName);
         f.setFolderCreationDate(ServerTimeUtil.accurateToDay());
-        if (account != null)
-        {
+        if (account != null) {
             f.setFolderCreator(account);
         }
-        else
-        {
+        else {
             f.setFolderCreator("匿名用户");
         }
         f.setFolderParent(parentId);
         int i = 0;
-        while (true)
-        {
-            try
-            {
+        while (true) {
+            try {
                 final int r = this.folderMapper.insertNewFolder(f);
-                if (r > 0)
-                {
+                if (r > 0) {
                     return f;
                 }
                 break;
             }
-            catch (Exception e)
-            {
+            catch (Exception e) {
                 f.setFolderId(UUID.randomUUID().toString());
                 i++;
             }
-            if (i >= 10)
-            {
+            if (i >= 10) {
                 break;
             }
         }
@@ -208,12 +177,10 @@ public class FolderUtil
      * @return boolean 是否有效，若返回false则进行了数据回滚
      * @author 青阳龙野(kohgylw)
      */
-    public boolean isValidFolder(Folder f)
-    {
+    public boolean isValidFolder(Folder f) {
         Folder[] repeats = folderMapper.queryByParentId(f.getFolderParent()).parallelStream()
                 .filter((e) -> e.getFolderName().equals(f.getFolderName())).toArray(Folder[]::new);
-        if (folderMapper.queryById(f.getFolderParent()) == null || repeats.length > 1)
-        {
+        if (folderMapper.queryById(f.getFolderParent()) == null || repeats.length > 1) {
             // 如果插入后存在：
             // 1，该文件夹没有有效的父级文件夹（死节点）；
             // 2，与同级的其他文件夹重名，
@@ -222,8 +189,7 @@ public class FolderUtil
             deleteAllChildFolder(f.getFolderId());
             return false;// 返回“无效”的判定结果
         }
-        else
-        {
+        else {
             return true;// 否则，该节点有效，返回结果
         }
     }
@@ -243,64 +209,53 @@ public class FolderUtil
      * @author 青阳龙野(kohgylw)
      */
     private Folder copyFolderByNewNameToPath(Folder prototype, String account, Folder parentFolder, String newName,
-                                             String excludeFolderId)
-    {
-        if (prototype == null || parentFolder == null)
-        {
+                                             String excludeFolderId) {
+        if (prototype == null || parentFolder == null) {
             return null;
         }
-        try
-        {
+        try {
             // 先在指定文件夹下创建原文件夹的副本
             Folder newFolder = createNewFolder(parentFolder.getFolderId(), account,
                     newName == null ? prototype.getFolderName() : newName,
                     "" + (prototype.getFolderConstraint() < parentFolder.getFolderConstraint()
                             ? parentFolder.getFolderConstraint()
                             : prototype.getFolderConstraint()));
-            if (newFolder == null)
-            {
+            if (newFolder == null) {
                 return null;// 副本创建失败则直接返回失败，无需继续执行后续的操作
             }
             // excludeFolderId的传参思路是：该参数为null？那肯定是第一层迭代，将此节点的ID作为“禁入ID”传下去，
             // 如果不为null，则说明是第一层以下的迭代，接收上层传入的excludeFolderId，确保本层复制不触碰此ID代表的
             // 文件夹即可。
-            if (excludeFolderId == null)
-            {
+            if (excludeFolderId == null) {
                 excludeFolderId = newFolder.getFolderId();
             }
             // 创建成功后，检查原文件夹内是否有子文件夹
             List<Folder> childs = folderMapper.queryByParentId(prototype.getFolderId());
             // 若有，则迭代执行本操作直至最底层文件夹
-            for (Folder c : childs)
-            {
+            for (Folder c : childs) {
                 // 如果拷贝路径下还有个“自己”，那么说明目标文件夹是原文件夹的一个子文件夹
                 // 这个时候，必须跳过自己，继续拷贝其他的文件夹
-                if (c.getFolderId().equals(excludeFolderId) || c.getFolderId().equals(newFolder.getFolderId()))
-                {
+                if (c.getFolderId().equals(excludeFolderId) || c.getFolderId().equals(newFolder.getFolderId())) {
                     continue;
                 }
                 // 注意：复制子文件夹时必须将newName传为null！因为子文件夹能存在就不会重名。
-                if (copyFolderByNewNameToPath(c, account, newFolder, null, excludeFolderId) == null)
-                {
+                if (copyFolderByNewNameToPath(c, account, newFolder, null, excludeFolderId) == null) {
                     return null;// 如果中途哪个子文件夹复制失败，则返回失败
                 }
             }
             // 之后，再复制原文件夹中的文件节点，并将文件的副本放在文件夹的副本下
             List<Node> nodes = nodeMapper.queryByParentFolderId(prototype.getFolderId());
-            for (Node n : nodes)
-            {
+            for (Node n : nodes) {
                 Node newNode = fileBlockUtil.insertNewNode(n.getFileName(), account, n.getFilePath(), n.getFileSize(),
                         newFolder.getFolderId());
-                if (newNode == null)
-                {
+                if (newNode == null) {
                     return null;// 某个文件节点复制失败同样返回失败
                 }
             }
             // 上述操作都成功了？那么复制成功。
             return newFolder;
         }
-        catch (FoldersTotalOutOfLimitException e)
-        {
+        catch (FoldersTotalOutOfLimitException e) {
             return null;
         }
     }
@@ -318,8 +273,7 @@ public class FolderUtil
      * 否则返回null（包括传入目标文件夹或父文件夹参数错误的情况）
      * @author 青阳龙野(kohgylw)
      */
-    public Folder copyFolderByNewNameToPath(Folder prototype, String account, Folder parentFolder, String newName)
-    {
+    public Folder copyFolderByNewNameToPath(Folder prototype, String account, Folder parentFolder, String newName) {
         return copyFolderByNewNameToPath(prototype, account, parentFolder, newName, null);
     }
 
@@ -333,12 +287,10 @@ public class FolderUtil
      * @return java.lang.String 指定节点的逻辑路径，包含其自身完整的文件夹路径名，各级之间以“/”分割。
      * @author 青阳龙野(kohgylw)
      */
-    public String getFolderPath(Folder f)
-    {
+    public String getFolderPath(Folder f) {
         List<Folder> l = getParentList(f.getFolderId());
         StringBuffer pl = new StringBuffer();
-        for (Folder i : l)
-        {
+        for (Folder i : l) {
             pl.append(i.getFolderName() + "/");
         }
         pl.append(f.getFolderName());
@@ -356,13 +308,10 @@ public class FolderUtil
      * @param c        约束等级
      * @author 青阳龙野(kohgylw)
      */
-    public void changeChildFolderConstraint(String folderId, int c)
-    {
+    public void changeChildFolderConstraint(String folderId, int c) {
         List<Folder> cfs = folderMapper.queryByParentId(folderId);
-        for (Folder cf : cfs)
-        {
-            if (cf.getFolderConstraint() < c)
-            {
+        for (Folder cf : cfs) {
+            if (cf.getFolderConstraint() < c) {
                 Map<String, Object> map = new HashMap<String, Object>();
                 map.put("newConstraint", c);
                 map.put("folderId", cf.getFolderId());

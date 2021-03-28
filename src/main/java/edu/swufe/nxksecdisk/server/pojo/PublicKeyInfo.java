@@ -3,29 +3,25 @@ package edu.swufe.nxksecdisk.server.pojo;
 /**
  * @author Administrator
  */
-public class PublicKeyInfo
-{
+public class PublicKeyInfo {
+
     private String publicKey;
 
     private long time;
 
-    public String getPublicKey()
-    {
+    public String getPublicKey() {
         return this.publicKey;
     }
 
-    public void setPublicKey(final String publicKey)
-    {
+    public void setPublicKey(final String publicKey) {
         this.publicKey = publicKey;
     }
 
-    public long getTime()
-    {
+    public long getTime() {
         return this.time;
     }
 
-    public void setTime(final long time)
-    {
+    public void setTime(final long time) {
         this.time = time;
     }
 }

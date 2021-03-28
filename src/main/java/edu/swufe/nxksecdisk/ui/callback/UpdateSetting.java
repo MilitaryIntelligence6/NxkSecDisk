@@ -5,7 +5,7 @@ import edu.swufe.nxksecdisk.server.pojo.ServerSetting;
 /**
  * @author Administrator
  */
-public interface UpdateSetting
-{
+public interface UpdateSetting {
+
     boolean update(final ServerSetting s);
 }

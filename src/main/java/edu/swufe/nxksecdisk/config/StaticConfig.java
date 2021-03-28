@@ -7,7 +7,7 @@ package edu.swufe.nxksecdisk.config;
  * @Description TODO
  * @CreateTime 2021年03月28日 13:00:00
  */
-public final class StaticConfig
-{
+public final class StaticConfig {
+
     private StaticConfig() {}
 }

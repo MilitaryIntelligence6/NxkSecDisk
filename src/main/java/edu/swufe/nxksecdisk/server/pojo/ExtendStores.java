@@ -5,29 +5,25 @@ import java.io.File;
 /**
  * @author Administrator
  */
-public class ExtendStores
-{
+public class ExtendStores {
+
     private short index;
 
     private File path;
 
-    public short getIndex()
-    {
+    public short getIndex() {
         return index;
     }
 
-    public void setIndex(short index)
-    {
+    public void setIndex(short index) {
         this.index = index;
     }
 
-    public File getPath()
-    {
+    public File getPath() {
         return path;
     }
 
-    public void setPath(File path)
-    {
+    public void setPath(File path) {
         this.path = path;
     }
 

@@ -8,8 +8,8 @@ package edu.swufe.nxksecdisk.server.model;
  * @author 青阳龙野(kohgylw)
  * @version 1.0
  */
-public class Node
-{
+public class Node {
+
     /**
      * 可返回前端的字段;
      */
@@ -30,73 +30,59 @@ public class Node
      */
     private transient String filePath;
 
-    public String getFileId()
-    {
+    public String getFileId() {
         return this.fileId;
     }
 
-    public void setFileId(final String fileId)
-    {
+    public void setFileId(final String fileId) {
         this.fileId = fileId;
     }
 
-    public String getFileName()
-    {
+    public String getFileName() {
         return this.fileName;
     }
 
-    public void setFileName(final String fileName)
-    {
+    public void setFileName(final String fileName) {
         this.fileName = fileName;
     }
 
-    public String getFileSize()
-    {
+    public String getFileSize() {
         return this.fileSize;
     }
 
-    public void setFileSize(final String fileSize)
-    {
+    public void setFileSize(final String fileSize) {
         this.fileSize = fileSize;
     }
 
-    public String getFileParentFolder()
-    {
+    public String getFileParentFolder() {
         return this.fileParentFolder;
     }
 
-    public void setFileParentFolder(final String fileParentFolder)
-    {
+    public void setFileParentFolder(final String fileParentFolder) {
         this.fileParentFolder = fileParentFolder;
     }
 
-    public String getFileCreationDate()
-    {
+    public String getFileCreationDate() {
         return this.fileCreationDate;
     }
 
-    public void setFileCreationDate(final String fileCreationDate)
-    {
+    public void setFileCreationDate(final String fileCreationDate) {
         this.fileCreationDate = fileCreationDate;
     }
 
-    public String getFileCreator()
-    {
+    public String getFileCreator() {
         return this.fileCreator;
     }
 
-    public void setFileCreator(final String fileCreator)
-    {
+    public void setFileCreator(final String fileCreator) {
         this.fileCreator = fileCreator;
     }
 
-    public String getFilePath()
-    {
+    public String getFilePath() {
         return this.filePath;
     }
 
-    public void setFilePath(final String filePath)
-    {
+    public void setFilePath(final String filePath) {
         this.filePath = filePath;
     }
 }

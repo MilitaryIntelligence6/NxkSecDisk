@@ -1,12 +1,12 @@
 package edu.swufe.nxksecdisk.server.util;
 
-import edu.swufe.nxksecdisk.system.AppSystem;
 import edu.swufe.nxksecdisk.server.enumeration.AccountAuth;
 import edu.swufe.nxksecdisk.server.mapper.FolderMapper;
 import edu.swufe.nxksecdisk.server.mapper.NodeMapper;
 import edu.swufe.nxksecdisk.server.model.Folder;
 import edu.swufe.nxksecdisk.server.model.Node;
 import edu.swufe.nxksecdisk.server.pojo.ExtendStores;
+import edu.swufe.nxksecdisk.system.AppSystem;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import org.zeroturnaround.zip.FileSource;
@@ -33,8 +33,8 @@ import java.util.zip.ZipEntry;
  * @version 1.1
  */
 @Component
-public class FileBlockUtil
-{
+public class FileBlockUtil {
+
     /**
      * 节点映射，用于遍历;
      */
@@ -67,31 +67,24 @@ public class FileBlockUtil
      *
      * @author 青阳龙野(kohgylw)
      */
-    public void initTempDir()
-    {
+    public void initTempDir() {
         final String tfPath = ConfigureReader.getInstance().getTemporaryfilePath();
         final File f = new File(tfPath);
-        if (f.isDirectory())
-        {
-            try
-            {
+        if (f.isDirectory()) {
+            try {
                 Iterator<Path> listFiles = Files.newDirectoryStream(f.toPath()).iterator();
-                while (listFiles.hasNext())
-                {
+                while (listFiles.hasNext()) {
                     listFiles.next().toFile().delete();
                 }
             }
-            catch (IOException e)
-            {
+            catch (IOException e) {
                 logUtil.writeException(e);
                 // FIXME 所有format换成printf;
                 AppSystem.out.println(String.format("错误：临时文件清理失败，请手动清理%s文件夹内的临时文件。", f.getAbsolutePath()));
             }
         }
-        else
-        {
-            if (!f.mkdir())
-            {
+        else {
+            if (!f.mkdir()) {
                 AppSystem.out.println("错误：无法创建临时文件夹" + f.getAbsolutePath() + "，请检查主文件系统存储路径是否可用。");
             }
         }
@@ -108,65 +101,50 @@ public class FileBlockUtil
      * @return java.io.File 生成的文件块，如果保存失败则返回null
      * @author 青阳龙野(kohgylw)
      */
-    public File saveToFileBlocks(final MultipartFile f)
-    {
+    public File saveToFileBlocks(final MultipartFile f) {
         // 如果存在扩展存储区，则优先在已有文件块数目最少的扩展存储区中存放文件（避免占用主文件系统）
         List<ExtendStores> ess = ConfigureReader.getInstance().getExtendStores();// 得到全部扩展存储区
-        if (ess.size() > 0)
-        {
+        if (ess.size() > 0) {
             // 将所有扩展存储区按照已存储文件块的数目从小到大进行排序
-            Collections.sort(ess, new Comparator<ExtendStores>()
-            {
+            Collections.sort(ess, new Comparator<ExtendStores>() {
                 @Override
-                public int compare(ExtendStores o1, ExtendStores o2)
-                {
-                    try
-                    {
+                public int compare(ExtendStores o1, ExtendStores o2) {
+                    try {
                         // 通常情况下，直接比较子文件列表长度即可
                         return o1.getPath().list().length - o2.getPath().list().length;
                     }
-                    catch (Exception e)
-                    {
-                        try
-                        {
+                    catch (Exception e) {
+                        try {
                             // 如果文件太多以至于超出数组上限，则换用如下统计方法
                             long dValue = Files.list(o1.getPath().toPath()).count()
                                     - Files.list(o2.getPath().toPath()).count();
                             return dValue > 0L ? 1 : dValue == 0 ? 0 : -1;
                         }
-                        catch (IOException e1)
-                        {
+                        catch (IOException e1) {
                             return 0;
                         }
                     }
                 }
             });
             // 排序完毕后，从文件块最少的开始遍历这些扩展存储区，并尝试将新文件存入一个容量足够的扩展存储区中
-            for (ExtendStores es : ess)
-            {
+            for (ExtendStores es : ess) {
                 // 如果该存储区的空余容量大于要存放的文件
-                if (es.getPath().getFreeSpace() > f.getSize())
-                {
-                    try
-                    {
+                if (es.getPath().getFreeSpace() > f.getSize()) {
+                    try {
                         File file = createNewBlock(es.getIndex() + "_", es.getPath());
-                        if (file != null)
-                        {
+                        if (file != null) {
                             f.transferTo(file);// 则执行存放，并将文件命名为“{存储区编号}_{UUID}.block”的形式
                             return file;
                         }
-                        else
-                        {
+                        else {
                             continue;// 如果本处无法生成新的文件块，那么在其他路径下继续尝试
                         }
                     }
-                    catch (IOException e)
-                    {
+                    catch (IOException e) {
                         // 如果无法存入（由于体积过大或其他问题），那么继续尝试其他扩展存储区
                         continue;
                     }
-                    catch (Exception e)
-                    {
+                    catch (Exception e) {
                         logUtil.writeException(e);
                         AppSystem.out.println(e.getMessage());
                         continue;
@@ -175,17 +153,14 @@ public class FileBlockUtil
             }
         }
         // 如果不存在扩展存储区或者最大的扩展存储区无法存放目标文件，则尝试将其存放至主文件系统路径下
-        try
-        {
+        try {
             final File file = createNewBlock("file_", new File(ConfigureReader.getInstance().getFileBlockPath()));
-            if (file != null)
-            {
+            if (file != null) {
                 f.transferTo(file);// 执行存放，并肩文件命名为“file_{UUID}.block”的形式
                 return file;
             }
         }
-        catch (Exception e)
-        {
+        catch (Exception e) {
             logUtil.writeException(e);
             AppSystem.out.println("错误：文件块生成失败，无法存入新的文件数据。详细信息：" + e.getMessage());
         }
@@ -193,27 +168,21 @@ public class FileBlockUtil
     }
 
     // 生成创建一个在指定路径下名称（编号）绝对不重复的新文件块
-    private File createNewBlock(String prefix, File parent) throws IOException
-    {
+    private File createNewBlock(String prefix, File parent) throws IOException {
         int appendIndex = 0;
         int retryNum = 0;
         String newName = prefix + UUID.randomUUID().toString().replace("-", "");
         File newBlock = new File(parent, newName + ".block");
-        while (!newBlock.createNewFile())
-        {
-            if (appendIndex >= 0 && appendIndex < Integer.MAX_VALUE)
-            {
+        while (!newBlock.createNewFile()) {
+            if (appendIndex >= 0 && appendIndex < Integer.MAX_VALUE) {
                 newBlock = new File(parent, newName + "_" + appendIndex + ".block");
                 appendIndex++;
             }
-            else
-            {
-                if (retryNum >= 5)
-                {
+            else {
+                if (retryNum >= 5) {
                     return null;
                 }
-                else
-                {
+                else {
                     newName = prefix + UUID.randomUUID().toString().replace("-", "");
                     newBlock = new File(parent, newName + ".block");
                     retryNum++;
@@ -233,8 +202,7 @@ public class FileBlockUtil
      * @return java.lang.String 计算出来的体积，以MB为单位
      * @author 青阳龙野(kohgylw)
      */
-    public String getFileSize(final MultipartFile f)
-    {
+    public String getFileSize(final MultipartFile f) {
         final long size = f.getSize();
         final int mb = (int) (size / 1048576L);
         return "" + mb;
@@ -251,25 +219,21 @@ public class FileBlockUtil
      * @return boolean 删除结果，true为成功
      * @author 青阳龙野(kohgylw)
      */
-    public boolean deleteFromFileBlocks(Node f)
-    {
+    public boolean deleteFromFileBlocks(Node f) {
         // 检查是否还有其他节点引用相同的文件块
         Map<String, String> map = new HashMap<>();
         map.put("path", f.getFilePath());
         map.put("fileId", f.getFileId());
         List<Node> nodes = nodeMapper.queryByPathExcludeById(map);
-        if (nodes == null || nodes.isEmpty())
-        {
+        if (nodes == null || nodes.isEmpty()) {
             // 如果已经无任何节点再引用此文件块，则删除它
             File file = getFileFromBlocks(f);// 获取对应的文件块对象
-            if (file != null)
-            {
+            if (file != null) {
                 return file.delete();// 执行删除操作
             }
             return false;
         }
-        else
-        {
+        else {
             // 如果还有，那么直接返回true即可，认为此节点的文件块已经删除了（其他的引用是属于其他节点的）
             return true;
         }
@@ -285,31 +249,25 @@ public class FileBlockUtil
      * @return java.io.File 对应的文件块抽象路径，获取失败则返回null
      * @author 青阳龙野(kohgylw)
      */
-    public File getFileFromBlocks(Node f)
-    {
+    public File getFileFromBlocks(Node f) {
         // 检查该节点对应的文件块存放于哪个位置（主文件系统/扩展存储区）
-        try
-        {
+        try {
             File file = null;
-            if (f.getFilePath().startsWith("file_"))
-            {// 存放于主文件系统中
+            if (f.getFilePath().startsWith("file_")) {// 存放于主文件系统中
                 // 直接从主文件系统的文件块存放区获得对应的文件块
                 file = new File(ConfigureReader.getInstance().getFileBlockPath(), f.getFilePath());
             }
-            else
-            {// 存放于扩展存储区
+            else {// 存放于扩展存储区
                 short index = Short.parseShort(f.getFilePath().substring(0, f.getFilePath().indexOf('_')));
                 // 根据编号查到对应的扩展存储区路径，进而获取对应的文件块
                 file = new File(ConfigureReader.getInstance().getExtendStores().parallelStream()
                         .filter((e) -> e.getIndex() == index).findAny().get().getPath(), f.getFilePath());
             }
-            if (file.isFile())
-            {
+            if (file.isFile()) {
                 return file;
             }
         }
-        catch (Exception e)
-        {
+        catch (Exception e) {
             logUtil.writeException(e);
             AppSystem.out.println("错误：文件数据读取失败。详细信息：" + e.getMessage());
         }
@@ -324,8 +282,7 @@ public class FileBlockUtil
      *
      * @author 青阳龙野(kohgylw)
      */
-    public void checkFileBlocks()
-    {
+    public void checkFileBlocks() {
         Thread checkThread = new Thread(() ->
         {
             // 检查是否存在未正确对应文件块的文件节点信息，若有则删除，从而确保文件节点信息不出现遗留问题
@@ -333,30 +290,23 @@ public class FileBlockUtil
             // 检查是否存在未正确对应文件节点的文件块，若有则删除，从而确保文件块不出现遗留问题
             List<File> paths = new ArrayList<>();
             paths.add(new File(ConfigureReader.getInstance().getFileBlockPath()));
-            for (ExtendStores es : ConfigureReader.getInstance().getExtendStores())
-            {
+            for (ExtendStores es : ConfigureReader.getInstance().getExtendStores()) {
                 paths.add(es.getPath());
             }
-            for (File path : paths)
-            {
-                try (DirectoryStream<Path> ds = Files.newDirectoryStream(path.toPath()))
-                {
+            for (File path : paths) {
+                try (DirectoryStream<Path> ds = Files.newDirectoryStream(path.toPath())) {
                     Iterator<Path> blocks = ds.iterator();
-                    while (blocks.hasNext())
-                    {
+                    while (blocks.hasNext()) {
                         File testBlock = blocks.next().toFile();
-                        if (testBlock.isFile())
-                        {
+                        if (testBlock.isFile()) {
                             List<Node> nodes = nodeMapper.queryByPath(testBlock.getName());
-                            if (nodes == null || nodes.isEmpty())
-                            {
+                            if (nodes == null || nodes.isEmpty()) {
                                 testBlock.delete();
                             }
                         }
                     }
                 }
-                catch (IOException e)
-                {
+                catch (IOException e) {
                     AppSystem.out.println("警告：文件节点效验时发生意外错误，可能未能正确完成文件节点效验。错误信息：" + e.getMessage());
                     logUtil.writeException(e);
                 }
@@ -366,20 +316,16 @@ public class FileBlockUtil
     }
 
     // 校对文件节点，要求某一节点必须有对应的文件块，否则将其移除（避免出现死节点）
-    private void checkNodes(String fid)
-    {
+    private void checkNodes(String fid) {
         List<Node> nodes = nodeMapper.queryByParentFolderId(fid);
-        for (Node node : nodes)
-        {
+        for (Node node : nodes) {
             File block = getFileFromBlocks(node);
-            if (block == null)
-            {
+            if (block == null) {
                 nodeMapper.deleteById(node.getFileId());
             }
         }
         List<Folder> folders = folderMapper.queryByParentId(fid);
-        for (Folder fl : folders)
-        {
+        for (Folder fl : folders) {
             checkNodes(fl.getFolderId());
         }
     }
@@ -397,86 +343,69 @@ public class FileBlockUtil
      * 压缩后产生的文件名称，命名规则为“tf_{UUID}.zip”，存放于文件系统中的temporaryfiles目录下
      * @author 青阳龙野(kohgylw)
      */
-    public String createZip(final List<String> idList, final List<String> fidList, String account)
-    {
+    public String createZip(final List<String> idList, final List<String> fidList, String account) {
         final String zipname = "tf_" + UUID.randomUUID().toString() + ".zip";
         final String tempPath = ConfigureReader.getInstance().getTemporaryfilePath();
         final File f = new File(tempPath, zipname);
-        try
-        {
+        try {
             final List<ZipEntrySource> zs = new ArrayList<>();
             // 避免压缩时出现同名文件导致打不开：
             final List<Folder> folders = new ArrayList<>();
-            for (String fid : fidList)
-            {
+            for (String fid : fidList) {
                 Folder fo = folderMapper.queryById(fid);
                 if (ConfigureReader.getInstance().accessFolder(fo, account) && ConfigureReader.getInstance()
-                        .authorized(account, AccountAuth.DOWNLOAD_FILES, folderUtil.getAllFoldersId(fo.getFolderParent())))
-                {
-                    if (fo != null)
-                    {
+                        .authorized(account, AccountAuth.DOWNLOAD_FILES,
+                                folderUtil.getAllFoldersId(fo.getFolderParent()))) {
+                    if (fo != null) {
                         folders.add(fo);
                     }
                 }
             }
             final List<Node> nodes = new ArrayList<>();
-            for (String id : idList)
-            {
+            for (String id : idList) {
                 Node n = nodeMapper.queryById(id);
                 if (ConfigureReader.getInstance().accessFolder(folderMapper.queryById(n.getFileParentFolder()), account)
                         && ConfigureReader.getInstance().authorized(account, AccountAuth.DOWNLOAD_FILES,
-                        folderUtil.getAllFoldersId(n.getFileParentFolder())))
-                {
-                    if (n != null)
-                    {
+                        folderUtil.getAllFoldersId(n.getFileParentFolder()))) {
+                    if (n != null) {
                         nodes.add(n);
                     }
                 }
             }
-            for (Folder fo : folders)
-            {
+            for (Folder fo : folders) {
                 int i = 1;
                 String flname = fo.getFolderName();
-                while (true)
-                {
+                while (true) {
                     if (folders.parallelStream().filter((e) -> e.getFolderName().equals(fo.getFolderName()))
-                            .count() > 1)
-                    {
+                            .count() > 1) {
                         fo.setFolderName(flname + " " + i);
                         i++;
                     }
-                    else
-                    {
+                    else {
                         break;
                     }
                 }
                 addFoldersToZipEntrySourceArray(fo, zs, account, "");
             }
-            for (Node node : nodes)
-            {
-                if (ConfigureReader.getInstance().accessFolder(folderMapper.queryById(node.getFileParentFolder()), account))
-                {
+            for (Node node : nodes) {
+                if (ConfigureReader.getInstance().accessFolder(folderMapper.queryById(node.getFileParentFolder()),
+                        account)) {
                     int i = 1;
                     String fname = node.getFileName();
-                    while (true)
-                    {
+                    while (true) {
                         if (nodes.parallelStream().filter((e) -> e.getFileName().equals(node.getFileName())).count() > 1
                                 || folders.parallelStream().filter((e) -> e.getFolderName().equals(node.getFileName()))
-                                .count() > 0)
-                        {
-                            if (fname.indexOf(".") >= 0)
-                            {
+                                .count() > 0) {
+                            if (fname.indexOf(".") >= 0) {
                                 node.setFileName(fname.substring(0, fname.lastIndexOf(".")) + " (" + i + ")"
                                         + fname.substring(fname.lastIndexOf(".")));
                             }
-                            else
-                            {
+                            else {
                                 node.setFileName(fname + " (" + i + ")");
                             }
                             i++;
                         }
-                        else
-                        {
+                        else {
                             break;
                         }
                     }
@@ -486,8 +415,7 @@ public class FileBlockUtil
             ZipUtil.pack(zs.toArray(new ZipEntrySource[0]), f);
             return zipname;
         }
-        catch (Exception e)
-        {
+        catch (Exception e) {
             logUtil.writeException(e);
             AppSystem.out.println(e.getMessage());
             return null;
@@ -495,77 +423,61 @@ public class FileBlockUtil
     }
 
     // 迭代生成ZIP文件夹单元，将一个文件夹内的文件和文件夹也进行打包
-    private void addFoldersToZipEntrySourceArray(Folder f, List<ZipEntrySource> zs, String account, String parentPath)
-    {
-        if (f != null && ConfigureReader.getInstance().accessFolder(f, account))
-        {
+    private void addFoldersToZipEntrySourceArray(Folder f, List<ZipEntrySource> zs, String account, String parentPath) {
+        if (f != null && ConfigureReader.getInstance().accessFolder(f, account)) {
             String folderName = f.getFolderName();
             String thisPath = parentPath + folderName + "/";
-            zs.add(new ZipEntrySource()
-            {
+            zs.add(new ZipEntrySource() {
 
                 @Override
-                public String getPath()
-                {
+                public String getPath() {
                     return thisPath;
                 }
 
                 @Override
-                public InputStream getInputStream() throws IOException
-                {
+                public InputStream getInputStream() throws IOException {
                     return null;
                 }
 
                 @Override
-                public ZipEntry getEntry()
-                {
+                public ZipEntry getEntry() {
                     return new ZipEntry(thisPath);
                 }
             });
             List<Folder> folders = folderMapper.queryByParentId(f.getFolderId());
-            for (Folder fo : folders)
-            {
+            for (Folder fo : folders) {
                 int i = 1;
                 String flname = fo.getFolderName();
-                while (true)
-                {
+                while (true) {
                     if (folders.parallelStream().filter((e) -> e.getFolderName().equals(fo.getFolderName()))
-                            .count() > 1)
-                    {
+                            .count() > 1) {
                         fo.setFolderName(flname + " " + i);
                         i++;
                     }
-                    else
-                    {
+                    else {
                         break;
                     }
                 }
                 addFoldersToZipEntrySourceArray(fo, zs, account, thisPath);
             }
             List<Node> nodes = nodeMapper.queryByParentFolderId(f.getFolderId());
-            for (Node node : nodes)
-            {
+            for (Node node : nodes) {
                 int i = 1;
                 String fname = node.getFileName();
-                while (true)
-                {
+                while (true) {
                     if (nodes.parallelStream().filter((e) -> e.getFileName().equals(node.getFileName())).count() > 1
                             || folders.parallelStream().filter((e) -> e.getFolderName().equals(node.getFileName()))
-                            .count() > 0)
-                    {
-                        if (fname.indexOf(".") >= 0)
-                        {
+                            .count() > 0) {
+                        if (fname.indexOf(".") >= 0) {
                             node.setFileName(fname.substring(0, fname.lastIndexOf(".")) + " (" + i + ")"
                                     + fname.substring(fname.lastIndexOf(".")));
                         }
-                        else
-                        {
+                        else {
                             node.setFileName(fname + " (" + i + ")");
                         }
                         i++;
                     }
-                    else
-                    {
+                    else {
                         break;
                     }
                 }
@@ -584,10 +496,8 @@ public class FileBlockUtil
      * @return java.lang.String 生成的ETag值。当传入的block是null或其不存在时，返回空字符串
      * @author 青阳龙野(kohgylw)
      */
-    public String getETag(File block)
-    {
-        if (block != null && block.exists())
-        {
+    public String getETag(File block) {
+        if (block != null && block.exists()) {
             StringBuffer sb = new StringBuffer();
             sb.append("\"");
             sb.append(block.lastModified());
@@ -614,16 +524,13 @@ public class FileBlockUtil
      * @author 青阳龙野(kohgylw)
      */
     public Node insertNewNode(String fileName, String account, String filePath, String fileSize,
-                              String fileParentFolder)
-    {
+                              String fileParentFolder) {
         final Node f2 = new Node();
         f2.setFileId(UUID.randomUUID().toString());
-        if (account != null)
-        {
+        if (account != null) {
             f2.setFileCreator(account);
         }
-        else
-        {
+        else {
             f2.setFileCreator("\u533f\u540d\u7528\u6237");
         }
         f2.setFileCreationDate(ServerTimeUtil.accurateToDay());
@@ -633,30 +540,23 @@ public class FileBlockUtil
         f2.setFileSize(fileSize);
         int i = 0;
         // 尽可能避免UUID重复的情况发生，重试10次
-        while (true)
-        {
-            try
-            {
-                if (this.nodeMapper.insert(f2) > 0)
-                {
-                    if (isValidNode(f2))
-                    {
+        while (true) {
+            try {
+                if (this.nodeMapper.insert(f2) > 0) {
+                    if (isValidNode(f2)) {
                         return f2;
                     }
-                    else
-                    {
+                    else {
                         break;
                     }
                 }
                 break;
             }
-            catch (Exception e)
-            {
+            catch (Exception e) {
                 f2.setFileId(UUID.randomUUID().toString());
                 i++;
             }
-            if (i >= 10)
-            {
+            if (i >= 10) {
                 break;
             }
         }
@@ -673,12 +573,10 @@ public class FileBlockUtil
      * @return boolean 通过检查则返回true，否则返回false并删除此节点
      * @author 青阳龙野(kohgylw)
      */
-    public boolean isValidNode(Node n)
-    {
+    public boolean isValidNode(Node n) {
         Node[] repeats = nodeMapper.queryByParentFolderId(n.getFileParentFolder()).parallelStream()
                 .filter((e) -> e.getFileName().equals(n.getFileName())).toArray(Node[]::new);
-        if (folderMapper.queryById(n.getFileParentFolder()) == null || repeats.length > 1)
-        {
+        if (folderMapper.queryById(n.getFileParentFolder()) == null || repeats.length > 1) {
             // 如果插入后存在：
             // 1，该节点没有有效的父级文件夹（死节点）；
             // 2，与同级的其他节点重名，
@@ -687,8 +585,7 @@ public class FileBlockUtil
             nodeMapper.deleteById(n.getFileId());
             return false;// 返回“无效”的判定结果
         }
-        else
-        {
+        else {
             return true;// 否则，该节点有效，返回结果
         }
     }
@@ -703,13 +600,11 @@ public class FileBlockUtil
      * @return java.lang.String 指定节点的逻辑路径，包含其完整的上级文件夹路径和自身的文件名，各级之间以“/”分割。
      * @author 青阳龙野(kohgylw)
      */
-    public String getNodePath(Node n)
-    {
+    public String getNodePath(Node n) {
         Folder folder = folderMapper.queryById(n.getFileParentFolder());
         List<Folder> l = folderUtil.getParentList(folder.getFolderId());
         StringBuffer pl = new StringBuffer();
-        for (Folder i : l)
-        {
+        for (Folder i : l) {
             pl.append(i.getFolderName() + "/");
         }
         pl.append(folder.getFolderName());

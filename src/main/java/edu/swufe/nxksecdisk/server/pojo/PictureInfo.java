@@ -3,29 +3,25 @@ package edu.swufe.nxksecdisk.server.pojo;
 /**
  * @author Administrator
  */
-public class PictureInfo
-{
+public class PictureInfo {
+
     private String fileName;
 
     private String url;
 
-    public String getUrl()
-    {
+    public String getUrl() {
         return url;
     }
 
-    public void setUrl(String url)
-    {
+    public void setUrl(String url) {
         this.url = url;
     }
 
-    public String getFileName()
-    {
+    public String getFileName() {
         return fileName;
     }
 
-    public void setFileName(String fileName)
-    {
+    public void setFileName(String fileName) {
         this.fileName = fileName;
     }
 

@@ -10,8 +10,8 @@ import java.util.Map;
  * @author Administrator
  */
 @Mapper
-public interface FolderMapper
-{
+public interface FolderMapper {
+
     Folder queryById(final String fid);
 
     /**

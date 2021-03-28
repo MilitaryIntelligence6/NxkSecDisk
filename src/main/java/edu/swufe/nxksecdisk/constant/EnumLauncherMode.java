@@ -7,8 +7,8 @@ package edu.swufe.nxksecdisk.constant;
  * @Description TODO
  * @CreateTime 2021年03月28日 13:02:00
  */
-public enum EnumLauncherMode
-{
+public enum EnumLauncherMode {
+
     /**
      * 启动模式;
      */

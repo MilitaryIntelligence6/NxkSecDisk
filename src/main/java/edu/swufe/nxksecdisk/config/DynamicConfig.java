@@ -9,17 +9,15 @@ import edu.swufe.nxksecdisk.constant.EnumLauncherMode;
  * @Description TODO
  * @CreateTime 2021年03月28日 13:00:00
  */
-public final class DynamicConfig
-{
+public final class DynamicConfig {
+
     private static EnumLauncherMode launcherMode = EnumLauncherMode.CONSOLE;
 
-    public static EnumLauncherMode getLauncherMode()
-    {
+    public static EnumLauncherMode getLauncherMode() {
         return launcherMode;
     }
 
-    public static void setLauncherMode(EnumLauncherMode launcherMode)
-    {
+    public static void setLauncherMode(EnumLauncherMode launcherMode) {
         DynamicConfig.launcherMode = launcherMode;
     }
 }

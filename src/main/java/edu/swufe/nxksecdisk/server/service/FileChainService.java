@@ -10,8 +10,8 @@ import javax.servlet.http.HttpServletResponse;
  * @author 青阳龙野(kohgylw)
  * @version 1.0
  */
-public interface FileChainService
-{
+public interface FileChainService {
+
     /**
      * <h2>根据文件ID获取其永久资源链接的ckey</h2>
      * <p>该方法用于获取加密的ckey，以便在使用资源链接时声明其指向的文件。</p>

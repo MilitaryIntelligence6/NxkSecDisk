@@ -7,8 +7,8 @@ package edu.swufe.nxksecdisk.server.pojo;
  * @author 青阳龙野(kohgylw)
  * @version 1.0
  */
-public class UploadKeyCertificate
-{
+public class UploadKeyCertificate {
+
     /**
      * 有效次数;
      */
@@ -27,8 +27,7 @@ public class UploadKeyCertificate
      * @param account java.lang.String 创建者
      * @author 青阳龙野(kohgylw)
      */
-    public UploadKeyCertificate(int term, String account)
-    {
+    public UploadKeyCertificate(int term, String account) {
         this.term = term;
         this.account = account;
     }
@@ -39,8 +38,7 @@ public class UploadKeyCertificate
      *
      * @author 青阳龙野(kohgylw)
      */
-    public void checked()
-    {
+    public void checked() {
         term--;
     }
 
@@ -51,8 +49,7 @@ public class UploadKeyCertificate
      * @return boolean true代表仍有效，否则无效。
      * @author 青阳龙野(kohgylw)
      */
-    public boolean isEffective()
-    {
+    public boolean isEffective() {
         return term > 0;
     }
 
@@ -63,8 +60,7 @@ public class UploadKeyCertificate
      * @return java.lang.String 创建者
      * @author 青阳龙野(kohgylw)
      */
-    public String getAccount()
-    {
+    public String getAccount() {
         return account;
     }
 

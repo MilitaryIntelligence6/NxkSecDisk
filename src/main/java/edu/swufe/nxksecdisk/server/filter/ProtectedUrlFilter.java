@@ -18,34 +18,29 @@ import java.io.IOException;
  */
 @WebFilter({"/prv/*"})
 @Order(4)
-public class ProtectedURLFilter implements Filter
-{
+public class ProtectedUrlFilter implements Filter {
+
     @Override
-    public void init(FilterConfig filterConfig) throws ServletException
-    {
+    public void init(FilterConfig filterConfig) throws ServletException {
     }
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-            throws IOException, ServletException
-    {
+            throws IOException, ServletException {
         final HttpServletRequest hsq = (HttpServletRequest) request;
         final HttpServletResponse hsr = (HttpServletResponse) response;
         final String url = hsq.getServletPath();
-        switch (url)
-        {
+        switch (url) {
             case "/prv/forbidden.html":
             case "/prv/error.html":
                 hsr.sendRedirect("/home.html");
                 break;
             case "/prv/login.html":
                 final String account = (String) hsq.getSession().getAttribute("ACCOUNT");
-                if (ConfigureReader.getInstance().foundAccount(account))
-                {
+                if (ConfigureReader.getInstance().foundAccount(account)) {
                     hsr.sendRedirect("/home.html");
                 }
-                else
-                {
+                else {
                     chain.doFilter(request, response);
                 }
                 break;
@@ -56,8 +51,7 @@ public class ProtectedURLFilter implements Filter
     }
 
     @Override
-    public void destroy()
-    {
+    public void destroy() {
 
     }
 

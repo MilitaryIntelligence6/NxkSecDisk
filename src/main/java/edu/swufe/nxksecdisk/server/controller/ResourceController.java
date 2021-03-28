@@ -17,8 +17,8 @@ import javax.servlet.http.HttpServletResponse;
  */
 @Controller
 @RequestMapping("/resourceController")
-public class ResourceController
-{
+public class ResourceController {
+
     /**
      * 资源相关的服务层，详见具体实现;
      */
@@ -34,8 +34,7 @@ public class ResourceController
      */
     @RequestMapping("/getResource/{fileId}")
     public void getResource(@PathVariable("fileId") String fileId, HttpServletRequest request,
-                            HttpServletResponse response)
-    {
+                            HttpServletResponse response) {
         resourceService.requireResource(fileId, request, response);
     }
 
@@ -48,8 +47,7 @@ public class ResourceController
      */
     @RequestMapping("/getWordView/{fileId}")
     public void getWordView(@PathVariable("fileId") String fileId, HttpServletRequest request,
-                            HttpServletResponse response)
-    {
+                            HttpServletResponse response) {
         resourceService.getWordView(fileId, request, response);
     }
 
@@ -62,8 +60,7 @@ public class ResourceController
      */
     @RequestMapping("/getTxtView/{fileId}")
     public void getTxtView(@PathVariable("fileId") String fileId, HttpServletRequest request,
-                           HttpServletResponse response)
-    {
+                           HttpServletResponse response) {
         resourceService.getTxtView(fileId, request, response);
     }
 
@@ -76,8 +73,7 @@ public class ResourceController
      */
     @RequestMapping("/getPPTView/{fileId}")
     public void getPPTView(@PathVariable("fileId") String fileId, HttpServletRequest request,
-                           HttpServletResponse response)
-    {
+                           HttpServletResponse response) {
         resourceService.getPPTView(fileId, request, response);
     }
 
@@ -90,8 +86,7 @@ public class ResourceController
      */
     @RequestMapping("/getLRContext/{fileId}")
     public void getLRContext(@PathVariable("fileId") String fileId, HttpServletRequest request,
-                             HttpServletResponse response)
-    {
+                             HttpServletResponse response) {
         resourceService.getLRContextByUTF8(fileId, request, response);
     }
 
@@ -103,8 +98,7 @@ public class ResourceController
      */
     @RequestMapping("/getVideoTranscodeStatus.ajax")
     public @ResponseBody
-    String getVideoTranscodeStatus(HttpServletRequest request)
-    {
+    String getVideoTranscodeStatus(HttpServletRequest request) {
         return resourceService.getVideoTranscodeStatus(request);
     }
 
@@ -115,8 +109,7 @@ public class ResourceController
      */
     @RequestMapping("/getNoticeMD5.ajax")
     public @ResponseBody
-    String getNoticeMD5()
-    {
+    String getNoticeMD5() {
         return resourceService.requireNoticeMD5();
     }
 
@@ -127,8 +120,7 @@ public class ResourceController
      * @param response
      */
     @RequestMapping("/getNoticeContext.do")
-    public void getNoticeContext(HttpServletRequest request, HttpServletResponse response)
-    {
+    public void getNoticeContext(HttpServletRequest request, HttpServletResponse response) {
         resourceService.getNoticeContext(request, response);
     }
 

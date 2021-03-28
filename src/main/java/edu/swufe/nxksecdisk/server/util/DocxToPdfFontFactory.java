@@ -11,8 +11,7 @@ import java.io.File;
  * @author 青阳龙野(kohgylw)
  * @version 1.0
  */
-public class DocxToPdfFontFactory extends FontFactoryImp
-{
+public class DocxToPdfFontFactory extends FontFactoryImp {
 
     /**
      * 指定各种系统可能的字体存放路径，并定义程序内置字体存放路径;
@@ -20,8 +19,7 @@ public class DocxToPdfFontFactory extends FontFactoryImp
      * @return
      */
     @Override
-    public int registerDirectories()
-    {
+    public int registerDirectories() {
         int i = 0;
         i += registerDirectory("c:/windows/Fonts");
         i += registerDirectory("c:/winnt/fonts");

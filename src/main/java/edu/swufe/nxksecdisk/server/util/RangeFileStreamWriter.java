@@ -19,8 +19,8 @@ import java.io.RandomAccessFile;
  * @author 青阳龙野(kohgylw)
  * @version 1.0
  */
-public class RangeFileStreamWriter
-{
+public class RangeFileStreamWriter {
+
     private static final long DOWNLOAD_CACHE_MAX_AGE = 1800L;
 
     /**
@@ -41,8 +41,7 @@ public class RangeFileStreamWriter
      * @author 青阳龙野(kohgylw)
      */
     protected int writeRangeFileStream(HttpServletRequest request, HttpServletResponse response, File fo, String fname,
-                                       String contentType, long maxRate, String eTag, boolean isAttachment)
-    {
+                                       String contentType, long maxRate, String eTag, boolean isAttachment) {
         // 文件总大小;
         long fileLength = fo.length();
         // 起始偏移量
@@ -62,24 +61,19 @@ public class RangeFileStreamWriter
         String ifModifiedSince = request.getHeader("If-Modified-Since");
         String ifNoneMatch = request.getHeader("If-None-Match");
         // 是否提供了两个判断参数之一？
-        if (ifModifiedSince != null || ifNoneMatch != null)
-        {
+        if (ifModifiedSince != null || ifNoneMatch != null) {
             // 是，那么是否提供了Etag？
-            if (ifNoneMatch != null)
-            {
+            if (ifNoneMatch != null) {
                 // 是，则只检查Etag，理论上其比Last-Modified更准确
-                if (ifNoneMatch.trim().equals(eTag))
-                {
+                if (ifNoneMatch.trim().equals(eTag)) {
                     status = HttpServletResponse.SC_NOT_MODIFIED;
                     response.setStatus(status);// 304
                     return status;
                 }
             }
-            else
-            {
+            else {
                 // 不是，则再检查Last-Modified
-                if (ifModifiedSince.trim().equals(lastModified))
-                {
+                if (ifModifiedSince.trim().equals(lastModified)) {
                     status = HttpServletResponse.SC_NOT_MODIFIED;
                     response.setStatus(status);// 304
                     return status;
@@ -88,16 +82,14 @@ public class RangeFileStreamWriter
         }
         // 检查断点续传请求是否过期，两个条件，有就要满足，没有就算了
         String ifUnmodifiedSince = request.getHeader("If-Unmodified-Since");
-        if (ifUnmodifiedSince != null && !(ifUnmodifiedSince.trim().equals(lastModified)))
-        {
+        if (ifUnmodifiedSince != null && !(ifUnmodifiedSince.trim().equals(lastModified))) {
             status = HttpServletResponse.SC_PRECONDITION_FAILED;
             // 412;
             response.setStatus(status);
             return status;
         }
         String ifMatch = request.getHeader("If-Match");
-        if (ifMatch != null && !(ifMatch.trim().equals(eTag)))
-        {
+        if (ifMatch != null && !(ifMatch.trim().equals(eTag))) {
             status = HttpServletResponse.SC_PRECONDITION_FAILED;
             // 412;
             response.setStatus(status);
@@ -108,15 +100,13 @@ public class RangeFileStreamWriter
         // 设置文件信息
         response.setCharacterEncoding("UTF-8");
         // 设置Content-Disposition信息
-        if (isAttachment)
-        {
+        if (isAttachment) {
             response.setHeader("Content-Disposition",
                     String.format("attachment; filename=\"%s\"; filename*=utf-8''%s",
                             EncodeUtil.getFileNameByUTF8(fname),
                             EncodeUtil.getFileNameByUTF8(fname)));
         }
-        else
-        {
+        else {
             response.setHeader("Content-Disposition", "inline");
         }
         // 设置支持断点续传功能
@@ -129,20 +119,17 @@ public class RangeFileStreamWriter
         final String rangeTag = request.getHeader("Range");
         final String ifRange = request.getHeader("If-Range");
         if (rangeTag != null && rangeTag.startsWith("bytes=")
-                && (ifRange == null || ifRange.trim().equals(eTag) || ifRange.trim().equals(lastModified)))
-        {
+                && (ifRange == null || ifRange.trim().equals(eTag) || ifRange.trim().equals(lastModified))) {
             status = HttpServletResponse.SC_PARTIAL_CONTENT;
             response.setStatus(status);
             rangeBytes = rangeTag.replaceAll("bytes=", "");
-            if (rangeBytes.endsWith("-"))
-            {
+            if (rangeBytes.endsWith("-")) {
                 // 解析请求参数范围为仅有起始偏移量而无结束偏移量的情况
                 startOffset = Long.parseLong(rangeBytes.substring(0, rangeBytes.indexOf('-')).trim());
                 // 仅具备起始偏移量时，例如文件长为13，请求为5-，则响应体长度为8
                 contentLength = fileLength - startOffset;
             }
-            else
-            {
+            else {
                 hasEnd = true;
                 startOffset = Long.parseLong(rangeBytes.substring(0, rangeBytes.indexOf('-')).trim());
                 endOffset = Long.parseLong(rangeBytes.substring(rangeBytes.indexOf('-') + 1).trim());
@@ -151,20 +138,17 @@ public class RangeFileStreamWriter
             }
             // 设置Content-Range，格式为“bytes 起始偏移-结束偏移/文件的总大小”
             String contentRange;
-            if (!hasEnd)
-            {
+            if (!hasEnd) {
                 contentRange = new StringBuffer("bytes ").append("" + startOffset).append("-")
                         .append("" + (fileLength - 1)).append("/").append("" + fileLength).toString();
             }
-            else
-            {
+            else {
                 contentRange = new StringBuffer("bytes ").append(rangeBytes).append("/").append("" + fileLength)
                         .toString();
             }
             response.setHeader("Content-Range", contentRange);
         }
-        else
-        {
+        else {
             // 从开始进行下载
             // 客户端要求全文下载;
             contentLength = fileLength;
@@ -174,29 +158,24 @@ public class RangeFileStreamWriter
         // 写出缓冲
         byte[] buf = new byte[ConfigureReader.getInstance().getBuffSize()];
         // 读取文件并写处至输出流
-        try (RandomAccessFile raf = new RandomAccessFile(fo, "r"))
-        {
+        try (RandomAccessFile raf = new RandomAccessFile(fo, "r")) {
             BufferedOutputStream out = maxRate >= 0
                     ? new VariableSpeedBufferedOutputStream(response.getOutputStream(), maxRate, request.getSession())
                     : new BufferedOutputStream(response.getOutputStream());
             raf.seek(startOffset);
-            if (!hasEnd)
-            {
+            if (!hasEnd) {
                 // 无结束偏移量时，将其从起始偏移量开始写到文件整体结束，如果从头开始下载，起始偏移量为0
                 int n = 0;
-                while ((n = raf.read(buf)) != -1)
-                {
+                while ((n = raf.read(buf)) != -1) {
                     out.write(buf, 0, n);
                 }
             }
-            else
-            {
+            else {
                 // 有结束偏移量时，将其从起始偏移量开始写至指定偏移量结束。
                 int n = 0;
                 // 写出量，用于确定结束位置;
                 long readLength = 0;
-                while (readLength < contentLength)
-                {
+                while (readLength < contentLength) {
                     n = raf.read(buf);
                     readLength += n;
                     out.write(buf, 0, n);
@@ -206,22 +185,18 @@ public class RangeFileStreamWriter
             out.close();
             return status;
         }
-        catch (IOException ex)
-        {
+        catch (IOException ex) {
             // 针对任何IO异常忽略，传输失败不处理
             status = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
             return status;
         }
-        catch (IllegalArgumentException e)
-        {
+        catch (IllegalArgumentException e) {
             e.printStackTrace();
             status = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
-            try
-            {
+            try {
                 response.sendError(status);
             }
-            catch (IOException e1)
-            {
+            catch (IOException e1) {
                 e1.printStackTrace();
             }
             return status;

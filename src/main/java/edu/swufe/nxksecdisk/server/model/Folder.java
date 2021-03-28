@@ -1,7 +1,10 @@
 package edu.swufe.nxksecdisk.server.model;
 
-public class Folder
-{
+/**
+ * @author Administrator
+ */
+public class Folder {
+
     private String folderId;
 
     private String folderName;
@@ -14,63 +17,51 @@ public class Folder
 
     private int folderConstraint;
 
-    public String getFolderId()
-    {
+    public String getFolderId() {
         return this.folderId;
     }
 
-    public void setFolderId(final String folderId)
-    {
+    public void setFolderId(final String folderId) {
         this.folderId = folderId;
     }
 
-    public String getFolderName()
-    {
+    public String getFolderName() {
         return this.folderName;
     }
 
-    public void setFolderName(final String folderName)
-    {
+    public void setFolderName(final String folderName) {
         this.folderName = folderName;
     }
 
-    public String getFolderCreationDate()
-    {
+    public String getFolderCreationDate() {
         return this.folderCreationDate;
     }
 
-    public void setFolderCreationDate(final String folderCreationDate)
-    {
+    public void setFolderCreationDate(final String folderCreationDate) {
         this.folderCreationDate = folderCreationDate;
     }
 
-    public String getFolderCreator()
-    {
+    public String getFolderCreator() {
         return this.folderCreator;
     }
 
-    public void setFolderCreator(final String folderCreator)
-    {
+    public void setFolderCreator(final String folderCreator) {
         this.folderCreator = folderCreator;
     }
 
-    public String getFolderParent()
-    {
+    public String getFolderParent() {
         return this.folderParent;
     }
 
-    public void setFolderParent(final String folderParent)
-    {
+    public void setFolderParent(final String folderParent) {
         this.folderParent = folderParent;
     }
 
-    public int getFolderConstraint()
-    {
+    public int getFolderConstraint() {
         return folderConstraint;
     }
 
-    public void setFolderConstraint(int folderConstraint)
-    {
+    public void setFolderConstraint(int folderConstraint) {
         this.folderConstraint = folderConstraint;
     }
 }

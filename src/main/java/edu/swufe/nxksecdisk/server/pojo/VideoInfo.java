@@ -9,28 +9,25 @@ import edu.swufe.nxksecdisk.server.model.Node;
  * @author 青阳龙野(kohgylw)
  * @version 1.0
  */
-public class VideoInfo extends Node
-{
-    public VideoInfo(Node n)
-    {
-        this.setFileId(n.getFileId());
-        this.setFileName(n.getFileName());
-        this.setFileParentFolder(n.getFileParentFolder());
-        this.setFilePath(n.getFilePath());
-        this.setFileSize(n.getFileSize());
-        this.setFileCreationDate(n.getFileCreationDate());
-        this.setFileCreator(n.getFileCreator());
+public class VideoInfo extends Node {
+
+    public VideoInfo(Node node) {
+        this.setFileId(node.getFileId());
+        this.setFileName(node.getFileName());
+        this.setFileParentFolder(node.getFileParentFolder());
+        this.setFilePath(node.getFilePath());
+        this.setFileSize(node.getFileSize());
+        this.setFileCreationDate(node.getFileCreationDate());
+        this.setFileCreator(node.getFileCreator());
     }
 
     private String needEncode;
 
-    public String getNeedEncode()
-    {
+    public String getNeedEncode() {
         return needEncode;
     }
 
-    public void setNeedEncode(String needEncode)
-    {
+    public void setNeedEncode(String needEncode) {
         this.needEncode = needEncode;
     }
 

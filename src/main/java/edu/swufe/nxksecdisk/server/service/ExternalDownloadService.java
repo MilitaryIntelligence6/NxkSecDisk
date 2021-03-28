@@ -10,8 +10,8 @@ import javax.servlet.http.HttpServletResponse;
  * @author 青阳龙野(kohgylw)
  * @version 1.0
  */
-public interface ExternalDownloadService
-{
+public interface ExternalDownloadService {
+
     /**
      * <h2>获取一个下载凭证</h2>
      * <p>针对指定资源获取一个下载凭证，要求该凭证的签收者必须具备下载权限。该凭证在服务器关闭前将一直有效。</p>

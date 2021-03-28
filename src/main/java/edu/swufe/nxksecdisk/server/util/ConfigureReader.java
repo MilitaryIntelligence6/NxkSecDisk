@@ -1,12 +1,12 @@
 package edu.swufe.nxksecdisk.server.util;
 
-import edu.swufe.nxksecdisk.system.AppSystem;
 import edu.swufe.nxksecdisk.server.enumeration.AccountAuth;
 import edu.swufe.nxksecdisk.server.enumeration.LogLevel;
 import edu.swufe.nxksecdisk.server.enumeration.VcLevel;
 import edu.swufe.nxksecdisk.server.model.Folder;
 import edu.swufe.nxksecdisk.server.pojo.ExtendStores;
 import edu.swufe.nxksecdisk.server.pojo.ServerSetting;
+import edu.swufe.nxksecdisk.system.AppSystem;
 
 import java.io.*;
 import java.nio.file.*;
@@ -23,87 +23,87 @@ import java.util.*;
  * @author 青阳龙野(kohgylw)
  * @version 1.0
  */
-public class ConfigureReader
-{
+public class ConfigureReader {
+
     public static final int INVALID_DOWNLOAD_ZIP_SETTING = 15;
 
     /**
-     *  自体实体
+     * 自体实体
      */
     private volatile static ConfigureReader instance;
 
     /**
-     *  配置设置
+     * 配置设置
      */
-    private KiftdProperties serverp;
+    private DiskProperties serverp;
 
     /**
-     *  账户设置
+     * 账户设置
      */
-    private KiftdProperties accountp;
+    private DiskProperties accountp;
 
     /**
-     *  当前配置检查结果
+     * 当前配置检查结果
      */
     private int propertiesStatus;
 
     /**
-     *  程序主目录路径
+     * 程序主目录路径
      */
     private String path;
 
     /**
-     *  主文件系统路径
+     * 主文件系统路径
      */
     private String fileSystemPath;
 
     /**
-     *  设置文件夹路径
+     * 设置文件夹路径
      */
     private String confdir;
 
     /**
-     *  必须登录
+     * 必须登录
      */
     private String mustLogin;
 
     /**
-     *  端口号
+     * 端口号
      */
     private int port;
 
     /**
-     *  日志等级
+     * 日志等级
      */
     private String log;
 
     /**
-     *  验证码类型
+     * 验证码类型
      */
     private String vc;
 
     /**
-     *  主文件系统路径（设置的原始值）
+     * 主文件系统路径（设置的原始值）
      */
     private String FSPath;
 
     /**
-     *  扩展存储区路径列表
+     * 扩展存储区路径列表
      */
     private List<ExtendStores> extendStores;
 
     /**
-     *  缓存大小（byte）
+     * 缓存大小（byte）
      */
     private int bufferSize;
 
     /**
-     *  文件块存储路径（位于文件系统中）
+     * 文件块存储路径（位于文件系统中）
      */
     private String fileBlockPath;
 
     /**
-     *  文件节点存储路径（位于文件系统中）
+     * 文件节点存储路径（位于文件系统中）
      */
     private String fileNodePath;
 
@@ -118,27 +118,27 @@ public class ConfigureReader
     private String dbPwd;
 
     /**
-     *  是否允许用户修改密码
+     * 是否允许用户修改密码
      */
     private boolean allowChangePassword;
 
     /**
-     *  是否开启永久外部链接
+     * 是否开启永久外部链接
      */
     private boolean openFileChain;
 
     /**
-     *  是否允许自由注册新账户（高级）
+     * 是否允许自由注册新账户（高级）
      */
     private boolean allowSignUp;
 
     /**
-     *  注册新账户的权限标识符（高级）
+     * 注册新账户的权限标识符（高级）
      */
     private String signUpAuth;
 
     /**
-     *  注册新账户的组标识符（高级）
+     * 注册新账户的组标识符（高级）
      */
     private String signUpGroup;
 
@@ -225,81 +225,75 @@ public class ConfigureReader
     private int httpsPort;
 
     /**
-     *  需要检查的IP列表
+     * 需要检查的IP列表
      */
     private Set<String> ipRoster;
 
     /**
-     *  IP规则为允许还是禁止，若为允许则是false，否则应为true
+     * IP规则为允许还是禁止，若为允许则是false，否则应为true
      */
     private boolean ipAllowOrBanned;
 
     /**
-     *  是否启用IP规则检查
+     * 是否启用IP规则检查
      */
     private boolean enableIPRule;
 
     /**
-     *  是否启用XFF解析
+     * 是否启用XFF解析
      */
     private boolean ipXFFAnalysis = true;
 
     /**
-     *  是否启用视频播放的在线解码功能
+     * 是否启用视频播放的在线解码功能
      */
     private boolean enableFFMPEG = true;
 
     /**
-     *  是否启用“打包下载”功能
+     * 是否启用“打包下载”功能
      */
     private boolean enableDownloadByZip = true;
 
     /**
-     *  扩展存储区最大数目
+     * 扩展存储区最大数目
      */
     private static final int MAX_EXTENDSTORES_NUM = 255;
 
     /**
-     *  一些系统的特殊账户
+     * 一些系统的特殊账户
      */
     private static final String[] SYS_ACCOUNTS = {"SYS_IN", "Anonymous", "匿名用户"};
 
-    private ConfigureReader()
-    {
+    private ConfigureReader() {
         this.propertiesStatus = -1;
         // 开发环境下使用项目工程路径;
         this.path = System.getProperty("user.dir");
         String classPath = System.getProperty("java.class.path");
-        if (classPath.indexOf(File.pathSeparator) < 0)
-        {
+        if (classPath.indexOf(File.pathSeparator) < 0) {
             File f = new File(classPath);
             classPath = f.getAbsolutePath();
-            if (classPath.endsWith(".jar"))
-            {
+            if (classPath.endsWith(".jar")) {
                 // 使用环境下使用程序主目录;
                 this.path = classPath.substring(0, classPath.lastIndexOf(File.separator));
             }
         }
         this.DEFAULT_FILE_SYSTEM_PATH = String.format("%s%sfilesystem%s", this.path, File.separator, File.separator);
         this.confdir = this.path + File.separator + "conf" + File.separator;
-        this.serverp = new KiftdProperties();
-        this.accountp = new KiftdProperties();
+        this.serverp = new DiskProperties();
+        this.accountp = new DiskProperties();
         extendStores = new ArrayList<>();
         ipRoster = new TreeSet<>();
         final File serverProp = new File(this.confdir + SERVER_PROPERTIES_FILE);
-        if (!serverProp.isFile())
-        {
+        if (!serverProp.isFile()) {
             AppSystem.out.println("服务器配置文件不存在，需要初始化服务器配置。");
             this.createDefaultServerPropertiesFile();
         }
         final File accountProp = new File(String.format("%s%s", this.confdir, ACCOUNT_PROPERTIES_FILE));
-        if (!accountProp.isFile())
-        {
+        if (!accountProp.isFile()) {
             AppSystem.out.println("用户账户配置文件不存在，需要初始化账户配置。");
             this.createDefaultAccountPropertiesFile();
         }
-        try
-        {
+        try {
             AppSystem.out.println("正在载入配置文件...");
             final FileInputStream serverPropIn = new FileInputStream(serverProp);
             this.serverp.load(serverPropIn);
@@ -309,26 +303,20 @@ public class ConfigureReader
             initSignUpRules();
             AppSystem.out.println("配置文件载入完毕。正在检查配置...");
             this.propertiesStatus = this.testServerPropertiesAndEffect();
-            if (this.propertiesStatus == LEGAL_PROPERTIES)
-            {
+            if (this.propertiesStatus == LEGAL_PROPERTIES) {
                 AppSystem.out.println("准备就绪。");
                 startAccountRealTimeUpdateListener();
             }
         }
-        catch (Exception e)
-        {
+        catch (Exception e) {
             AppSystem.out.printf("错误：无法加载一个或多个配置文件（位于%s路径下），请尝试删除旧的配置文件并重新启动本应用或查看安装路径的权限（必须可读写）。", this.confdir);
         }
     }
 
-    public static ConfigureReader getInstance()
-    {
-        if (instance == null)
-        {
-            synchronized (ConfigureReader.class)
-            {
-                if (instance == null)
-                {
+    public static ConfigureReader getInstance() {
+        if (instance == null) {
+            synchronized (ConfigureReader.class) {
+                if (instance == null) {
                     instance = new ConfigureReader();
                 }
             }
@@ -336,18 +324,14 @@ public class ConfigureReader
         return instance;
     }
 
-    public boolean foundAccount(final String account)
-    {
+    public boolean foundAccount(final String account) {
         // 如果是匿名账户，那么永远不存在
-        if (account == null)
-        {
+        if (account == null) {
             return false;
         }
         // 一些系统内置的特殊账户名直接认为已经存在（避免新账户注册为这种账户）
-        for (String sysAccount : SYS_ACCOUNTS)
-        {
-            if (sysAccount.equals(account))
-            {
+        for (String sysAccount : SYS_ACCOUNTS) {
+            if (sysAccount.equals(account)) {
                 return true;
             }
         }
@@ -355,8 +339,7 @@ public class ConfigureReader
         return accountPwd != null && accountPwd.length() > 0;
     }
 
-    public boolean checkAccountPwd(final String account, final String pwd)
-    {
+    public boolean checkAccountPwd(final String account, final String pwd) {
         final String apwd = this.accountp.getProperty(String.format("%s.pwd", account));
         return apwd != null && apwd.equals(pwd);
     }
@@ -374,173 +357,132 @@ public class ConfigureReader
      * @return boolean 是否具备该操作的权限，若具备返回true，否则返回false
      * @author 青阳龙野(kohgylw)
      */
-    public boolean authorized(final String account, final AccountAuth auth, List<String> folders)
-    {
-        if (account != null && account.length() > 0)
-        {
+    public boolean authorized(final String account, final AccountAuth auth, List<String> folders) {
+        if (account != null && account.length() > 0) {
             final StringBuffer auths = new StringBuffer();
-            for (String id : folders)
-            {
+            for (String id : folders) {
                 String addedAuth = accountp.getProperty(String.format("%s.auth.%s", account, id));
-                if (addedAuth != null)
-                {
+                if (addedAuth != null) {
                     auths.append(addedAuth);
                 }
             }
             final String accauth = this.accountp.getProperty(String.format("%s.auth", account));
             final String overall = this.accountp.getProperty("authOverall");
-            if (accauth != null)
-            {
+            if (accauth != null) {
                 auths.append(accauth);
             }
-            if (overall != null)
-            {
+            if (overall != null) {
                 auths.append(overall);
             }
-            switch (auth)
-            {
-                case CREATE_NEW_FOLDER:
-                {
+            switch (auth) {
+                case CREATE_NEW_FOLDER: {
                     return auths.indexOf("c") >= 0;
                 }
-                case UPLOAD_FILES:
-                {
+                case UPLOAD_FILES: {
                     return auths.indexOf("u") >= 0;
                 }
-                case DELETE_FILE_OR_FOLDER:
-                {
+                case DELETE_FILE_OR_FOLDER: {
                     return auths.indexOf("d") >= 0;
                 }
-                case RENAME_FILE_OR_FOLDER:
-                {
+                case RENAME_FILE_OR_FOLDER: {
                     return auths.indexOf("r") >= 0;
                 }
-                case DOWNLOAD_FILES:
-                {
+                case DOWNLOAD_FILES: {
                     return auths.indexOf("l") >= 0;
                 }
-                case MOVE_FILES:
-                {
+                case MOVE_FILES: {
                     return auths.indexOf("m") >= 0;
                 }
-                default:
-                {
+                default: {
                     return false;
                 }
             }
         }
-        else
-        {
+        else {
             final String overall2 = this.accountp.getProperty("authOverall");
-            if (overall2 == null)
-            {
+            if (overall2 == null) {
                 return false;
             }
-            switch (auth)
-            {
-                case CREATE_NEW_FOLDER:
-                {
+            switch (auth) {
+                case CREATE_NEW_FOLDER: {
                     return overall2.indexOf("c") >= 0;
                 }
-                case UPLOAD_FILES:
-                {
+                case UPLOAD_FILES: {
                     return overall2.indexOf("u") >= 0;
                 }
-                case DELETE_FILE_OR_FOLDER:
-                {
+                case DELETE_FILE_OR_FOLDER: {
                     return overall2.indexOf("d") >= 0;
                 }
-                case RENAME_FILE_OR_FOLDER:
-                {
+                case RENAME_FILE_OR_FOLDER: {
                     return overall2.indexOf("r") >= 0;
                 }
-                case DOWNLOAD_FILES:
-                {
+                case DOWNLOAD_FILES: {
                     return overall2.indexOf("l") >= 0;
                 }
-                case MOVE_FILES:
-                {
+                case MOVE_FILES: {
                     return overall2.indexOf("m") >= 0;
                 }
-                default:
-                {
+                default: {
                     return false;
                 }
             }
         }
     }
 
-    public int getBuffSize()
-    {
+    public int getBuffSize() {
         return this.bufferSize;
     }
 
-    public String getInitBuffSize()
-    {
-        if (this.serverp != null && serverp.getProperty("buff.size") != null)
-        {
+    public String getInitBuffSize() {
+        if (this.serverp != null && serverp.getProperty("buff.size") != null) {
             return serverp.getProperty("buff.size");
         }
-        else
-        {
+        else {
             return DEFAULT_BUFFER_SIZE + "";
         }
     }
 
-    public boolean inspectLogLevel(final LogLevel l)
-    {
+    public boolean inspectLogLevel(final LogLevel l) {
         int o = 0;
         int m = 0;
-        if (l == null)
-        {
+        if (l == null) {
             return false;
         }
-        switch (l)
-        {
-            case NONE:
-            {
+        switch (l) {
+            case NONE: {
                 m = 0;
                 break;
             }
-            case RUNTIME_EXCEPTION:
-            {
+            case RUNTIME_EXCEPTION: {
                 m = 1;
             }
-            case EVENT:
-            {
+            case EVENT: {
                 m = 2;
                 break;
             }
-            default:
-            {
+            default: {
                 m = 0;
                 break;
             }
         }
-        if (this.log == null)
-        {
+        if (this.log == null) {
             this.log = "";
         }
         final String log = this.log;
-        switch (log)
-        {
-            case "N":
-            {
+        switch (log) {
+            case "N": {
                 o = 0;
                 break;
             }
-            case "R":
-            {
+            case "R": {
                 o = 1;
                 break;
             }
-            case "E":
-            {
+            case "E": {
                 o = 2;
                 break;
             }
-            default:
-            {
+            default: {
                 o = 1;
                 break;
             }
@@ -548,31 +490,25 @@ public class ConfigureReader
         return o >= m;
     }
 
-    public boolean mustLogin()
-    {
+    public boolean mustLogin() {
         return this.mustLogin != null && this.mustLogin.equals("N");
     }
 
-    public String getFileSystemPath()
-    {
+    public String getFileSystemPath() {
         return this.fileSystemPath;
     }
 
-    public String getInitFileSystemPath()
-    {
-        if (this.serverp != null && serverp.getProperty("FS.path") != null)
-        {
+    public String getInitFileSystemPath() {
+        if (this.serverp != null && serverp.getProperty("FS.path") != null) {
             return serverp.getProperty("FS.path").equals("DEFAULT") ? DEFAULT_FILE_SYSTEM_PATH
                     : serverp.getProperty("FS.path");
         }
-        else
-        {
+        else {
             return DEFAULT_FILE_SYSTEM_PATH;
         }
     }
 
-    public String getFileBlockPath()
-    {
+    public String getFileBlockPath() {
         return this.fileBlockPath;
     }
 
@@ -585,78 +521,60 @@ public class ConfigureReader
      * @return java.util.List<kohgylw.kiftd.server.pojo.ExtendStores> 所有扩展存储区对象的列表
      * @author 青阳龙野(kohgylw)
      */
-    public List<ExtendStores> getExtendStores()
-    {
+    public List<ExtendStores> getExtendStores() {
         return extendStores;
     }
 
-    public String getFileNodePath()
-    {
+    public String getFileNodePath() {
         return this.fileNodePath;
     }
 
-    public String getTemporaryfilePath()
-    {
+    public String getTemporaryfilePath() {
         return this.tfPath;
     }
 
-    public String getPath()
-    {
+    public String getPath() {
         return this.path;
     }
 
-    public LogLevel getLogLevel()
-    {
-        if (this.log == null)
-        {
+    public LogLevel getLogLevel() {
+        if (this.log == null) {
             this.log = "";
         }
         final String log = this.log;
-        switch (log)
-        {
-            case "N":
-            {
+        switch (log) {
+            case "N": {
                 return LogLevel.NONE;
             }
-            case "R":
-            {
+            case "R": {
                 return LogLevel.RUNTIME_EXCEPTION;
             }
-            case "E":
-            {
+            case "E": {
                 return LogLevel.EVENT;
             }
-            default:
-            {
+            default: {
                 return null;
             }
         }
     }
 
-    public LogLevel getInitLogLevel()
-    {
-        if (serverp != null && serverp.getProperty("log") != null)
-        {
-            switch (serverp.getProperty("log"))
-            {
-                case "N":
-                {
+    public LogLevel getInitLogLevel() {
+        if (serverp != null && serverp.getProperty("log") != null) {
+            switch (serverp.getProperty("log")) {
+                case "N": {
                     return LogLevel.NONE;
                 }
-                case "R":
-                {
+                case "R": {
                     return LogLevel.RUNTIME_EXCEPTION;
                 }
-                case "E":
-                {
+                case "E": {
                     return LogLevel.EVENT;
                 }
                 default:
                     return LogLevel.EVENT;
             }
         }
-        else
-        {
+        else {
             return LogLevel.EVENT;
         }
     }
@@ -670,40 +588,30 @@ public class ConfigureReader
      * @return kohgylw.kiftd.server.enumeration.VCLevel 验证码等级
      * @author 青阳龙野(kohgylw)
      */
-    public VcLevel getVCLevel()
-    {
-        if (this.vc == null)
-        {
+    public VcLevel getVCLevel() {
+        if (this.vc == null) {
             this.vc = "";
         }
         final String vc = this.vc;
-        switch (vc)
-        {
-            case "STANDARD":
-            {
+        switch (vc) {
+            case "STANDARD": {
                 return VcLevel.STANDARD;
             }
-            case "SIMP":
-            {
+            case "SIMP": {
                 return VcLevel.SIMPLIFIED;
             }
-            case "CLOSE":
-            {
+            case "CLOSE": {
                 return VcLevel.CLOSE;
             }
-            default:
-            {
+            default: {
                 return null;
             }
         }
     }
 
-    public VcLevel getInitVCLevel()
-    {
-        if (serverp != null && serverp.getProperty("VC.level") != null)
-        {
-            switch (serverp.getProperty("VC.level"))
-            {
+    public VcLevel getInitVCLevel() {
+        if (serverp != null && serverp.getProperty("VC.level") != null) {
+            switch (serverp.getProperty("VC.level")) {
                 case "STANDARD":
                     return VcLevel.STANDARD;
                 case "SIMP":
@@ -714,31 +622,25 @@ public class ConfigureReader
                     return VcLevel.STANDARD;
             }
         }
-        else
-        {
+        else {
             return VcLevel.STANDARD;
         }
     }
 
-    public int getPort()
-    {
+    public int getPort() {
         return this.port;
     }
 
-    public String getInitPort()
-    {
-        if (this.serverp != null && serverp.getProperty("port") != null)
-        {
+    public String getInitPort() {
+        if (this.serverp != null && serverp.getProperty("port") != null) {
             return serverp.getProperty("port");
         }
-        else
-        {
+        else {
             return DEFAULT_PORT + "";
         }
     }
 
-    public int getPropertiesStatus()
-    {
+    public int getPropertiesStatus() {
         return this.propertiesStatus;
     }
 
@@ -750,54 +652,43 @@ public class ConfigureReader
      *
      * @author 青阳龙野(kohgylw)
      */
-    public void reTestServerPropertiesAndEffect()
-    {
+    public void reTestServerPropertiesAndEffect() {
         this.propertiesStatus = testServerPropertiesAndEffect();
     }
 
-    public boolean doUpdate(final ServerSetting ss)
-    {
-        if (ss != null)
-        {
+    public boolean doUpdate(final ServerSetting ss) {
+        if (ss != null) {
             AppSystem.out.println("正在更新服务器配置...");
             this.serverp.setProperty("mustLogin", ss.isMustLogin() ? "N" : "O");
             this.serverp.setProperty("buff.size", ss.getBuffSize() + "");
             this.serverp.setProperty("password.change", ss.isAllowChangePassword() ? "Y" : "N");
             this.serverp.setProperty("openFileChain", ss.isOpenFileChain() ? "OPEN" : "CLOSE");
             String loglevelCode = "E";
-            switch (ss.getLog())
-            {
-                case EVENT:
-                {
+            switch (ss.getLog()) {
+                case EVENT: {
                     loglevelCode = "E";
                     break;
                 }
-                case RUNTIME_EXCEPTION:
-                {
+                case RUNTIME_EXCEPTION: {
                     loglevelCode = "R";
                     break;
                 }
-                case NONE:
-                {
+                case NONE: {
                     loglevelCode = "N";
                     break;
                 }
             }
             this.serverp.setProperty("log", loglevelCode);
-            switch (ss.getVc())
-            {
-                case STANDARD:
-                {
+            switch (ss.getVc()) {
+                case STANDARD: {
                     this.serverp.setProperty("VC.level", "STANDARD");
                     break;
                 }
-                case CLOSE:
-                {
+                case CLOSE: {
                     this.serverp.setProperty("VC.level", "CLOSE");
                     break;
                 }
-                case SIMPLIFIED:
-                {
+                case SIMPLIFIED: {
                     this.serverp.setProperty("VC.level", "SIMP");
                     break;
                 }
@@ -806,24 +697,19 @@ public class ConfigureReader
             this.serverp.setProperty("FS.path",
                     (ss.getFsPath() + File.separator).equals(this.DEFAULT_FILE_SYSTEM_PATH) ? "DEFAULT"
                             : ss.getFsPath());
-            for (short i = 1; i < MAX_EXTENDSTORES_NUM; i++)
-            {
+            for (short i = 1; i < MAX_EXTENDSTORES_NUM; i++) {
                 this.serverp.removeProperty("FS.extend." + i);// 清空旧的扩展存储区设置
             }
-            for (ExtendStores es : ss.getExtendStores())
-            {
+            for (ExtendStores es : ss.getExtendStores()) {
                 this.serverp.setProperty("FS.extend." + es.getIndex(), es.getPath().getAbsolutePath());
             }
-            if (this.testServerPropertiesAndEffect() == 0)
-            {
-                try
-                {
+            if (this.testServerPropertiesAndEffect() == 0) {
+                try {
                     this.serverp.store(new FileOutputStream(this.confdir + SERVER_PROPERTIES_FILE), null);
                     AppSystem.out.println("配置更新完毕，准备就绪。");
                     return true;
                 }
-                catch (Exception e)
-                {
+                catch (Exception e) {
                     AppSystem.out.println("错误：更新设置失败，无法存入设置文件。");
                 }
             }
@@ -840,72 +726,57 @@ public class ConfigureReader
      * @return int 验证结果代码
      * @author 青阳龙野(kohgylw)
      */
-    private int testServerPropertiesAndEffect()
-    {
+    private int testServerPropertiesAndEffect() {
         AppSystem.out.println("正在检查服务器配置...");
         final String pMustLogin = this.serverp.getProperty("mustLogin");
-        if (pMustLogin == null)
-        {
+        if (pMustLogin == null) {
             AppSystem.out.println("警告：未找到是否必须登录配置，将采用默认值（O）。");
             this.mustLogin = "O";
         }
-        else
-        {
-            if (!"N".equals(pMustLogin) && !"O".equals(pMustLogin))
-            {
+        else {
+            if (!"N".equals(pMustLogin) && !"O".equals(pMustLogin)) {
                 AppSystem.out.println("错误：必须登入功能配置不正确（只能设置为“O”或“N”），请重新检查。");
                 return INVALID_MUST_LOGIN_SETTING;
             }
             this.mustLogin = pMustLogin;
         }
         final String ports = this.serverp.getProperty("port");
-        if (ports == null)
-        {
+        if (ports == null) {
             AppSystem.out.println("警告：未找到端口配置，将采用默认值（8080）。");
             this.port = 8080;
         }
-        else
-        {
-            try
-            {
+        else {
+            try {
                 this.port = Integer.parseInt(ports);
-                if (this.port <= 0 || this.port > 65535)
-                {
+                if (this.port <= 0 || this.port > 65535) {
                     AppSystem.out.println("错误：端口号配置不正确，必须使用1-65535之间的整数。");
                     return INVALID_PORT;
                 }
             }
-            catch (Exception e)
-            {
+            catch (Exception e) {
                 AppSystem.out.println("错误：端口号配置不正确，必须使用1-65535之间的整数。");
                 return INVALID_PORT;
             }
         }
         final String logs = this.serverp.getProperty("log");
-        if (logs == null)
-        {
+        if (logs == null) {
             AppSystem.out.println("警告：未找到日志等级配置，将采用默认值（E）。");
             this.log = "E";
         }
-        else
-        {
-            if (!logs.equals("N") && !logs.equals("R") && !logs.equals("E"))
-            {
+        else {
+            if (!logs.equals("N") && !logs.equals("R") && !logs.equals("E")) {
                 AppSystem.out.println("错误：日志等级配置不正确（只能设置为“N”、“R”或“E”），请重新检查。");
                 return INVALID_LOG;
             }
             this.log = logs;
         }
         final String vcl = this.serverp.getProperty("VC.level");
-        if (vcl == null)
-        {
+        if (vcl == null) {
             AppSystem.out.println("警告：未找到登录验证码配置，将采用默认值（STANDARD）。");
             this.vc = DEFAULT_VC_LEVEL;
         }
-        else
-        {
-            switch (vcl)
-            {
+        else {
+            switch (vcl) {
                 case "STANDARD":
                 case "SIMP":
                 case "CLOSE":
@@ -918,15 +789,12 @@ public class ConfigureReader
         }
         // 是否允许用户修改密码
         final String changePassword = this.serverp.getProperty("password.change");
-        if (changePassword == null)
-        {
+        if (changePassword == null) {
             AppSystem.out.println("警告：未找到用户修改密码功能配置，将采用默认值（禁用）。");
             this.allowChangePassword = false;
         }
-        else
-        {
-            switch (changePassword)
-            {
+        else {
+            switch (changePassword) {
                 case "Y":
                     this.allowChangePassword = true;
                     break;
@@ -940,15 +808,12 @@ public class ConfigureReader
         }
         // 是否提供永久资源链接
         final String fileChain = this.serverp.getProperty("openFileChain");
-        if (fileChain == null)
-        {
+        if (fileChain == null) {
             AppSystem.out.println("警告：未找到永久资源链接功能配置，将采用默认值（禁用）。");
             this.openFileChain = false;
         }
-        else
-        {
-            switch (fileChain)
-            {
+        else {
+            switch (fileChain) {
                 case "OPEN":
                     this.openFileChain = true;
                     break;
@@ -962,52 +827,42 @@ public class ConfigureReader
         }
         // 缓存大小
         final String bufferSizes = this.serverp.getProperty("buff.size");
-        if (bufferSizes == null)
-        {
+        if (bufferSizes == null) {
             AppSystem.out.println("警告：未找到缓冲大小配置，将采用默认值（1048576）。");
             this.bufferSize = 1048576;
         }
-        else
-        {
-            try
-            {
+        else {
+            try {
                 this.bufferSize = Integer.parseInt(bufferSizes);
-                if (this.bufferSize <= 0)
-                {
+                if (this.bufferSize <= 0) {
                     AppSystem.out.println("错误：缓冲区大小设置无效。");
                     return INVALID_BUFFER_SIZE;
                 }
             }
-            catch (Exception e2)
-            {
+            catch (Exception e2) {
                 AppSystem.out.println("错误：缓冲区大小设置无效。");
                 return INVALID_BUFFER_SIZE;
             }
         }
         // 加载主文件系统路径配置
         this.FSPath = this.serverp.getProperty("FS.path");
-        if (this.FSPath == null)
-        {
+        if (this.FSPath == null) {
             AppSystem.out.println("警告：未找到主文件系统路径配置，将采用默认值。");
             this.fileSystemPath = this.DEFAULT_FILE_SYSTEM_PATH;
         }
-        else if (this.FSPath.equals("DEFAULT"))
-        {
+        else if (this.FSPath.equals("DEFAULT")) {
             this.fileSystemPath = this.DEFAULT_FILE_SYSTEM_PATH;
         }
-        else
-        {
-            this.fileSystemPath = this.FSPath.replaceAll("\\\\:", ":").replaceAll("\\\\\\\\", "\\\\");// 后面的替换是为了兼容以前版本的设置
+        else {
+            this.fileSystemPath = this.FSPath.replaceAll("\\\\:", ":").replaceAll("\\\\\\\\", "\\\\");//
+            // 后面的替换是为了兼容以前版本的设置
         }
-        if (!fileSystemPath.endsWith(File.separator))
-        {
+        if (!fileSystemPath.endsWith(File.separator)) {
             fileSystemPath = fileSystemPath + File.separator;
         }
         extendStores.clear();
-        for (short i = 1; i < MAX_EXTENDSTORES_NUM + 1; i++)
-        {
-            if (serverp.getProperty("FS.extend." + i) != null)
-            {
+        for (short i = 1; i < MAX_EXTENDSTORES_NUM + 1; i++) {
+            if (serverp.getProperty("FS.extend." + i) != null) {
                 ExtendStores es = new ExtendStores();
                 es.setPath(new File(
                         serverp.getProperty("FS.extend." + i).replaceAll("\\\\:", ":").replaceAll("\\\\\\\\", "\\\\")));
@@ -1016,25 +871,19 @@ public class ConfigureReader
             }
         }
         final File fsFile = new File(this.fileSystemPath);
-        if (!fsFile.isDirectory() || !fsFile.canRead() || !fsFile.canWrite())
-        {
+        if (!fsFile.isDirectory() || !fsFile.canRead() || !fsFile.canWrite()) {
             AppSystem.out.println("错误：文件系统路径[" + this.fileSystemPath + "]无效，该路径必须指向一个具备读写权限的文件夹。");
             return INVALID_FILE_SYSTEM_PATH;
         }
-        for (ExtendStores es : extendStores)
-        {
-            if (!es.getPath().isDirectory() || !es.getPath().canRead() || !es.getPath().canWrite())
-            {
+        for (ExtendStores es : extendStores) {
+            if (!es.getPath().isDirectory() || !es.getPath().canRead() || !es.getPath().canWrite()) {
                 AppSystem.out.println("错误：扩展存储区路径[" + es.getPath().getAbsolutePath() + "]无效，该路径必须指向一个具备读写权限的文件夹。");
                 return INVALID_FILE_SYSTEM_PATH;
             }
         }
-        for (int i = 0; i < extendStores.size() - 1; i++)
-        {
-            for (int j = i + 1; j < extendStores.size(); j++)
-            {
-                if (extendStores.get(i).getPath().equals(extendStores.get(j).getPath()))
-                {
+        for (int i = 0; i < extendStores.size() - 1; i++) {
+            for (int j = i + 1; j < extendStores.size(); j++) {
+                if (extendStores.get(i).getPath().equals(extendStores.get(j).getPath())) {
                     AppSystem.out.println(
                             "错误：扩展存储区路径[" + extendStores.get(j).getPath().getAbsolutePath() + "]无效，该路径已被其他扩展存储区占用。");
                     return INVALID_FILE_SYSTEM_PATH;
@@ -1043,32 +892,27 @@ public class ConfigureReader
         }
         this.fileBlockPath = this.fileSystemPath + "fileblocks" + File.separator;
         final File fbFile = new File(this.fileBlockPath);
-        if (!fbFile.isDirectory() && !fbFile.mkdirs())
-        {
+        if (!fbFile.isDirectory() && !fbFile.mkdirs()) {
             AppSystem.out.println("错误：无法创建文件块存放区[" + this.fileBlockPath + "]。");
             return CANT_CREATE_FILE_BLOCK_PATH;
         }
         this.fileNodePath = this.fileSystemPath + "filenodes" + File.separator;
         final File fnFile = new File(this.fileNodePath);
-        if (!fnFile.isDirectory() && !fnFile.mkdirs())
-        {
+        if (!fnFile.isDirectory() && !fnFile.mkdirs()) {
             AppSystem.out.println("错误：无法创建文件节点存放区[" + this.fileNodePath + "]。");
             return CANT_CREATE_FILE_NODE_PATH;
         }
         this.tfPath = this.fileSystemPath + "temporaryfiles" + File.separator;
         final File tfFile = new File(this.tfPath);
-        if (!tfFile.isDirectory() && !tfFile.mkdirs())
-        {
+        if (!tfFile.isDirectory() && !tfFile.mkdirs()) {
             AppSystem.out.println("错误：无法创建临时文件存放区[" + this.tfPath + "]。");
             return CANT_CREATE_TF_PATH;
         }
 
-        if ("true".equals(serverp.getProperty("mysql.enable")))
-        {
+        if ("true".equals(serverp.getProperty("mysql.enable"))) {
             dbDriver = "com.mysql.cj.jdbc.Driver";
             String url = serverp.getProperty("mysql.url", "127.0.0.1/kift");
-            if (url.indexOf("/") <= 0 || url.substring(url.indexOf("/")).length() == 1)
-            {
+            if (url.indexOf("/") <= 0 || url.substring(url.indexOf("/")).length() == 1) {
                 AppSystem.out.println("错误：自定义数据库的URL中必须指定数据库名称。");
                 return CANT_CONNECT_DB;
             }
@@ -1076,25 +920,21 @@ public class ConfigureReader
             dbUser = serverp.getProperty("mysql.user", "root");
             dbPwd = serverp.getProperty("mysql.password", "");
             timeZone = serverp.getProperty("mysql.timezone");
-            if (timeZone != null)
-            {
+            if (timeZone != null) {
                 dbURL = dbURL + "&serverTimezone=" + timeZone;
             }
-            try
-            {
+            try {
                 Class.forName(dbDriver).newInstance();
                 Connection testConn = DriverManager.getConnection(dbURL, dbUser, dbPwd);
                 testConn.close();
             }
-            catch (Exception e)
-            {
+            catch (Exception e) {
                 AppSystem.out.println(
                         "错误：无法连接至自定义数据库：" + dbURL + "（user=" + dbUser + ",password=" + dbPwd + "），请确重新配置MySQL数据库相关项。");
                 return CANT_CONNECT_DB;
             }
         }
-        else
-        {
+        else {
             dbDriver = "org.h2.Driver";
             dbURL = "jdbc:h2:file:" + fileNodePath + File.separator + "kift";
             dbUser = "root";
@@ -1102,68 +942,55 @@ public class ConfigureReader
         }
         // https支持检查及生效处理
         String enableHttps = serverp.getProperty("https.enable");
-        if (enableHttps != null)
-        {
-            if ("true".equals(enableHttps))
-            {
+        if (enableHttps != null) {
+            if ("true".equals(enableHttps)) {
                 File keyFile = new File(path, "https.p12");
-                if (keyFile.isFile())
-                {
+                if (keyFile.isFile()) {
                     httpsKeyType = "PKCS12";
                 }
-                else
-                {
+                else {
                     keyFile = new File(path, "https.jks");
-                    if (keyFile.isFile())
-                    {
+                    if (keyFile.isFile()) {
                         httpsKeyType = "JKS";
                     }
-                    else
-                    {
+                    else {
                         AppSystem.out.println(
-                                "错误：无法启用https支持，因为kiftd未能找到https证书文件。您必须在应用主目录内放置PKCS12（必须命名为https.p12）或JKS（必须命名为https.jks）证书。");
+                                "错误：无法启用https支持，因为kiftd未能找到https证书文件。您必须在应用主目录内放置PKCS12（必须命名为https" +
+                                        ".p12）或JKS（必须命名为https.jks）证书。");
                         return HTTPS_SETTING_ERROR;
                     }
                 }
                 httpsKeyFile = keyFile.getAbsolutePath();
                 httpsKeyPass = serverp.getProperty("https.keypass", "");
                 String httpsports = serverp.getProperty("https.port");
-                if (httpsports == null)
-                {
+                if (httpsports == null) {
                     AppSystem.out.println("警告：未找到https端口配置，将采用默认值（443）。");
                     httpsPort = 443;
                 }
-                else
-                {
-                    try
-                    {
+                else {
+                    try {
                         this.httpsPort = Integer.parseInt(httpsports);
-                        if (httpsPort <= 0 || httpsPort > 65535)
-                        {
+                        if (httpsPort <= 0 || httpsPort > 65535) {
                             AppSystem.out.println("错误：无法启用https支持，https访问端口号配置不正确。");
                             return HTTPS_SETTING_ERROR;
                         }
                     }
-                    catch (Exception e)
-                    {
+                    catch (Exception e) {
                         AppSystem.out.println("错误：无法启用https支持，https访问端口号配置不正确。");
                         return HTTPS_SETTING_ERROR;
                     }
                 }
                 openHttps = true;
             }
-            else if (!"false".equals(enableHttps))
-            {
+            else if (!"false".equals(enableHttps)) {
                 AppSystem.out.println("错误：https支持功能的启用项配置不正确（只能设置为“true”或“false”），请重新检查。");
                 return HTTPS_SETTING_ERROR;
             }
         }
         // 是否启用XFF解析
         String xffConf = serverp.getProperty("IP.xff");
-        if (xffConf != null)
-        {
-            switch (xffConf)
-            {
+        if (xffConf != null) {
+            switch (xffConf) {
                 case "disable":
                     ipXFFAnalysis = false;
                     break;
@@ -1175,16 +1002,13 @@ public class ConfigureReader
                     return INVALID_IP_XFF_SETTING;
             }
         }
-        else
-        {
+        else {
             ipXFFAnalysis = true;
         }
         // 是否启用视频播放的在线解码功能
         String ffmpegConf = serverp.getProperty("video.ffmpeg");
-        if (ffmpegConf != null)
-        {
-            switch (ffmpegConf)
-            {
+        if (ffmpegConf != null) {
+            switch (ffmpegConf) {
                 case "disable":
                     enableFFMPEG = false;
                     break;
@@ -1196,16 +1020,13 @@ public class ConfigureReader
                     return INVALID_FFMPEG_SETTING;
             }
         }
-        else
-        {
+        else {
             enableFFMPEG = true;
         }
         // 是否启用“打包下载”功能
         String downloadZipConf = serverp.getProperty("download.zip");
-        if (downloadZipConf != null)
-        {
-            switch (downloadZipConf)
-            {
+        if (downloadZipConf != null) {
+            switch (downloadZipConf) {
                 case "disable":
                     enableDownloadByZip = false;
                     break;
@@ -1217,16 +1038,14 @@ public class ConfigureReader
                     return INVALID_DOWNLOAD_ZIP_SETTING;
             }
         }
-        else
-        {
+        else {
             enableDownloadByZip = true;
         }
         AppSystem.out.println("检查完毕。");
         return LEGAL_PROPERTIES;
     }
 
-    public void createDefaultServerPropertiesFile()
-    {
+    public void createDefaultServerPropertiesFile() {
         AppSystem.out.println("正在生成初始服务器配置文件（" + this.confdir + SERVER_PROPERTIES_FILE + "）...");
         final Properties dsp = new Properties();
         dsp.setProperty("mustLogin", DEFAULT_MUST_LOGIN);
@@ -1237,41 +1056,34 @@ public class ConfigureReader
         dsp.setProperty("buff.size", DEFAULT_BUFFER_SIZE + "");
         dsp.setProperty("password.change", DEFAULT_PASSWORD_CHANGE_SETTING);
         dsp.setProperty("openFileChain", DEFAULT_FILE_CHAIN_SETTING);
-        try
-        {
+        try {
             dsp.store(new FileOutputStream(this.confdir + SERVER_PROPERTIES_FILE),
                     "<This is the default kiftd server setting file. >");
             AppSystem.out.println("初始服务器配置文件生成完毕。");
         }
-        catch (FileNotFoundException e)
-        {
+        catch (FileNotFoundException e) {
             AppSystem.out.println("错误：无法生成初始服务器配置文件，存储路径不存在。");
         }
-        catch (IOException e2)
-        {
+        catch (IOException e2) {
             AppSystem.out.println("错误：无法生成初始服务器配置文件，写入失败。");
         }
     }
 
-    private void createDefaultAccountPropertiesFile()
-    {
+    private void createDefaultAccountPropertiesFile() {
         AppSystem.out.println("正在生成初始账户配置文件（" + this.confdir + ACCOUNT_PROPERTIES_FILE + "）...");
         final Properties dap = new Properties();
         dap.setProperty(DEFAULT_ACCOUNT_ID + ".pwd", DEFAULT_ACCOUNT_PWD);
         dap.setProperty(DEFAULT_ACCOUNT_ID + ".auth", DEFAULT_ACCOUNT_AUTH);
         dap.setProperty("authOverall", DEFAULT_AUTH_OVERALL);
 
-        try (FileOutputStream accountSettingOut = new FileOutputStream(this.confdir + ACCOUNT_PROPERTIES_FILE))
-        {
+        try (FileOutputStream accountSettingOut = new FileOutputStream(this.confdir + ACCOUNT_PROPERTIES_FILE)) {
             dap.store(accountSettingOut, "<This is the default kiftd account setting file. >");
             AppSystem.out.println("初始账户配置文件生成完毕。");
         }
-        catch (FileNotFoundException e)
-        {
+        catch (FileNotFoundException e) {
             AppSystem.out.println("错误：无法生成初始账户配置文件，存储路径不存在。");
         }
-        catch (IOException e2)
-        {
+        catch (IOException e2) {
             AppSystem.out.println("错误：无法生成初始账户配置文件，写入失败。");
         }
     }
@@ -1285,8 +1097,7 @@ public class ConfigureReader
      * @return boolean 是否使用了外部MySQL数据库
      * @author 青阳龙野(kohgylw)
      */
-    public boolean useMySQL()
-    {
+    public boolean useMySQL() {
         return serverp == null ? false : "true".equals(serverp.getProperty("mysql.enable"));
     }
 
@@ -1300,8 +1111,7 @@ public class ConfigureReader
      * @return String 用于数据源或jdbc进行连接的文件节点数据库URL地址
      * @author 青阳龙野(kohgylw)
      */
-    public String getFileNodePathURL()
-    {
+    public String getFileNodePathURL() {
         return dbURL;
     }
 
@@ -1314,8 +1124,7 @@ public class ConfigureReader
      * @return java.lang, String 数据库驱动类型
      * @author 青阳龙野(kohgylw)
      */
-    public String getFileNodePathDriver()
-    {
+    public String getFileNodePathDriver() {
         return dbDriver;
     }
 
@@ -1328,8 +1137,7 @@ public class ConfigureReader
      * @return java.lang, String 数据库用户名
      * @author 青阳龙野(kohgylw)
      */
-    public String getFileNodePathUserName()
-    {
+    public String getFileNodePathUserName() {
         return dbUser;
     }
 
@@ -1342,8 +1150,7 @@ public class ConfigureReader
      * @return java.lang, String 数据库密码
      * @author 青阳龙野(kohgylw)
      */
-    public String getFileNodePathPassWord()
-    {
+    public String getFileNodePathPassWord() {
         return dbPwd;
     }
 
@@ -1361,53 +1168,39 @@ public class ConfigureReader
      * @return boolean true允许访问，false不允许访问
      * @author 青阳龙野(kohgylw)
      */
-    public boolean accessFolder(Folder f, String account)
-    {
-        if (f == null)
-        {
+    public boolean accessFolder(Folder f, String account) {
+        if (f == null) {
             return false;// 访问不存在的文件夹肯定是没权限
         }
         int cl = f.getFolderConstraint();
-        if (cl == 0)
-        {
+        if (cl == 0) {
             return true;
         }
-        else
-        {
-            if (account != null)
-            {
-                if (cl == 1)
-                {
-                    if (f.getFolderCreator().equals(account))
-                    {
+        else {
+            if (account != null) {
+                if (cl == 1) {
+                    if (f.getFolderCreator().equals(account)) {
                         return true;
                     }
                     String vGroup = accountp.getProperty(account + ".group");
                     String cGroup = accountp.getProperty(f.getFolderCreator() + ".group");
-                    if (vGroup != null && cGroup != null)
-                    {
-                        if ("*".equals(vGroup) || "*".equals(cGroup))
-                        {
+                    if (vGroup != null && cGroup != null) {
+                        if ("*".equals(vGroup) || "*".equals(cGroup)) {
                             return true;
                         }
                         String[] vgs = vGroup.split(";");
                         String[] cgs = cGroup.split(";");
-                        for (String vs : vgs)
-                        {
-                            for (String cs : cgs)
-                            {
-                                if (vs.equals(cs))
-                                {
+                        for (String vs : vgs) {
+                            for (String cs : cgs) {
+                                if (vs.equals(cs)) {
                                     return true;
                                 }
                             }
                         }
                     }
                 }
-                if (cl == 2)
-                {
-                    if (f.getFolderCreator().equals(account))
-                    {
+                if (cl == 2) {
+                    if (f.getFolderCreator().equals(account)) {
                         return true;
                     }
                 }
@@ -1424,41 +1217,32 @@ public class ConfigureReader
      *
      * @author 青阳龙野(kohgylw)
      */
-    public void startAccountRealTimeUpdateListener()
-    {
-        if (accountPropertiesUpdateDaemonThread == null)
-        {
+    public void startAccountRealTimeUpdateListener() {
+        if (accountPropertiesUpdateDaemonThread == null) {
             Path confPath = Paths.get(confdir);// 获取配置文件存放路径以对其中的变动进行监听
             accountPropertiesUpdateDaemonThread = new Thread(() ->
             {
-                try
-                {
-                    while (true)
-                    {
+                try {
+                    while (true) {
                         WatchService ws = confPath.getFileSystem().newWatchService();
                         confPath.register(ws, StandardWatchEventKinds.ENTRY_MODIFY,
                                 StandardWatchEventKinds.ENTRY_DELETE, StandardWatchEventKinds.ENTRY_CREATE);
                         WatchKey wk = ws.take();
                         List<WatchEvent<?>> es = wk.pollEvents();
-                        for (WatchEvent<?> we : es)
-                        {
-                            if (ACCOUNT_PROPERTIES_FILE.equals(we.context().toString()))
-                            {
+                        for (WatchEvent<?> we : es) {
+                            if (ACCOUNT_PROPERTIES_FILE.equals(we.context().toString())) {
                                 AppSystem.out.println("正在更新账户配置信息...");
                                 final File accountProp = new File(this.confdir + ACCOUNT_PROPERTIES_FILE);
-                                if (accountProp.isFile() && accountProp.canRead())
-                                {
+                                if (accountProp.isFile() && accountProp.canRead()) {
                                     final FileInputStream accountPropIn = new FileInputStream(accountProp);
-                                    synchronized (accountp)
-                                    {
+                                    synchronized (accountp) {
                                         this.accountp.load(accountPropIn);
                                     }
                                     initIPRules();
                                     initSignUpRules();
                                     AppSystem.out.println("账户配置更新完成，已加载最新配置。");
                                 }
-                                else
-                                {
+                                else {
                                     accountp.clear();
                                     AppSystem.out.println("警告：账户配置文件已被删除或无法读取，账户信息已清空。");
                                 }
@@ -1466,8 +1250,7 @@ public class ConfigureReader
                         }
                     }
                 }
-                catch (Exception e)
-                {
+                catch (Exception e) {
                     AppSystem.out.println("错误：用户配置文件更改监听失败，该功能已失效，kiftd无法实时更新用户配置（可尝试重启程序以恢复该功能）。");
                 }
             });
@@ -1485,28 +1268,23 @@ public class ConfigureReader
      * @return boolean 是否开启
      * @author 青阳龙野(kohgylw)
      */
-    public boolean openHttps()
-    {
+    public boolean openHttps() {
         return openHttps;
     }
 
-    public String getHttpsKeyType()
-    {
+    public String getHttpsKeyType() {
         return httpsKeyType;
     }
 
-    public String getHttpsKeyFile()
-    {
+    public String getHttpsKeyFile() {
         return httpsKeyFile;
     }
 
-    public String getHttpsKeyPass()
-    {
+    public String getHttpsKeyPass() {
         return httpsKeyPass;
     }
 
-    public int getHttpsPort()
-    {
+    public int getHttpsPort() {
         return httpsPort;
     }
 
@@ -1520,15 +1298,12 @@ public class ConfigureReader
      * @return long 以byte为单位的最大阈值，若返回0则设置错误，若小于0则不限制。
      * @author 青阳龙野(kohgylw)
      */
-    public long getUploadFileSize(String account)
-    {
+    public long getUploadFileSize(String account) {
         String defaultMaxSizeP = accountp.getProperty("defaultMaxSize");
-        if (account == null)
-        {
+        if (account == null) {
             return getMaxSizeByString(defaultMaxSizeP);
         }
-        else
-        {
+        else {
             String accountMaxSizeP = accountp.getProperty(account + ".maxSize");
             return accountMaxSizeP == null ? getMaxSizeByString(defaultMaxSizeP) : getMaxSizeByString(accountMaxSizeP);
         }
@@ -1556,31 +1331,24 @@ public class ConfigureReader
      * @return long 以Byte为单位计算的体积值，若为0则代表设置错误，若为负数则代表无限制
      * @author 青阳龙野(kohgylw)
      */
-    private long getMaxSizeByString(String in)
-    {
+    private long getMaxSizeByString(String in) {
         long r = 0L;
         // 首先，判断是否为null，若是，则直接返回-1。
-        if (in == null || in.length() <= 0)
-        {
+        if (in == null || in.length() <= 0) {
             return -1L;
         }
         // 接下来判断是否有单位，若字符串总长小于1，则必无单位，否则可能有单位。
-        try
-        {
-            if (in.length() > 1)
-            {
+        try {
+            if (in.length() > 1) {
                 String value = in.substring(0, in.length() - 1).trim();
                 String unit = in.substring(in.length() - 1).toLowerCase();
-                if (in.length() > 2)
-                {
-                    if (in.toLowerCase().charAt(in.length() - 1) == 'b')
-                    {
+                if (in.length() > 2) {
+                    if (in.toLowerCase().charAt(in.length() - 1) == 'b') {
                         unit = in.substring(in.length() - 2, in.length() - 1).toLowerCase();
                         value = in.substring(0, in.length() - 2).trim();
                     }
                 }
-                switch (unit)
-                {
+                switch (unit) {
                     case "k":
                         r = Integer.parseInt(value) * 1024L;
                         break;
@@ -1595,13 +1363,11 @@ public class ConfigureReader
                         break;
                 }
             }
-            else
-            {
+            else {
                 r = Integer.parseInt(in.trim());
             }
         }
-        catch (Exception e)
-        {
+        catch (Exception e) {
         }
         return r;
     }
@@ -1616,15 +1382,12 @@ public class ConfigureReader
      * @return long 最大下载速度限制，以KB/s为单位
      * @author 青阳龙野(kohgylw)
      */
-    public long getDownloadMaxRate(String account)
-    {
+    public long getDownloadMaxRate(String account) {
         String defaultMaxRateP = accountp.getProperty("defaultMaxRate");
-        if (account == null)
-        {
+        if (account == null) {
             return getMaxRateByString(defaultMaxRateP);
         }
-        else
-        {
+        else {
             String accountMaxRateP = accountp.getProperty(account + ".maxRate");
             return accountMaxRateP == null ? getMaxRateByString(defaultMaxRateP) : getMaxRateByString(accountMaxRateP);
         }
@@ -1650,31 +1413,24 @@ public class ConfigureReader
      * @return long 以KB/s为单位计算的下载速度，若为0则代表设置错误，若为负数则代表无限制
      * @author 青阳龙野(kohgylw)
      */
-    private long getMaxRateByString(String in)
-    {
+    private long getMaxRateByString(String in) {
         long r = 0L;
         // 首先，判断是否为null，若是，则直接返回-1。
-        if (in == null || in.length() <= 0)
-        {
+        if (in == null || in.length() <= 0) {
             return -1L;
         }
         // 接下来判断是否有单位，若字符串总长小于1，则必无单位，否则可能有单位。
-        try
-        {
-            if (in.length() > 1)
-            {
+        try {
+            if (in.length() > 1) {
                 String value = in.substring(0, in.length() - 1).trim();
                 String unit = in.substring(in.length() - 1).toLowerCase();
-                if (in.length() > 2)
-                {
-                    if (in.toLowerCase().charAt(in.length() - 1) == 'b')
-                    {
+                if (in.length() > 2) {
+                    if (in.toLowerCase().charAt(in.length() - 1) == 'b') {
                         unit = in.substring(in.length() - 2, in.length() - 1).toLowerCase();
                         value = in.substring(0, in.length() - 2).trim();
                     }
                 }
-                switch (unit)
-                {
+                switch (unit) {
                     case "m":
                         r = Integer.parseInt(value) * 1024L;
                         break;
@@ -1686,63 +1442,49 @@ public class ConfigureReader
                         break;
                 }
             }
-            else
-            {
+            else {
                 r = Integer.parseInt(in.trim());
             }
         }
-        catch (Exception e)
-        {
+        catch (Exception e) {
         }
         return r;
     }
 
-    public List<String> getAllAddedAuthFoldersId()
-    {
+    public List<String> getAllAddedAuthFoldersId() {
         List<String> foldersId = new ArrayList<>();
-        for (Iterator<String> it = accountp.stringPropertieNames().iterator(); it.hasNext(); )
-        {
+        for (Iterator<String> it = accountp.stringPropertieNames().iterator(); it.hasNext(); ) {
             String config = it.next();
             int index = config.lastIndexOf(".auth.");
-            if (index >= 0)
-            {
+            if (index >= 0) {
                 foldersId.add(config.substring(index + 6));
             }
         }
         return foldersId;
     }
 
-    public boolean removeAddedAuthByFolderId(List<String> fIds)
-    {
-        if (fIds == null || fIds.size() == 0)
-        {
+    public boolean removeAddedAuthByFolderId(List<String> fIds) {
+        if (fIds == null || fIds.size() == 0) {
             return false;
         }
         Set<String> configs = accountp.stringPropertieNames();
         List<String> invalidConfigs = new ArrayList<>();
-        for (String fId : fIds)
-        {
-            for (String config : configs)
-            {
-                if (config.endsWith(".auth." + fId))
-                {
+        for (String fId : fIds) {
+            for (String config : configs) {
+                if (config.endsWith(".auth." + fId)) {
                     invalidConfigs.add(config);
                 }
             }
         }
-        synchronized (accountp)
-        {
-            for (String config : invalidConfigs)
-            {
+        synchronized (accountp) {
+            for (String config : invalidConfigs) {
                 accountp.removeProperty(config);
             }
-            try (FileOutputStream accountSettingOut = new FileOutputStream(this.confdir + ACCOUNT_PROPERTIES_FILE))
-            {
+            try (FileOutputStream accountSettingOut = new FileOutputStream(this.confdir + ACCOUNT_PROPERTIES_FILE)) {
                 accountp.store(accountSettingOut, null);
                 return true;
             }
-            catch (Exception e)
-            {
+            catch (Exception e) {
                 AppSystem.out.println("错误：更新账户配置文件时出现错误，请立即检查账户配置文件。");
                 return false;
             }
@@ -1758,8 +1500,7 @@ public class ConfigureReader
      * @return boolean 允许则返回true，否则返回false
      * @author 青阳龙野(kohgylw)
      */
-    public boolean isAllowChangePassword()
-    {
+    public boolean isAllowChangePassword() {
         return allowChangePassword;
     }
 
@@ -1772,8 +1513,7 @@ public class ConfigureReader
      * @return boolean 开启则返回true，否则返回false
      * @author 青阳龙野(kohgylw)
      */
-    public boolean isOpenFileChain()
-    {
+    public boolean isOpenFileChain() {
         return openFileChain;
     }
 
@@ -1786,8 +1526,7 @@ public class ConfigureReader
      * @return boolean 允许则返回true，否则返回false
      * @author 青阳龙野(kohgylw)
      */
-    public boolean isAllowSignUp()
-    {
+    public boolean isAllowSignUp() {
         return allowSignUp;
     }
 
@@ -1802,23 +1541,17 @@ public class ConfigureReader
      * @return boolean 操作是否成功，成功则返回true
      * @author 青阳龙野(kohgylw)
      */
-    public boolean changePassword(String account, String newPassword) throws Exception
-    {
-        if (account != null && newPassword != null)
-        {
-            if (accountp.getProperty(account + ".pwd") != null)
-            {
-                synchronized (accountp)
-                {
+    public boolean changePassword(String account, String newPassword) throws Exception {
+        if (account != null && newPassword != null) {
+            if (accountp.getProperty(account + ".pwd") != null) {
+                synchronized (accountp) {
                     accountp.setProperty(account + ".pwd", newPassword);
                     try (FileOutputStream accountSettingOut = new FileOutputStream(
-                            this.confdir + ACCOUNT_PROPERTIES_FILE))
-                    {
+                            this.confdir + ACCOUNT_PROPERTIES_FILE)) {
                         accountp.store(accountSettingOut, null);
                         return true;
                     }
-                    catch (Exception e)
-                    {
+                    catch (Exception e) {
                         throw e;
                     }
                 }
@@ -1837,8 +1570,7 @@ public class ConfigureReader
      * @return boolean 该地址是否被禁用，被禁用则返回true
      * @author 青阳龙野(kohgylw)
      */
-    public boolean filterAccessIP(String ipAddr)
-    {
+    public boolean filterAccessIP(String ipAddr) {
         return enableIPRule == true ? ipAllowOrBanned ^ ipRoster.contains(ipAddr) : false;
     }
 
@@ -1851,27 +1583,23 @@ public class ConfigureReader
      * @return boolean 启用则返回true，否则返回false
      * @author 青阳龙野(kohgylw)
      */
-    public boolean enableIPRule()
-    {
+    public boolean enableIPRule() {
         return enableIPRule;
     }
 
     // 从账户配置文件中加载IP访问规则
-    private void initIPRules()
-    {
+    private void initIPRules() {
         // 初始化IP访问规则
         ipRoster.clear();
         String ipRosterSetting = accountp.getProperty("IP.allow");
-        if (ipRosterSetting != null && ipRosterSetting.length() > 0)
-        {
+        if (ipRosterSetting != null && ipRosterSetting.length() > 0) {
             ipAllowOrBanned = false;
             enableIPRule = true;
             ipRoster.addAll(Arrays.asList(ipRosterSetting.split(";")));
             return;
         }
         ipRosterSetting = accountp.getProperty("IP.banned");
-        if (ipRosterSetting != null && ipRosterSetting.length() > 0)
-        {
+        if (ipRosterSetting != null && ipRosterSetting.length() > 0) {
             ipAllowOrBanned = true;
             enableIPRule = true;
             ipRoster.addAll(Arrays.asList(ipRosterSetting.split(";")));
@@ -1881,19 +1609,16 @@ public class ConfigureReader
     }
 
     // 从配置文件中加载账户注册规则
-    private void initSignUpRules()
-    {
+    private void initSignUpRules() {
         // 是否允许访问者自由注册账户
         final String signUpAuth = this.accountp.getProperty("authSignup");
         final String signUpGroup = this.accountp.getProperty("groupSignup");
-        if (signUpAuth != null || signUpGroup != null)
-        {
+        if (signUpAuth != null || signUpGroup != null) {
             this.allowSignUp = true;
             this.signUpAuth = signUpAuth;
             this.signUpGroup = signUpGroup;
         }
-        else
-        {
+        else {
             this.allowSignUp = false;
         }
     }
@@ -1910,31 +1635,23 @@ public class ConfigureReader
      * @throws Exception 写入时发生的异常
      * @author 青阳龙野(kohgylw)
      */
-    public boolean createNewAccount(String newAccount, String newPassword) throws Exception
-    {
-        if (newAccount != null && newPassword != null)
-        {
-            if (accountp.getProperty(newAccount + ".pwd") == null)
-            {
-                synchronized (accountp)
-                {
+    public boolean createNewAccount(String newAccount, String newPassword) throws Exception {
+        if (newAccount != null && newPassword != null) {
+            if (accountp.getProperty(newAccount + ".pwd") == null) {
+                synchronized (accountp) {
                     accountp.setProperty(newAccount + ".pwd", newPassword);
-                    if (signUpAuth != null)
-                    {
+                    if (signUpAuth != null) {
                         accountp.setProperty(newAccount + ".auth", signUpAuth);
                     }
-                    if (signUpGroup != null)
-                    {
+                    if (signUpGroup != null) {
                         accountp.setProperty(newAccount + ".group", signUpGroup);
                     }
                     try (FileOutputStream accountSettingOut = new FileOutputStream(
-                            this.confdir + ACCOUNT_PROPERTIES_FILE))
-                    {
+                            this.confdir + ACCOUNT_PROPERTIES_FILE)) {
                         accountp.store(accountSettingOut, null);
                         return true;
                     }
-                    catch (Exception e)
-                    {
+                    catch (Exception e) {
                         throw e;
                     }
                 }
@@ -1952,8 +1669,7 @@ public class ConfigureReader
      * @return int 扩展存储区最大数目
      * @author 青阳龙野(kohgylw)
      */
-    public int getMaxExtendstoresNum()
-    {
+    public int getMaxExtendstoresNum() {
         return MAX_EXTENDSTORES_NUM;
     }
 
@@ -1966,8 +1682,7 @@ public class ConfigureReader
      * @return boolean 启用返回true，否则返回false
      * @author 青阳龙野(kohgylw)
      */
-    public boolean isIpXFFAnalysis()
-    {
+    public boolean isIpXFFAnalysis() {
         return ipXFFAnalysis;
     }
 
@@ -1980,8 +1695,7 @@ public class ConfigureReader
      * @return boolean 启用则返回true，否则返回false
      * @author 青阳龙野(kohgylw)
      */
-    public boolean isEnableFFMPEG()
-    {
+    public boolean isEnableFFMPEG() {
         return enableFFMPEG;
     }
 
@@ -1994,8 +1708,7 @@ public class ConfigureReader
      * @return boolean 启用则返回true，否则返回false
      * @author 青阳龙野(kohgylw)
      */
-    public boolean isEnableDownloadByZip()
-    {
+    public boolean isEnableDownloadByZip() {
         return enableDownloadByZip;
     }
 }

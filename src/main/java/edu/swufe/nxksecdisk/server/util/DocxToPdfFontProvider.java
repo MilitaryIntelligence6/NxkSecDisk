@@ -10,18 +10,16 @@ import fr.opensagres.xdocreport.itext.extension.font.AbstractFontRegistry;
  * @author 青阳龙野(kohgylw)
  * @version 1.0
  */
-public class DocxToPdfFontProvider extends AbstractFontRegistry
-{
+public class DocxToPdfFontProvider extends AbstractFontRegistry {
+
     private volatile static DocxToPdfFontProvider instance;
 
-    private DocxToPdfFontProvider()
-    {
+    private DocxToPdfFontProvider() {
         FontFactory.setFontImp(new DocxToPdfFontFactory());
     }
 
     @Override
-    protected String resolveFamilyName(String arg0, int arg1)
-    {
+    protected String resolveFamilyName(String arg0, int arg1) {
         return arg0;
     }
 
@@ -32,14 +30,10 @@ public class DocxToPdfFontProvider extends AbstractFontRegistry
      * @return fr.opensagres.xdocreport.itext.extension.font.AbstractFontRegistry 字体封装对象
      * @author 青阳龙野(kohgylw)
      */
-    public static DocxToPdfFontProvider getInstance()
-    {
-        if (instance == null)
-        {
-            synchronized (DocxToPdfFontProvider.class)
-            {
-                if (instance == null)
-                {
+    public static DocxToPdfFontProvider getInstance() {
+        if (instance == null) {
+            synchronized (DocxToPdfFontProvider.class) {
+                if (instance == null) {
                     instance = new DocxToPdfFontProvider();
                 }
             }

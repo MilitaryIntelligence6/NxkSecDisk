@@ -2,8 +2,8 @@ package edu.swufe.nxksecdisk.server.service;
 
 import javax.servlet.http.HttpServletRequest;
 
-public interface FolderService
-{
+public interface FolderService {
+
     String newFolder(final HttpServletRequest request);
 
     String deleteFolder(final HttpServletRequest request);

@@ -7,8 +7,8 @@ import org.apache.ibatis.annotations.Mapper;
  * @author Administrator
  */
 @Mapper
-public interface PropertiesMapper
-{
+public interface PropertiesMapper {
+
     int insert(final Property p);
 
     int deleteByKey(final String propertyKey);

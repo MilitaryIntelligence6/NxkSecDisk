@@ -1,6 +1,9 @@
 package edu.swufe.nxksecdisk.ui.callback;
 
-public interface OnStartServer
-{
+/**
+ * @author Administrator
+ */
+public interface OnStartServer {
+
     boolean start();
 }

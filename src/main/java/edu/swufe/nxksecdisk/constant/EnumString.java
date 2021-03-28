@@ -7,8 +7,8 @@ package edu.swufe.nxksecdisk.constant;
  * @Description TODO
  * @CreateTime 2021年03月27日 15:59:00
  */
-public enum EnumString
-{
+public enum EnumString {
+
     /**
      * string池;
      */
@@ -18,13 +18,11 @@ public enum EnumString
 
     private final String value;
 
-    EnumString(String value)
-    {
+    EnumString(String value) {
         this.value = value;
     }
 
-    public String value()
-    {
+    public String value() {
         return value;
     }
 }

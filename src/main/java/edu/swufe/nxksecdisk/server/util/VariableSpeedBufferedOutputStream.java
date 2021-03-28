@@ -18,8 +18,9 @@ import java.io.OutputStream;
  * @author 青阳龙野(kohgylw)
  * @version 1.0
  */
-public class VariableSpeedBufferedOutputStream extends BufferedOutputStream
-{
+public class VariableSpeedBufferedOutputStream
+        extends BufferedOutputStream {
+
     /**
      * 该实例的最大输出限速，以KB/s为单位;
      */
@@ -42,8 +43,7 @@ public class VariableSpeedBufferedOutputStream extends BufferedOutputStream
      *                下载任务时，总的最大下载速率仍不会超过限速值
      * @author 青阳龙野(kohgylw)
      */
-    public VariableSpeedBufferedOutputStream(OutputStream out, long maxRate, HttpSession session)
-    {
+    public VariableSpeedBufferedOutputStream(OutputStream out, long maxRate, HttpSession session) {
         super(out);
         this.maxRate = maxRate;
         this.session = session;
@@ -61,13 +61,10 @@ public class VariableSpeedBufferedOutputStream extends BufferedOutputStream
      * @param len int 数据在数组中的长度
      * @author 青阳龙野(kohgylw)
      */
-    public void write(byte[] b, int off, int len) throws IOException
-    {
-        if (maxRate > 0)
-        {
+    public void write(byte[] b, int off, int len) throws IOException {
+        if (maxRate > 0) {
             // 如果限速值为正数，那么进行限速输出，输出时要求独占Session对象以确保和其它下载任务共享最大限速。
-            synchronized (session)
-            {
+            synchronized (session) {
                 // 记录写出前的纳秒值
                 long startNano = System.nanoTime();
                 // 执行写出……;
@@ -76,26 +73,21 @@ public class VariableSpeedBufferedOutputStream extends BufferedOutputStream
                 long endNano = System.nanoTime();
                 // 计算本次写出的数据长度（byte数）;
                 int n = len - off;
-                if (n > 0)
-                {
+                if (n > 0) {
                     // 确实写出了数据？
                     // 记录写出的耗时（纳秒）;
                     long consumeNano = endNano - startNano;
                     // 计算最大应耗时（纳秒）;
                     long shouldNano = 976562L * (long) ((double) n / maxRate);
-                    if (consumeNano < shouldNano)
-                    {// 如果实际耗时小于应耗时，则代表写出过快，应进行延迟
+                    if (consumeNano < shouldNano) {// 如果实际耗时小于应耗时，则代表写出过快，应进行延迟
                         // 计算还需要再延迟的毫秒数
                         long shouldSleep = (shouldNano - consumeNano) / 1000000;
-                        if (shouldSleep > 0)
-                        {// 延迟毫秒数大于0？
-                            try
-                            {
+                        if (shouldSleep > 0) {// 延迟毫秒数大于0？
+                            try {
                                 // 执行延迟;
                                 Thread.sleep(shouldSleep);
                             }
-                            catch (InterruptedException e)
-                            {
+                            catch (InterruptedException e) {
                                 // 如果收到中断指令，那么就响应中断
                                 Thread.currentThread().interrupt();
                             }
@@ -104,13 +96,11 @@ public class VariableSpeedBufferedOutputStream extends BufferedOutputStream
                 }
             }
         }
-        else if (maxRate < 0)
-        {
+        else if (maxRate < 0) {
             // 如果限速值为负数，则不限速输出
             super.write(b, off, len);
         }
-        else
-        {
+        else {
             // 如果限速值为0，那肯定是限速设置有误造成的。
             throw new IllegalArgumentException("Error:invalid maximum download rate value.");
         }

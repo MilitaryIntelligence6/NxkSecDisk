@@ -16,8 +16,8 @@ import java.util.Properties;
  * @author 青阳龙野(kohgylw)
  * @version 1.0
  */
-public class DiskDynamicWindow
-{
+public class DiskDynamicWindow {
+
     /**
      * 原始（基准）屏幕分辨率-长度
      */
@@ -56,17 +56,14 @@ public class DiskDynamicWindow
     /**
      * 允许通过初始化配置文件动态修改分辨率;
      */
-    public DiskDynamicWindow()
-    {
+    public DiskDynamicWindow() {
         // 得到conf目录，此处未使用ConfigureReader获得是因为界面的初始化要在最前。
         String path = System.getProperty("user.dir");
         String classPath = System.getProperty("java.class.path");
-        if (classPath.indexOf(File.pathSeparator) < 0)
-        {
+        if (classPath.indexOf(File.pathSeparator) < 0) {
             File f = new File(classPath);
             classPath = f.getAbsolutePath();
-            if (classPath.endsWith(".jar"))
-            {
+            if (classPath.endsWith(".jar")) {
                 path = classPath.substring(0, classPath.lastIndexOf(File.separator));
             }
         }
@@ -74,33 +71,27 @@ public class DiskDynamicWindow
         // 检查conf文件夹中是否包含名为“init.txt”的设置文件，若有，则使用其中定义的缩放比；否则使用程序计算的缩放比。
         File settingFile = new File(confDir, "init.txt");
         Properties settingProp = new Properties();
-        try
-        {
+        try {
             settingProp.load(new FileInputStream(settingFile));
             // 缩放比的设置项必须是scale=?形式;
             String udp = settingProp.getProperty("scale");
-            if (udp != null)
-            {
+            if (udp != null) {
                 double udpi = Double.parseDouble(udp);
                 // 设置其最大界限，避免用户错误设置导致界面显示溢出
-                if (udpi > 10)
-                {
+                if (udpi > 10) {
                     udpi = 10;
                 }
                 // 如果上述条件均满足，则使用用户定义的比例替换程序计算的比例;
                 proportion = udpi;
             }
         }
-        catch (FileNotFoundException e)
-        {
+        catch (FileNotFoundException e) {
             System.out.println("未发现 init.txt 配置，使用计算的缩放比");
         }
-        catch (Exception e1)
-        {
+        catch (Exception e1) {
             e1.printStackTrace();
         }
-        if (proportion < 1.0)
-        {
+        if (proportion < 1.0) {
             // 设置其最小限界，防止界面显示不全;
             proportion = 1.0;
         }
@@ -117,8 +108,7 @@ public class DiskDynamicWindow
      * @param c Container 需要动态调整的容器对象
      * @author 青阳龙野(kohgylw)
      */
-    protected void modifyComponentSize(Container c)
-    {
+    protected void modifyComponentSize(Container c) {
         c.setSize((int) (c.getWidth() * proportion), (int) (c.getHeight() * proportion));
     }
 
@@ -131,8 +121,7 @@ public class DiskDynamicWindow
      * @return int 基准宽度-像素
      * @author 青阳龙野(kohgylw)
      */
-    public int getOriginResolutionW()
-    {
+    public int getOriginResolutionW() {
         return originResolutionW;
     }
 
@@ -145,8 +134,7 @@ public class DiskDynamicWindow
      * @return int 基准高度-像素
      * @author 青阳龙野(kohgylw)
      */
-    public int getOriginResolutionH()
-    {
+    public int getOriginResolutionH() {
         return originResolutionH;
     }
 
@@ -158,16 +146,14 @@ public class DiskDynamicWindow
      *
      * @author 青阳龙野(kohgylw)
      */
-    protected void setUIFont()
-    {
+    protected void setUIFont() {
         Font f = new Font("宋体", Font.PLAIN, (int) (13 * proportion));
         String names[] = {"Label", "CheckBox", "PopupMenu", "MenuItem", "CheckBoxMenuItem", "JRadioButtonMenuItem",
                 "ComboBox", "Button", "Tree", "ScrollPane", "TabbedPane", "EditorPane", "TitledBorder", "Menu",
                 "TextArea", "OptionPane", "MenuBar", "ToolBar", "ToggleButton", "ToolTip", "ProgressBar", "TableHeader",
                 "Panel", "List", "ColorChooser", "PasswordField", "TextField", "Table", "Label", "Viewport",
                 "RadioButtonMenuItem", "RadioButton", "DesktopPane", "InternalFrame"};
-        for (String item : names)
-        {
+        for (String item : names) {
             UIManager.put(item + ".font", f);
         }
     }

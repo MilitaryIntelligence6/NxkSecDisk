@@ -12,10 +12,9 @@ import java.net.URLEncoder;
  * @author 青阳龙野(kohgylw)
  * @version 1.0
  */
-public class EncodeUtil
-{
-    private EncodeUtil()
-    {
+public class EncodeUtil {
+
+    private EncodeUtil() {
     }
 
     /**
@@ -28,14 +27,11 @@ public class EncodeUtil
      * @return java.lang.String 转码后的文件名
      * @author 青阳龙野(kohgylw)
      */
-    public static String getFileNameByUTF8(String name)
-    {
-        try
-        {
+    public static String getFileNameByUTF8(String name) {
+        try {
             return URLEncoder.encode(name, "UTF-8").replaceAll("\\+", "%20");
         }
-        catch (UnsupportedEncodingException e)
-        {
+        catch (UnsupportedEncodingException e) {
             return name;
         }
     }

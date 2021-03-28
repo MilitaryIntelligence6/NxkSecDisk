@@ -22,8 +22,10 @@ import java.util.UUID;
  * @author Administrator
  */
 @Service
-public class ExternalDownloadServiceImpl extends RangeFileStreamWriter implements ExternalDownloadService
-{
+public class ExternalDownloadServiceImpl
+        extends RangeFileStreamWriter
+        implements ExternalDownloadService {
+
     private static final String CONTENT_TYPE = "application/octet-stream";
 
     /**
@@ -47,35 +49,29 @@ public class ExternalDownloadServiceImpl extends RangeFileStreamWriter implement
     private FolderMapper folderMapper;
 
     @Override
-    public String getDownloadKey(HttpServletRequest request)
-    {
+    public String getDownloadKey(HttpServletRequest request) {
         // 首先进行权限检查
         final String account = (String) request.getSession().getAttribute("ACCOUNT");
         // 找到要下载的文件节点
         final String fileId = request.getParameter("fId");
-        if (fileId != null)
-        {
+        if (fileId != null) {
             final Node f = this.nodeMapper.queryById(fileId);
-            if (f != null)
-            {
+            if (f != null) {
                 // 权限检查
                 if (ConfigureReader.getInstance().authorized(account, AccountAuth.DOWNLOAD_FILES,
                         folderUtil.getAllFoldersId(f.getFileParentFolder()))
-                        && ConfigureReader.getInstance().accessFolder(folderMapper.queryById(f.getFileParentFolder()), account))
-                {
+                        && ConfigureReader.getInstance().accessFolder(folderMapper.queryById(f.getFileParentFolder())
+                        , account)) {
                     // 获取凭证
-                    synchronized (downloadKeyMap)
-                    {
+                    synchronized (downloadKeyMap) {
                         // 查找该资源是否已经生成了一个凭证，如有，则直接使用，否则，新生成一个加入到凭证表。
                         this.logUtil.writeShareFileURLEvent(request, f);
-                        if (downloadKeyMap.containsValue(f.getFileId()))
-                        {
+                        if (downloadKeyMap.containsValue(f.getFileId())) {
                             Entry<String, String> k = downloadKeyMap.entrySet().parallelStream()
                                     .filter((e) -> e.getValue().equals(f.getFileId())).findFirst().get();
                             return k.getKey();
                         }
-                        else
-                        {
+                        else {
                             String dKey = UUID.randomUUID().toString();
                             downloadKeyMap.put(dKey, f.getFileId());
                             return dKey;
@@ -88,31 +84,25 @@ public class ExternalDownloadServiceImpl extends RangeFileStreamWriter implement
     }
 
     @Override
-    public void downloadFileByKey(HttpServletRequest request, HttpServletResponse response)
-    {
+    public void downloadFileByKey(HttpServletRequest request, HttpServletResponse response) {
         final String dkey = request.getParameter("dkey");
         // 权限凭证有效性并确认其对应的资源
-        if (dkey != null)
-        {
+        if (dkey != null) {
             // 找到要下载的文件节点
             String fId = null;
-            synchronized (downloadKeyMap)
-            {
+            synchronized (downloadKeyMap) {
                 fId = downloadKeyMap.get(dkey);
             }
-            if (fId != null)
-            {
+            if (fId != null) {
                 Node f = this.nodeMapper.queryById(fId);
-                if (f != null)
-                {
+                if (f != null) {
                     File target = this.fileBlockUtil.getFileFromBlocks(f);
-                    if (target != null && target.isFile())
-                    {
+                    if (target != null && target.isFile()) {
                         String range = request.getHeader("Range");
                         int status = writeRangeFileStream(request, response, target, f.getFileName(), CONTENT_TYPE,
-                                ConfigureReader.getInstance().getDownloadMaxRate(null), fileBlockUtil.getETag(target), true);
-                        if (status == HttpServletResponse.SC_OK || (range != null && range.startsWith("bytes=0-")))
-                        {
+                                ConfigureReader.getInstance().getDownloadMaxRate(null), fileBlockUtil.getETag(target)
+                                , true);
+                        if (status == HttpServletResponse.SC_OK || (range != null && range.startsWith("bytes=0-"))) {
                             this.logUtil.writeDownloadFileByKeyEvent(request, f);
                         }
                         return;
@@ -120,13 +110,11 @@ public class ExternalDownloadServiceImpl extends RangeFileStreamWriter implement
                 }
             }
         }
-        try
-        {
+        try {
             // 处理无法下载的资源
             response.sendError(404);
         }
-        catch (IOException e)
-        {
+        catch (IOException e) {
             e.printStackTrace();
         }
     }

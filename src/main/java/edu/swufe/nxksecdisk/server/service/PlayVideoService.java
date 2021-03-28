@@ -2,8 +2,11 @@ package edu.swufe.nxksecdisk.server.service;
 
 import javax.servlet.http.HttpServletRequest;
 
-public interface PlayVideoService
-{
+/**
+ * @author Administrator
+ */
+public interface PlayVideoService {
+
     /**
      * <h2>解析播放视频文件</h2>
      * <p>

@@ -1,8 +1,8 @@
 package edu.swufe.nxksecdisk.server.app;
 
-import edu.swufe.nxksecdisk.system.AppSystem;
 import edu.swufe.nxksecdisk.server.config.Mvc;
 import edu.swufe.nxksecdisk.server.util.ConfigureReader;
+import edu.swufe.nxksecdisk.system.AppSystem;
 import org.apache.catalina.Context;
 import org.apache.catalina.connector.Connector;
 import org.apache.coyote.http11.Http11NioProtocol;
@@ -32,8 +32,8 @@ import org.springframework.http.HttpStatus;
  */
 @SpringBootApplication
 @Import({Mvc.class})
-public class DiskAppController
-{
+public class DiskAppController {
+
     private static ApplicationContext context;
 
     private static boolean run;
@@ -41,8 +41,7 @@ public class DiskAppController
     /**
      * 这里负责设置一些系统参数;
      */
-    static
-    {
+    static {
         // 简化SpringBoot框架本身的日志信息输出，避免控制台信息杂乱影响操作
         System.setProperty("logging.level.root", "ERROR");
     }
@@ -56,18 +55,14 @@ public class DiskAppController
      * @return boolean 启动结果
      * @author 青阳龙野(kohgylw)
      */
-    public boolean start()
-    {
+    public boolean start() {
         AppSystem.out.println("正在初始化服务器设置...");
         final String[] args = new String[0];
-        if (!DiskAppController.run)
-        {
+        if (!DiskAppController.run) {
             // 启动服务器前重新检查各项设置并加载;
             ConfigureReader.getInstance().reTestServerPropertiesAndEffect();
-            if (ConfigureReader.getInstance().getPropertiesStatus() == 0)
-            {
-                try
-                {
+            if (ConfigureReader.getInstance().getPropertiesStatus() == 0) {
+                try {
                     AppSystem.out.println("正在开启服务器引擎...");
                     SpringApplication springApplication = new SpringApplication(DiskAppController.class);
                     // 关闭自定义标志输出，简化日志信息;
@@ -77,8 +72,7 @@ public class DiskAppController
                     AppSystem.out.println("服务器引擎已启动。");
                     return DiskAppController.run;
                 }
-                catch (Exception e)
-                {
+                catch (Exception e) {
                     return false;
                 }
             }
@@ -98,20 +92,17 @@ public class DiskAppController
      * @return boolean 关闭结果
      * @author 青阳龙野(kohgylw)
      */
-    public boolean stop()
-    {
+    public boolean stop() {
         AppSystem.out.println("正在关闭服务器...");
-        if (DiskAppController.context != null)
-        {
+        if (DiskAppController.context != null) {
             AppSystem.out.println("正在终止服务器引擎...");
-            try
-            {
-                DiskAppController.run = (SpringApplication.exit(DiskAppController.context, new ExitCodeGenerator[0]) != 0);
+            try {
+                DiskAppController.run =
+                        (SpringApplication.exit(DiskAppController.context, new ExitCodeGenerator[0]) != 0);
                 AppSystem.out.println("服务器引擎已终止。");
                 return !DiskAppController.run;
             }
-            catch (Exception e)
-            {
+            catch (Exception e) {
                 return false;
             }
         }
@@ -128,13 +119,11 @@ public class DiskAppController
      * @return boolean 服务器是否启动
      * @author 青阳龙野(kohgylw)
      */
-    public boolean started()
-    {
+    public boolean started() {
         return DiskAppController.run;
     }
 
-    static
-    {
+    static {
         DiskAppController.run = false;
     }
 
@@ -144,19 +133,15 @@ public class DiskAppController
      * @return
      */
     @Bean
-    public ServletWebServerFactory servletContainer()
-    {
+    public ServletWebServerFactory servletContainer() {
         // 创建Tomcat容器引擎，分为开启https和不开启https两种模式
         TomcatServletWebServerFactory tomcat = null;
-        if (ConfigureReader.getInstance().openHttps())
-        {
+        if (ConfigureReader.getInstance().openHttps()) {
             // 对于开启https模式，则将http端口的请求全部转发至https端口处理
-            tomcat = new TomcatServletWebServerFactory()
-            {
+            tomcat = new TomcatServletWebServerFactory() {
                 // 设置默认http处理转发
                 @Override
-                protected void customizeConnector(Connector connector)
-                {
+                protected void customizeConnector(Connector connector) {
                     connector.setScheme("http");
                     // Connector监听的http的端口号
                     connector.setPort(ConfigureReader.getInstance().getPort());
@@ -167,8 +152,7 @@ public class DiskAppController
 
                 // 设置默认http处理
                 @Override
-                protected void postProcessContext(Context context)
-                {
+                protected void postProcessContext(Context context) {
                     SecurityConstraint constraint = new SecurityConstraint();
                     constraint.setUserConstraint("CONFIDENTIAL");
                     SecurityCollection collection = new SecurityCollection();
@@ -180,8 +164,7 @@ public class DiskAppController
             // 添加https链接处理器
             tomcat.addAdditionalTomcatConnectors(createHttpsConnector());
         }
-        else
-        {
+        else {
             // 对于不开启https模式，以常规方法生成容器
             tomcat = new TomcatServletWebServerFactory();
             tomcat.setPort(ConfigureReader.getInstance().getPort());
@@ -197,10 +180,10 @@ public class DiskAppController
 
     /**
      * 生成https支持配置，包括端口号、证书文件、证书密码等;
+     *
      * @return
      */
-    private Connector createHttpsConnector()
-    {
+    private Connector createHttpsConnector() {
         Connector connector = new Connector("org.apache.coyote.http11.Http11NioProtocol");
         // 配置针对Https的支持
         // 设置请求协议头;

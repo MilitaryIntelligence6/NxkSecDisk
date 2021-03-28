@@ -5,15 +5,22 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public interface FileService
-{
-    String checkUploadFile(final HttpServletRequest request, final HttpServletResponse response);
+/**
+ * @author Administrator
+ */
+public interface FileService {
 
-    String doUploadFile(final HttpServletRequest request, final HttpServletResponse response, final MultipartFile file);
+    String checkUploadFile(final HttpServletRequest request,
+                           final HttpServletResponse response);
+
+    String doUploadFile(final HttpServletRequest request,
+                        final HttpServletResponse response,
+                        final MultipartFile file);
 
     String deleteFile(final HttpServletRequest request);
 
-    void doDownloadFile(final HttpServletRequest request, final HttpServletResponse response);
+    void doDownloadFile(final HttpServletRequest request,
+                        final HttpServletResponse response);
 
     String doRenameFile(final HttpServletRequest request);
 
@@ -23,7 +30,9 @@ public interface FileService
 
     String downloadCheckedFiles(final HttpServletRequest request);
 
-    void downloadCheckedFilesZip(final HttpServletRequest request, final HttpServletResponse response) throws Exception;
+    void downloadCheckedFilesZip(final HttpServletRequest request,
+                                 final HttpServletResponse response)
+            throws Exception;
 
     /**
      * <h2>移动文件的前置判断操作</h2>

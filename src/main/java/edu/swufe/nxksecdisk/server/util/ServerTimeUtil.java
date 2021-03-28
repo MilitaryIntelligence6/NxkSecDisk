@@ -18,39 +18,34 @@ import java.util.Locale;
  * @author 青阳龙野(kohgylw)
  * @version 1.0
  */
-public final class ServerTimeUtil
-{
-    private ServerTimeUtil() {}
-    
-    public static String accurateToSecond()
-    {
+public final class ServerTimeUtil {
+
+    private ServerTimeUtil() {
+    }
+
+    public static String accurateToSecond() {
         return accurateFormat("yyyy年MM月dd日 HH:mm:ss");
     }
 
-    public static String accurateToMinute()
-    {
+    public static String accurateToMinute() {
         return accurateFormat("yyyy年MM月dd日 HH:mm");
     }
 
-    public static String accurateToDay()
-    {
+    public static String accurateToDay() {
         return accurateFormat("yyyy年MM月dd日");
     }
 
-    public static String accurateToLogName()
-    {
+    public static String accurateToLogName() {
         return accurateFormat("yyyy_MM_dd");
     }
 
-    private static String accurateFormat(String format)
-    {
+    private static String accurateFormat(String format) {
         return DateTimeFormatter
                 .ofPattern(format)
                 .format(LocalDateTime.now());
     }
 
-    public static Date serverTime()
-    {
+    public static Date serverTime() {
         return new Date();
     }
 
@@ -65,15 +60,12 @@ public final class ServerTimeUtil
      * GMT”，若传入文件不存在或为null，则返回当前时间
      * @author 青阳龙野(kohgylw)
      */
-    public static String getLastModifiedFormBlock(File block)
-    {
+    public static String getLastModifiedFormBlock(File block) {
         ZonedDateTime longToTime;
-        if (block != null && block.exists())
-        {
+        if (block != null && block.exists()) {
             longToTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(block.lastModified()), ZoneId.of("GMT"));
         }
-        else
-        {
+        else {
             longToTime = ZonedDateTime.now(ZoneId.of("GMT"));
         }
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("EEE, dd MMM yyyy HH:mm:ss z", Locale.US)

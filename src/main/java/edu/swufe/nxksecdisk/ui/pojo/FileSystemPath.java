@@ -5,8 +5,8 @@ import java.io.File;
 /**
  * @author Administrator
  */
-public class FileSystemPath
-{
+public class FileSystemPath {
+
     public static final String MAIN_FILE_SYSTEM_NAME = "主文件系统";
 
     public static final String EXTEND_STORES_NAME = "扩展存储区";
@@ -17,33 +17,27 @@ public class FileSystemPath
 
     private short index;
 
-    public String getType()
-    {
+    public String getType() {
         return type;
     }
 
-    public void setType(String type)
-    {
+    public void setType(String type) {
         this.type = type;
     }
 
-    public short getIndex()
-    {
+    public short getIndex() {
         return index;
     }
 
-    public void setIndex(short index)
-    {
+    public void setIndex(short index) {
         this.index = index;
     }
 
-    public File getPath()
-    {
+    public File getPath() {
         return path;
     }
 
-    public void setPath(File path)
-    {
+    public void setPath(File path) {
         this.path = path;
     }
 

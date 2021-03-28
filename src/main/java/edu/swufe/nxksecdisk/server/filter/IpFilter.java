@@ -21,13 +21,12 @@ import java.io.IOException;
  */
 @WebFilter
 @Order(1)
-public class IpFilter implements Filter
-{
+public class IpFilter implements Filter {
+
     private IpAddrGetter ipAddrGetter;
 
     @Override
-    public void init(FilterConfig filterConfig) throws ServletException
-    {
+    public void init(FilterConfig filterConfig) throws ServletException {
         ApplicationContext context = WebApplicationContextUtils
                 .getWebApplicationContext(filterConfig.getServletContext());
         ipAddrGetter = context.getBean(IpAddrGetter.class);
@@ -35,29 +34,23 @@ public class IpFilter implements Filter
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-            throws IOException, ServletException
-    {
-        if (ConfigureReader.getInstance().enableIPRule())
-        {
+            throws IOException, ServletException {
+        if (ConfigureReader.getInstance().enableIPRule()) {
             HttpServletRequest hsr = (HttpServletRequest) request;
-            if (ConfigureReader.getInstance().filterAccessIP(ipAddrGetter.getIpAddr(hsr)))
-            {
+            if (ConfigureReader.getInstance().filterAccessIP(ipAddrGetter.getIpAddr(hsr))) {
                 chain.doFilter(request, response);
             }
-            else
-            {
+            else {
                 ((HttpServletResponse) response).sendError(HttpServletResponse.SC_FORBIDDEN);
             }
         }
-        else
-        {
+        else {
             chain.doFilter(request, response);
         }
     }
 
     @Override
-    public void destroy()
-    {
+    public void destroy() {
     }
 
 }

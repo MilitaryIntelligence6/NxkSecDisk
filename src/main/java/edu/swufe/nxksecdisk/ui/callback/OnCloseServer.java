@@ -1,6 +1,9 @@
 package edu.swufe.nxksecdisk.ui.callback;
 
-public interface OnCloseServer
-{
+/**
+ * @author Administrator
+ */
+public interface OnCloseServer {
+
     boolean close();
 }

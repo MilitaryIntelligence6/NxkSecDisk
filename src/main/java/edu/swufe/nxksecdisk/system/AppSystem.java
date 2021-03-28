@@ -10,40 +10,33 @@ import edu.swufe.nxksecdisk.server.util.LogUtil;
  * @Description TODO
  * @CreateTime 2021年03月27日 22:22:00
  */
-public final class AppSystem
-{
+public final class AppSystem {
+
     public static IOutputStream out = null;
 
     public static final LogUtil log = null;
 
-    static
-    {
+    static {
         initOutStream();
     }
 
-    private static void initOutStream()
-    {
-        switch (DynamicConfig.getLauncherMode())
-        {
-            case CONSOLE:
-            {
+    private static void initOutStream() {
+        switch (DynamicConfig.getLauncherMode()) {
+            case CONSOLE: {
                 out = StdOutStream.getInstance();
                 break;
             }
-            case UI:
-            {
+            case UI: {
                 out = UiOutStream.getInstance();
                 break;
             }
-            default:
-            {
+            default: {
                 break;
             }
         }
     }
 
-    public void exit(int status)
-    {
+    public void exit(int status) {
         System.exit(status);
     }
 }

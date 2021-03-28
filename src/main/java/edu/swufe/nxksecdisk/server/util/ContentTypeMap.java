@@ -16,8 +16,7 @@ import org.springframework.stereotype.Component;
  * @version 1.0
  */
 @Component
-public class ContentTypeMap
-{
+public class ContentTypeMap {
 
     /**
      * <h2>通过后缀名获取对应的ContentType</h2>
@@ -30,10 +29,8 @@ public class ContentTypeMap
      * 传入后缀所对应的ContentType，若无对应类型则统一返回“application/octet-stream”（二进制流）
      * @author 青阳龙野(kohgylw)
      */
-    public String getContentType(String suffix)
-    {
-        switch (suffix)
-        {
+    public String getContentType(String suffix) {
+        switch (suffix) {
 
             case ".123":
                 return "application/vnd.lotus-1-2-3";

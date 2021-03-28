@@ -23,8 +23,8 @@ import java.util.Arrays;
  * @version 1.0
  */
 @Component
-public class DocxToPdfUtil
-{
+public class DocxToPdfUtil {
+
     /**
      * <h2>执行word格式转换（docx）</h2>
      * <p>将输入流中的word文件转换为PDF格式并输出至指定输出流，该方法线程阻塞。</p>
@@ -33,26 +33,23 @@ public class DocxToPdfUtil
      * @param out java.io.OutputStream 输出流，输出PDF格式
      * @author 青阳龙野(kohgylw)
      */
-    public void convertPdf(InputStream in, OutputStream out) throws Exception
-    {
+    public void convertPdf(InputStream in, OutputStream out) throws Exception {
         XWPFDocument document = new XWPFDocument(in);
         //获取系统已安装的所有字体
         GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-        for (XWPFParagraph p : document.getParagraphs())
-        {
-            for (XWPFRun r : p.getRuns())
-            {
+        for (XWPFParagraph p : document.getParagraphs()) {
+            for (XWPFRun r : p.getRuns()) {
                 //判断文档中的字体是否安装
                 if (Arrays.stream(ge.getAvailableFontFamilyNames()).parallel()
-                        .anyMatch((e) -> e.equals(r.getFontFamily())))
-                {
+                        .anyMatch((e) -> e.equals(r.getFontFamily()))) {
                     continue;
                 }
                 //如未安装，则使用程序自带的“文泉驿正黑”替代
                 r.setFontFamily("WenQuanYi Zen Hei");
             }
         }
-        PdfConverter.getInstance().convert(document, out, PdfOptions.create().fontProvider(DocxToPdfFontProvider.getInstance()));
+        PdfConverter.getInstance().convert(document, out,
+                PdfOptions.create().fontProvider(DocxToPdfFontProvider.getInstance()));
     }
 
 }

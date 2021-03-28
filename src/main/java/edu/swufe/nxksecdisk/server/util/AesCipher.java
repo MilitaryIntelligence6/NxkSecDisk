@@ -18,8 +18,8 @@ import java.util.Base64;
  * @version 1.0
  */
 @Component
-public class AesCipher
-{
+public class AesCipher {
+
     /**
      * 所用到的加密算法类型;
      */
@@ -29,8 +29,7 @@ public class AesCipher
 
     private Base64.Decoder decoder;
 
-    public AesCipher()
-    {
+    public AesCipher() {
         encoder = Base64.getEncoder();
         decoder = Base64.getDecoder();
     }
@@ -42,8 +41,7 @@ public class AesCipher
      * @return java.lang.String 随机生成的密钥，以Base64字符串输出
      * @author 青阳龙野(kohgylw)
      */
-    public String generateRandomKey() throws NoSuchAlgorithmException
-    {
+    public String generateRandomKey() throws NoSuchAlgorithmException {
         KeyGenerator kg = KeyGenerator.getInstance(CIPHER_TYPE);
         kg.init(128);
         return encoder.encodeToString(kg.generateKey().getEncoded());
@@ -58,8 +56,7 @@ public class AesCipher
      * @return java.lang.String 加密后的密文，以Base64的形式返回
      * @author 青阳龙野(kohgylw)
      */
-    public String encrypt(String base64Key, String content) throws Exception
-    {
+    public String encrypt(String base64Key, String content) throws Exception {
         SecretKey key = new SecretKeySpec(decoder.decode(base64Key), CIPHER_TYPE);
         Cipher cipher = Cipher.getInstance(CIPHER_TYPE);
         cipher.init(Cipher.ENCRYPT_MODE, key);
@@ -75,8 +72,7 @@ public class AesCipher
      * @return java.lang.String 解密后的内容
      * @author 青阳龙野(kohgylw)
      */
-    public String decrypt(String base64Key, String ciphertext) throws Exception
-    {
+    public String decrypt(String base64Key, String ciphertext) throws Exception {
         SecretKey key = new SecretKeySpec(decoder.decode(base64Key), CIPHER_TYPE);
         Cipher cipher = Cipher.getInstance(CIPHER_TYPE);
         cipher.init(Cipher.DECRYPT_MODE, key);

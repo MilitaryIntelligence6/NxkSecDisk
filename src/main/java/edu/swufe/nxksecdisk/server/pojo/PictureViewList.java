@@ -5,29 +5,25 @@ import java.util.List;
 /**
  * @author Administrator
  */
-public class PictureViewList
-{
+public class PictureViewList {
+
     private List<PictureInfo> pictureViewList;
 
     private int index;
 
-    public List<PictureInfo> getPictureViewList()
-    {
+    public List<PictureInfo> getPictureViewList() {
         return this.pictureViewList;
     }
 
-    public void setPictureViewList(final List<PictureInfo> pictureViewList)
-    {
+    public void setPictureViewList(final List<PictureInfo> pictureViewList) {
         this.pictureViewList = pictureViewList;
     }
 
-    public int getIndex()
-    {
+    public int getIndex() {
         return this.index;
     }
 
-    public void setIndex(final int index)
-    {
+    public void setIndex(final int index) {
         this.index = index;
     }
 }

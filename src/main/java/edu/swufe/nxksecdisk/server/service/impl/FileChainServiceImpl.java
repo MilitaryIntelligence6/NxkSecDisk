@@ -21,8 +21,10 @@ import java.io.IOException;
  * @author Administrator
  */
 @Service
-public class FileChainServiceImpl extends RangeFileStreamWriter implements FileChainService
-{
+public class FileChainServiceImpl
+        extends RangeFileStreamWriter
+        implements FileChainService {
+
     @Resource
     private NodeMapper nodeMapper;
 
@@ -48,40 +50,32 @@ public class FileChainServiceImpl extends RangeFileStreamWriter implements FileC
     private FolderUtil folderUtil;
 
     @Override
-    public void getResourceByChainKey(HttpServletRequest request, HttpServletResponse response)
-    {
+    public void getResourceByChainKey(HttpServletRequest request, HttpServletResponse response) {
         int statusCode = 403;
-        if (ConfigureReader.getInstance().isOpenFileChain())
-        {
+        if (ConfigureReader.getInstance().isOpenFileChain()) {
             final String ckey = request.getParameter("ckey");
             // 权限凭证有效性并确认其对应的资源
-            if (ckey != null)
-            {
+            if (ckey != null) {
                 Property keyProp = propertiesMapper.selectByKey("chain_aes_key");
-                if (keyProp != null)
-                {
-                    try
-                    {
+                if (keyProp != null) {
+                    try {
                         String fid = cipher.decrypt(keyProp.getPropertyValue(), ckey);
                         Node f = this.nodeMapper.queryById(fid);
-                        if (f != null)
-                        {
+                        if (f != null) {
                             File target = this.fileBlockUtil.getFileFromBlocks(f);
-                            if (target != null && target.isFile())
-                            {
+                            if (target != null && target.isFile()) {
                                 String fileName = f.getFileName();
                                 String suffix = "";
-                                if (fileName.indexOf(".") >= 0)
-                                {
+                                if (fileName.indexOf(".") >= 0) {
                                     suffix = fileName.substring(fileName.lastIndexOf(".")).trim().toLowerCase();
                                 }
                                 String range = request.getHeader("Range");
                                 int status = writeRangeFileStream(request, response, target, f.getFileName(),
-                                        contentTypeMap.getContentType(suffix), ConfigureReader.getInstance().getDownloadMaxRate(null),
+                                        contentTypeMap.getContentType(suffix),
+                                        ConfigureReader.getInstance().getDownloadMaxRate(null),
                                         fileBlockUtil.getETag(target), false);
                                 if (status == HttpServletResponse.SC_OK
-                                        || (range != null && range.startsWith("bytes=0-")))
-                                {
+                                        || (range != null && range.startsWith("bytes=0-"))) {
                                     this.logUtil.writeChainEvent(request, f);
                                 }
                                 return;
@@ -89,69 +83,54 @@ public class FileChainServiceImpl extends RangeFileStreamWriter implements FileC
                         }
                         statusCode = 404;
                     }
-                    catch (Exception e)
-                    {
+                    catch (Exception e) {
                         logUtil.writeException(e);
                         statusCode = 500;
                     }
                 }
-                else
-                {
+                else {
                     statusCode = 404;
                 }
             }
         }
-        try
-        {
+        try {
             //  处理无法下载的资源
             response.sendError(statusCode);
         }
-        catch (IOException e)
-        {
+        catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     @Override
-    public String getChainKeyByFid(HttpServletRequest request)
-    {
-        if (ConfigureReader.getInstance().isOpenFileChain())
-        {
+    public String getChainKeyByFid(HttpServletRequest request) {
+        if (ConfigureReader.getInstance().isOpenFileChain()) {
             String fid = request.getParameter("fid");
             String account = (String) request.getSession().getAttribute("ACCOUNT");
-            if (fid != null)
-            {
+            if (fid != null) {
                 final Node f = this.nodeMapper.queryById(fid);
-                if (f != null)
-                {
+                if (f != null) {
                     if (ConfigureReader.getInstance().authorized(account, AccountAuth.DOWNLOAD_FILES,
-                            folderUtil.getAllFoldersId(f.getFileParentFolder())))
-                    {
+                            folderUtil.getAllFoldersId(f.getFileParentFolder()))) {
                         Folder folder = folderMapper.queryById(f.getFileParentFolder());
-                        if (ConfigureReader.getInstance().accessFolder(folder, account))
-                        {
+                        if (ConfigureReader.getInstance().accessFolder(folder, account)) {
                             // 将指定的fid加密为ckey并返回。
-                            try
-                            {
+                            try {
                                 Property keyProp = propertiesMapper.selectByKey("chain_aes_key");
-                                if (keyProp == null)
-                                {// 如果没有生成过永久性AES密钥，则先生成再加密
+                                if (keyProp == null) {// 如果没有生成过永久性AES密钥，则先生成再加密
                                     String aesKey = cipher.generateRandomKey();
                                     Property chainAESKey = new Property();
                                     chainAESKey.setPropertyKey("chain_aes_key");
                                     chainAESKey.setPropertyValue(aesKey);
-                                    if (propertiesMapper.insert(chainAESKey) > 0)
-                                    {
+                                    if (propertiesMapper.insert(chainAESKey) > 0) {
                                         return cipher.encrypt(aesKey, fid);
                                     }
                                 }
-                                else
-                                {// 如果已经有了，则直接用其加密
+                                else {// 如果已经有了，则直接用其加密
                                     return cipher.encrypt(keyProp.getPropertyValue(), fid);
                                 }
                             }
-                            catch (Exception e)
-                            {
+                            catch (Exception e) {
                                 logUtil.writeException(e);
                             }
                         }

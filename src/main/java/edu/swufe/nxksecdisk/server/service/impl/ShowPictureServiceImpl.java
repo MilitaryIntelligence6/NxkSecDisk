@@ -28,8 +28,8 @@ import java.util.List;
  * @author Administrator
  */
 @Service
-public class ShowPictureServiceImpl implements ShowPictureService
-{
+public class ShowPictureServiceImpl implements ShowPictureService {
+
     @Resource
     private NodeMapper nodeMapper;
 
@@ -59,28 +59,23 @@ public class ShowPictureServiceImpl implements ShowPictureService
      * @author 青阳龙野(kohgylw)
      * @see PictureViewList
      */
-    private PictureViewList foundPictures(final HttpServletRequest request)
-    {
+    private PictureViewList foundPictures(final HttpServletRequest request) {
         final String fileId = request.getParameter("fileId");
-        if (fileId != null && fileId.length() > 0)
-        {
+        if (fileId != null && fileId.length() > 0) {
             final String account = (String) request.getSession().getAttribute("ACCOUNT");
             Node p = nodeMapper.queryById(fileId);
-            if (p != null)
-            {
+            if (p != null) {
                 if (ConfigureReader.getInstance().authorized(account, AccountAuth.DOWNLOAD_FILES,
                         folderUtil.getAllFoldersId(p.getFileParentFolder()))
-                        && ConfigureReader.getInstance().accessFolder(folderMapper.queryById(p.getFileParentFolder()), account))
-                {
+                        && ConfigureReader.getInstance().accessFolder(folderMapper.queryById(p.getFileParentFolder())
+                        , account)) {
                     final List<Node> nodes = this.nodeMapper.queryBySomeFolder(fileId);
                     final List<PictureInfo> pictureViewList = new ArrayList<>();
                     int index = 0;
-                    for (final Node n : nodes)
-                    {
+                    for (final Node n : nodes) {
                         final String fileName = n.getFileName();
                         final String suffix = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
-                        switch (suffix)
-                        {
+                        switch (suffix) {
                             case "jpg":
                             case "jpeg":
                             case "bmp":
@@ -93,18 +88,15 @@ public class ShowPictureServiceImpl implements ShowPictureService
                                 File block = fileBlockUtil.getFileFromBlocks(n);
                                 // 尽可能地让覆盖后的图片也能立即更新;
                                 long lastModified = block.lastModified();
-                                if (pSize > 1 && !suffix.equals("gif"))
-                                {
+                                if (pSize > 1 && !suffix.equals("gif")) {
                                     pi.setUrl("homeController/showCondensedPicture.do?fileId=" + n.getFileId()
                                             + "&lastmodified=" + lastModified);
                                 }
-                                else
-                                {
+                                else {
                                     pi.setUrl("resourceController/getResource/" + n.getFileId() + "?lastmodified=" + lastModified);
                                 }
                                 pictureViewList.add(pi);
-                                if (n.getFileId().equals(fileId))
-                                {
+                                if (n.getFileId().equals(fileId)) {
                                     // 如果是正要预览的图片，记录位置;
                                     index = pictureViewList.size() - 1;
                                 }
@@ -123,64 +115,50 @@ public class ShowPictureServiceImpl implements ShowPictureService
         return null;
     }
 
-    public String getPreviewPictureJson(final HttpServletRequest request)
-    {
+    public String getPreviewPictureJson(final HttpServletRequest request) {
         final PictureViewList pvl = this.foundPictures(request);
-        if (pvl != null)
-        {
+        if (pvl != null) {
             return gson.toJson((Object) pvl);
         }
         return "ERROR";
     }
 
     @Override
-    public void requireCondensedPicture(final HttpServletRequest request, final HttpServletResponse response)
-    {
+    public void requireCondensedPicture(final HttpServletRequest request, final HttpServletResponse response) {
         // TODO 自动生成的方法存根
         String fileId = request.getParameter("fileId");
         String account = (String) request.getSession().getAttribute("ACCOUNT");
-        if (fileId != null)
-        {
+        if (fileId != null) {
             Node node = nodeMapper.queryById(fileId);
-            if (node != null)
-            {
+            if (node != null) {
                 if (ConfigureReader.getInstance().authorized(account, AccountAuth.DOWNLOAD_FILES,
                         folderUtil.getAllFoldersId(node.getFileParentFolder()))
                         && ConfigureReader.getInstance().accessFolder(folderMapper.queryById(node.getFileParentFolder()),
-                        account))
-                {
+                        account)) {
                     File pBlock = fileBlockUtil.getFileFromBlocks(node);
-                    if (pBlock != null && pBlock.exists())
-                    {
-                        try
-                        {
+                    if (pBlock != null && pBlock.exists()) {
+                        try {
                             int pSize = Integer.parseInt(node.getFileSize());
                             String format = "JPG";// 压缩后的格式
-                            if (pSize < 3)
-                            {
+                            if (pSize < 3) {
                                 Thumbnails.of(pBlock).size(1080, 1080).outputFormat(format)
                                         .toOutputStream(response.getOutputStream());
                             }
-                            else if (pSize < 5)
-                            {
+                            else if (pSize < 5) {
                                 Thumbnails.of(pBlock).size(1440, 1440).outputFormat(format)
                                         .toOutputStream(response.getOutputStream());
                             }
-                            else
-                            {
+                            else {
                                 Thumbnails.of(pBlock).size(1680, 1680).outputFormat(format)
                                         .toOutputStream(response.getOutputStream());
                             }
                         }
-                        catch (IOException e)
-                        {
+                        catch (IOException e) {
                             // 压缩失败时，尝试以源文件进行预览
-                            try
-                            {
+                            try {
                                 Files.copy(pBlock.toPath(), response.getOutputStream());
                             }
-                            catch (IOException e1)
-                            {
+                            catch (IOException e1) {
                                 logUtil.writeException(e1);
                             }
                         }

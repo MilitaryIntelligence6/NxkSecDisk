@@ -10,8 +10,8 @@ import java.util.Map;
  * @author Administrator
  */
 @Mapper
-public interface NodeMapper
-{
+public interface NodeMapper {
+
     /**
      * <h2>根据文件夹ID查询其中的所有文件节点</h2>
      * <p>

@@ -14,8 +14,8 @@ import java.util.List;
  * @author 青阳龙野(kohgylw)
  * @version 1.0
  */
-public class CheckUploadFilesResponds
-{
+public class CheckUploadFilesResponds {
+
     /**
      * 检查结果
      */
@@ -36,43 +36,35 @@ public class CheckUploadFilesResponds
      */
     private String maxUploadFileSize;
 
-    public String getCheckResult()
-    {
+    public String getCheckResult() {
         return checkResult;
     }
 
-    public void setCheckResult(String checkResult)
-    {
+    public void setCheckResult(String checkResult) {
         this.checkResult = checkResult;
     }
 
-    public List<String> getPereFileNameList()
-    {
+    public List<String> getPereFileNameList() {
         return pereFileNameList;
     }
 
-    public void setPereFileNameList(List<String> pereFileNameList)
-    {
+    public void setPereFileNameList(List<String> pereFileNameList) {
         this.pereFileNameList = pereFileNameList;
     }
 
-    public String getOverSizeFile()
-    {
+    public String getOverSizeFile() {
         return overSizeFile;
     }
 
-    public void setOverSizeFile(String overSizeFile)
-    {
+    public void setOverSizeFile(String overSizeFile) {
         this.overSizeFile = overSizeFile;
     }
 
-    public String getMaxUploadFileSize()
-    {
+    public String getMaxUploadFileSize() {
         return maxUploadFileSize;
     }
 
-    public void setMaxUploadFileSize(String maxUploadFileSize)
-    {
+    public void setMaxUploadFileSize(String maxUploadFileSize) {
         this.maxUploadFileSize = maxUploadFileSize;
     }
 }

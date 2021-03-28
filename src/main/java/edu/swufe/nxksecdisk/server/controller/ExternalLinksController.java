@@ -21,8 +21,8 @@ import javax.servlet.http.HttpServletResponse;
 @Controller
 @CrossOrigin
 @RequestMapping({"/externalLinksController"})
-public class ExternalLinksController
-{
+public class ExternalLinksController {
+
     /**
      * 分享下载链接的相关处理;
      */
@@ -34,20 +34,17 @@ public class ExternalLinksController
 
     @RequestMapping("/getDownloadKey.ajax")
     public @ResponseBody
-    String getDownloadKey(HttpServletRequest request)
-    {
+    String getDownloadKey(HttpServletRequest request) {
         return downloadService.getDownloadKey(request);
     }
 
     @RequestMapping("/downloadFileByKey/{fileName}")
-    public void downloadFileByKey(HttpServletRequest request, HttpServletResponse response)
-    {
+    public void downloadFileByKey(HttpServletRequest request, HttpServletResponse response) {
         downloadService.downloadFileByKey(request, response);
     }
 
     @RequestMapping("/chain/{fileName}")
-    public void chain(HttpServletRequest request, HttpServletResponse response)
-    {
+    public void chain(HttpServletRequest request, HttpServletResponse response) {
         fileChainService.getResourceByChainKey(request, response);
     }
 

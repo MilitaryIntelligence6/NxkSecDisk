@@ -12,8 +12,8 @@ import javax.servlet.http.HttpServletResponse;
  * @author 青阳龙野(kohgylw)
  * @version 1.0
  */
-public interface ResourceService
-{
+public interface ResourceService {
+
     /**
      * <h2>获取无需格式转化的流资源</h2>
      * <p>

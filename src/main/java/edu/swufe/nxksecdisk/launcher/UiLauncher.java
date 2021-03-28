@@ -4,14 +4,14 @@ import com.formdev.flatlaf.FlatDarculaLaf;
 import edu.swufe.nxksecdisk.config.DynamicConfig;
 import edu.swufe.nxksecdisk.constant.EnumLauncherMode;
 import edu.swufe.nxksecdisk.server.app.DiskAppController;
-import edu.swufe.nxksecdisk.server.util.ConfigureReader;
-import edu.swufe.nxksecdisk.ui.pojo.FileSystemPath;
 import edu.swufe.nxksecdisk.server.enumeration.LogLevel;
 import edu.swufe.nxksecdisk.server.enumeration.VcLevel;
 import edu.swufe.nxksecdisk.server.pojo.ExtendStores;
+import edu.swufe.nxksecdisk.server.util.ConfigureReader;
 import edu.swufe.nxksecdisk.server.util.ServerTimeUtil;
 import edu.swufe.nxksecdisk.ui.callback.GetServerStatus;
 import edu.swufe.nxksecdisk.ui.module.ServerUiModule;
+import edu.swufe.nxksecdisk.ui.pojo.FileSystemPath;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -26,16 +26,16 @@ import java.util.List;
  * @author 青阳龙野(kohgylw)
  * @version 1.0
  */
-public class UiLauncher
-{
+public class UiLauncher {
+
     private volatile static UiLauncher instance;
 
     /**
      * 实例化图形界面并显示它，同时将图形界面的各个操作与服务器控制器对应起来;
+     *
      * @throws Exception
      */
-    private UiLauncher() throws Exception
-    {
+    private UiLauncher() throws Exception {
         initSkin();
         DynamicConfig.setLauncherMode(EnumLauncherMode.UI);
         final ServerUiModule serverUi = ServerUiModule.getInstance();
@@ -44,70 +44,59 @@ public class UiLauncher
         ServerUiModule.setStartServer(appController::start);
         ServerUiModule.setOnCloseServer(appController::stop);
         ServerUiModule.setGetServerTime(ServerTimeUtil::serverTime);
-        ServerUiModule.setGetServerStatus(new GetServerStatus()
-        {
+        ServerUiModule.setGetServerStatus(new GetServerStatus() {
             @Override
-            public boolean getServerStatus()
-            {
+            public boolean getServerStatus() {
                 // TODO 自动生成的方法存根
                 return appController.started();
             }
 
             @Override
-            public int getPropertiesStatus()
-            {
+            public int getPropertiesStatus() {
                 // TODO 自动生成的方法存根
                 return ConfigureReader.getInstance().getPropertiesStatus();
             }
 
             @Override
-            public int getPort()
-            {
+            public int getPort() {
                 // TODO 自动生成的方法存根
                 return ConfigureReader.getInstance().getPort();
             }
 
             @Override
-            public boolean getMustLogin()
-            {
+            public boolean getMustLogin() {
                 // TODO 自动生成的方法存根
                 return ConfigureReader.getInstance().mustLogin();
             }
 
             @Override
-            public LogLevel getLogLevel()
-            {
+            public LogLevel getLogLevel() {
                 // TODO 自动生成的方法存根
                 return ConfigureReader.getInstance().getLogLevel();
             }
 
             @Override
-            public String getFileSystemPath()
-            {
+            public String getFileSystemPath() {
                 // TODO 自动生成的方法存根
                 return ConfigureReader.getInstance().getFileSystemPath();
             }
 
             @Override
-            public int getBufferSize()
-            {
+            public int getBufferSize() {
                 // TODO 自动生成的方法存根
                 return ConfigureReader.getInstance().getBuffSize();
             }
 
             @Override
-            public VcLevel getVCLevel()
-            {
+            public VcLevel getVCLevel() {
                 // TODO 自动生成的方法存根
                 return ConfigureReader.getInstance().getVCLevel();
             }
 
             @Override
-            public List<FileSystemPath> getExtendStores()
-            {
+            public List<FileSystemPath> getExtendStores() {
                 List<FileSystemPath> fileSystemPathList = new ArrayList<>();
-                for (ExtendStores es : ConfigureReader.getInstance().getExtendStores())
-                {
+                for (ExtendStores es : ConfigureReader.getInstance().getExtendStores()) {
                     FileSystemPath fileSystemPath = new FileSystemPath();
                     fileSystemPath.setIndex(es.getIndex());
                     fileSystemPath.setPath(es.getPath());
@@ -118,57 +107,49 @@ public class UiLauncher
             }
 
             @Override
-            public LogLevel getInitLogLevel()
-            {
+            public LogLevel getInitLogLevel() {
                 // TODO 自动生成的方法存根
                 return ConfigureReader.getInstance().getInitLogLevel();
             }
 
             @Override
-            public VcLevel getInitVCLevel()
-            {
+            public VcLevel getInitVCLevel() {
                 // TODO 自动生成的方法存根
                 return ConfigureReader.getInstance().getInitVCLevel();
             }
 
             @Override
-            public String getInitFileSystemPath()
-            {
+            public String getInitFileSystemPath() {
                 // TODO 自动生成的方法存根
                 return ConfigureReader.getInstance().getInitFileSystemPath();
             }
 
             @Override
-            public String getInitProt()
-            {
+            public String getInitProt() {
                 // TODO 自动生成的方法存根
                 return ConfigureReader.getInstance().getInitPort();
             }
 
             @Override
-            public String getInitBufferSize()
-            {
+            public String getInitBufferSize() {
                 // TODO 自动生成的方法存根
                 return ConfigureReader.getInstance().getInitBuffSize();
             }
 
             @Override
-            public boolean isAllowChangePassword()
-            {
+            public boolean isAllowChangePassword() {
                 // TODO 自动生成的方法存根
                 return ConfigureReader.getInstance().isAllowChangePassword();
             }
 
             @Override
-            public boolean isOpenFileChain()
-            {
+            public boolean isOpenFileChain() {
                 // TODO 自动生成的方法存根
                 return ConfigureReader.getInstance().isOpenFileChain();
             }
 
             @Override
-            public int getMaxExtendStoresNum()
-            {
+            public int getMaxExtendStoresNum() {
                 // TODO 自动生成的方法存根
                 return ConfigureReader.getInstance().getMaxExtendstoresNum();
             }
@@ -181,14 +162,10 @@ public class UiLauncher
         serverUi.show();
     }
 
-    public static UiLauncher getInstance() throws Exception
-    {
-        if (instance == null)
-        {
-            synchronized (UiLauncher.class)
-            {
-                if (instance == null)
-                {
+    public static UiLauncher getInstance() throws Exception {
+        if (instance == null) {
+            synchronized (UiLauncher.class) {
+                if (instance == null) {
                     instance = new UiLauncher();
                 }
             }
@@ -207,19 +184,15 @@ public class UiLauncher
      * @throws Exception
      * @author 青阳龙野(kohgylw)
      */
-    public static UiLauncher build() throws Exception
-    {
+    public static UiLauncher build() throws Exception {
         return getInstance();
     }
 
-    private void initSkin()
-    {
-        try
-        {
+    private void initSkin() {
+        try {
             UIManager.setLookAndFeel(new FlatDarculaLaf());
         }
-        catch (UnsupportedLookAndFeelException e)
-        {
+        catch (UnsupportedLookAndFeelException e) {
             e.printStackTrace();
         }
     }

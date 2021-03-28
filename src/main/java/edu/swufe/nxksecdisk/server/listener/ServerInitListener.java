@@ -24,8 +24,8 @@ import java.util.List;
  * @version 1.0
  */
 @WebListener
-public class ServerInitListener implements ServletContextListener
-{
+public class ServerInitListener implements ServletContextListener {
+
     /**
      * 定时检查失效额外权限的周期，以毫秒为单位;
      */
@@ -79,8 +79,7 @@ public class ServerInitListener implements ServletContextListener
     private LogUtil logUtil;
 
     @Override
-    public void contextInitialized(final ServletContextEvent sce)
-    {
+    public void contextInitialized(final ServletContextEvent sce) {
         // 获取IOC容器，用于实例化一些必要的工具
         final ApplicationContext context = WebApplicationContextUtils
                 .getWebApplicationContext(sce.getServletContext());
@@ -90,15 +89,13 @@ public class ServerInitListener implements ServletContextListener
         AppSystem.out.println("文件系统节点信息校对...");
         final String fsp = ConfigureReader.getInstance().getFileSystemPath();
         final File fspf = new File(fsp);
-        if (fspf.isDirectory() && fspf.canRead() && fspf.canWrite())
-        {
+        if (fspf.isDirectory() && fspf.canRead() && fspf.canWrite()) {
             fileBlockUtil = context.getBean(FileBlockUtil.class);
             fileBlockUtil.checkFileBlocks();
             fileBlockUtil.initTempDir();
             AppSystem.out.println("校对完成。");
         }
-        else
-        {
+        else {
             AppSystem.out.println("错误：文件系统节点信息校对失败，存储位置无法读写或不存在。");
         }
         // 3，解析公告信息（请确保该操作在校对文件块后进行）
@@ -113,8 +110,7 @@ public class ServerInitListener implements ServletContextListener
     }
 
     @Override
-    public void contextDestroyed(final ServletContextEvent sce)
-    {
+    public void contextDestroyed(final ServletContextEvent sce) {
         // 1，关闭动态监听
         run = false;
         // 2，清理临时文件夹
@@ -122,31 +118,25 @@ public class ServerInitListener implements ServletContextListener
         fileBlockUtil.initTempDir();
     }
 
-    private void doWatch()
-    {
+    private void doWatch() {
         // 后期的动态监听部分
         run = true;
         // 之后当监听到改动操作时再重载内容
-        if (pathWatchServiceThread == null)
-        {
+        if (pathWatchServiceThread == null) {
             // 对服务器主目录进行监听，主要监听文件改动事件
             Path confPath = Paths.get(ConfigureReader.getInstance().getPath());
             pathWatchServiceThread = new Thread(() ->
             {
-                try
-                {
-                    while (run)
-                    {
+                try {
+                    while (run) {
                         WatchService ws = confPath.getFileSystem().newWatchService();
                         confPath.register(ws, StandardWatchEventKinds.ENTRY_MODIFY,
                                 StandardWatchEventKinds.ENTRY_DELETE, StandardWatchEventKinds.ENTRY_CREATE);
                         WatchKey wk = ws.take();
                         List<WatchEvent<?>> es = wk.pollEvents();
-                        for (WatchEvent<?> we : es)
-                        {
+                        for (WatchEvent<?> we : es) {
                             // 根据改动文件的不同调用不同的处理方法
-                            switch (we.context().toString())
-                            {
+                            switch (we.context().toString()) {
                                 case NoticeUtil.NOTICE_FILE_NAME:
                                     noticeUtil.loadNotice();// 更新公告文件
                                     break;
@@ -157,8 +147,7 @@ public class ServerInitListener implements ServletContextListener
                         }
                     }
                 }
-                catch (Exception e)
-                {
+                catch (Exception e) {
                     AppSystem.out.println("错误：服务器文件自动更新失败，该功能已失效。某些文件将无法自动载入最新内容（请尝试重启程序以恢复该功能）。");
                 }
             });
@@ -166,40 +155,31 @@ public class ServerInitListener implements ServletContextListener
         }
     }
 
-    private void cleanInvalidAddedAuth()
-    {
+    private void cleanInvalidAddedAuth() {
         needCheck = true;
         continueCheck = true;
-        if (cleanInvalidAddedAuthThread == null)
-        {
+        if (cleanInvalidAddedAuthThread == null) {
             cleanInvalidAddedAuthThread = new Thread(() ->
             {
-                while (continueCheck)
-                {
-                    if (needCheck)
-                    {
+                while (continueCheck) {
+                    if (needCheck) {
                         List<String> invalidIdList = new ArrayList<>();
                         List<String> idList = ConfigureReader.getInstance().getAllAddedAuthFoldersId();
-                        for (String id : idList)
-                        {
-                            if (folderMapper.queryById(id) == null)
-                            {
+                        for (String id : idList) {
+                            if (folderMapper.queryById(id) == null) {
                                 invalidIdList.add(id);
                                 AppSystem.out.println("文件夹ID：" + id + "对应的文件夹不存在或已被删除，相关的额外权限设置将被清理。");
                             }
                         }
-                        if (ConfigureReader.getInstance().removeAddedAuthByFolderId(invalidIdList))
-                        {
+                        if (ConfigureReader.getInstance().removeAddedAuthByFolderId(invalidIdList)) {
                             AppSystem.out.println("失效的额外权限设置已经清理完成。");
                         }
                         needCheck = false;
                     }
-                    try
-                    {
+                    try {
                         Thread.sleep(CYVLE_TIME);
                     }
-                    catch (InterruptedException e)
-                    {
+                    catch (InterruptedException e) {
                         continueCheck = false;
                         logUtil.writeException(e);
                     }

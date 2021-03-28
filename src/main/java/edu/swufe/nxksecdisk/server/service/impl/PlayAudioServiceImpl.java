@@ -16,9 +16,12 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
+/**
+ * @author Administrator
+ */
 @Service
-public class PlayAudioServiceImpl implements PlayAudioService
-{
+public class PlayAudioServiceImpl implements PlayAudioService {
+
     @Resource
     private NodeMapper nodeMapper;
 
@@ -34,20 +37,16 @@ public class PlayAudioServiceImpl implements PlayAudioService
     @Resource
     private FolderMapper folderMapper;
 
-    private AudioInfoList foundAudios(final HttpServletRequest request)
-    {
+    private AudioInfoList foundAudios(final HttpServletRequest request) {
         final String fileId = request.getParameter("fileId");
-        if (fileId != null && fileId.length() > 0)
-        {
+        if (fileId != null && fileId.length() > 0) {
             Node targetNode = nodeMapper.queryById(fileId);
-            if (targetNode != null)
-            {
+            if (targetNode != null) {
                 final String account = (String) request.getSession().getAttribute("ACCOUNT");
                 if (ConfigureReader.getInstance().authorized(account, AccountAuth.DOWNLOAD_FILES,
                         folderUtil.getAllFoldersId(targetNode.getFileParentFolder()))
                         && ConfigureReader.getInstance().accessFolder(folderMapper.queryById(targetNode.getFileParentFolder()),
-                        account))
-                {
+                        account)) {
                     final List<Node> blocks = (List<Node>) this.nodeMapper.queryBySomeFolder(fileId);
                     return this.audioInfoUtil.transformToAudioInfoList(blocks, fileId);
                 }
@@ -67,11 +66,9 @@ public class PlayAudioServiceImpl implements PlayAudioService
      * @author kohgylw
      */
     @Override
-    public String requireAudioInfoListByJson(final HttpServletRequest request)
-    {
+    public String requireAudioInfoListByJson(final HttpServletRequest request) {
         final AudioInfoList ail = this.foundAudios(request);
-        if (ail != null)
-        {
+        if (ail != null) {
             return gson.toJson((Object) ail);
         }
         return "ERROR";

@@ -3,29 +3,25 @@ package edu.swufe.nxksecdisk.server.pojo;
 /**
  * @author Administrator
  */
-public class CheckImportFolderResponds
-{
+public class CheckImportFolderResponds {
+
     private String result;
 
     private String maxSize;
 
-    public String getResult()
-    {
+    public String getResult() {
         return result;
     }
 
-    public void setResult(String result)
-    {
+    public void setResult(String result) {
         this.result = result;
     }
 
-    public String getMaxSize()
-    {
+    public String getMaxSize() {
         return maxSize;
     }
 
-    public void setMaxSize(String maxSize)
-    {
+    public void setMaxSize(String maxSize) {
         this.maxSize = maxSize;
     }
 }

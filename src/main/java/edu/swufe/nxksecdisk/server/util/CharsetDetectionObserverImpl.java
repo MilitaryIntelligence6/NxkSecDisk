@@ -9,19 +9,17 @@ import org.mozilla.intl.chardet.nsICharsetDetectionObserver;
  * @author 青阳龙野(kohgylw)
  * @version 1.0
  */
-public class CharsetDetectionObserverImpl implements nsICharsetDetectionObserver
-{
+public class CharsetDetectionObserverImpl implements nsICharsetDetectionObserver {
+
     private String charset;
 
     @Override
-    public void Notify(String arg0)
-    {
+    public void Notify(String arg0) {
         // TODO 自动生成的方法存根
         charset = arg0;
     }
 
-    public String getCharset()
-    {
+    public String getCharset() {
         return charset;
     }
 

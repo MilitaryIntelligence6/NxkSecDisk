@@ -25,8 +25,8 @@ import java.util.Map;
  * @version 1.0
  */
 @Component
-public class VideoTranscodeUtil
-{
+public class VideoTranscodeUtil {
+
     /**
      * 转码设定;
      */
@@ -68,37 +68,29 @@ public class VideoTranscodeUtil
      * @throws Exception 获取失败
      * @author 青阳龙野(kohgylw)
      */
-    public String getTranscodeProcess(String fId) throws Exception
-    {
-        synchronized (videoTranscodeThreads)
-        {
+    public String getTranscodeProcess(String fId) throws Exception {
+        synchronized (videoTranscodeThreads) {
             VideoTranscodeThread vtt = videoTranscodeThreads.get(fId);
             Node n = nodeMapper.queryById(fId);
             File f = fileBlockUtil.getFileFromBlocks(n);
-            if (vtt != null)
-            {
-                if ("FIN".equals(vtt.getProgress()))
-                {
+            if (vtt != null) {
+                if ("FIN".equals(vtt.getProgress())) {
                     String md5 = DigestUtils.md5Hex(new FileInputStream(f));
                     if (md5.equals(vtt.getMd5())
                             && new File(ConfigureReader.getInstance().getTemporaryfilePath(), vtt.getOutputFileName())
-                            .isFile())
-                    {
+                            .isFile()) {
                         return vtt.getProgress();
                     }
-                    else
-                    {
+                    else {
                         videoTranscodeThreads.remove(fId);
                     }
                 }
-                else
-                {
+                else {
                     return vtt.getProgress();
                 }
             }
             String suffix = n.getFileName().substring(n.getFileName().lastIndexOf(".") + 1).toLowerCase();
-            switch (suffix)
-            {
+            switch (suffix) {
                 case "mp4":
                 case "webm":
                 case "mov":
