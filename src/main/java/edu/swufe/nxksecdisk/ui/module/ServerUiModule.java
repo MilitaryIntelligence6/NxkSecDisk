@@ -11,8 +11,6 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.IOException;
@@ -286,47 +284,35 @@ public class ServerUiModule extends DiskDynamicWindow {
             println("关闭服务器...");
             AppSystem.pool.execute(this::runClose);
         });
-        exit.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // TODO 自动生成的方法存根
-                fileIoUtil.setEnabled(false);
-                if (filesViewer != null) {
-                    filesViewer.setEnabled(false);
-                }
-                exit();
-            }
-        });
-        restart.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // TODO 自动生成的方法存根
-                stop.setEnabled(false);
-                restart.setEnabled(false);
-                fileIoUtil.setEnabled(false);
-                if (filesViewer != null) {
-                    filesViewer.setEnabled(false);
-                }
-                AppSystem.pool.execute(ServerUiModule.this::runReboot);
-            }
-        });
-        setting.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // TODO 自动生成的方法存根
-                settingWindow = SettingWindow.getInstance();
-                AppSystem.pool.execute(settingWindow::show);
-            }
-        });
-        fileIoUtil.addActionListener((e) ->
-        {
+        exit.addActionListener(e -> {
+            // TODO 自动生成的方法存根
             fileIoUtil.setEnabled(false);
             if (filesViewer != null) {
                 filesViewer.setEnabled(false);
             }
-            AppSystem.pool.execute(this::runReadSql);
+            exit();
+        });
+        restart.addActionListener(e -> {
+            // TODO 自动生成的方法存根
+            stop.setEnabled(false);
+            restart.setEnabled(false);
+            fileIoUtil.setEnabled(false);
+            if (filesViewer != null) {
+                filesViewer.setEnabled(false);
+            }
+            AppSystem.pool.execute(ServerUiModule.this::runReboot);
+        });
+        setting.addActionListener(e -> {
+            // TODO 自动生成的方法存根
+            settingWindow = SettingWindow.getInstance();
+            AppSystem.pool.execute(settingWindow::show);
+        });
+        fileIoUtil.addActionListener(e -> {
+            fileIoUtil.setEnabled(false);
+            if (filesViewer != null) {
+                filesViewer.setEnabled(false);
+            }
+            AppSystem.pool.execute(this::runReadFile);
         });
         modifyComponentSize(window);
         init();
@@ -514,7 +500,7 @@ public class ServerUiModule extends DiskDynamicWindow {
         updateServerStatus();
     }
 
-    private void runReadSql() {
+    private void runReadFile() {
         try {
             fsViewer = FsViewer.getInstance();
             fsViewer.show();
@@ -584,7 +570,7 @@ public class ServerUiModule extends DiskDynamicWindow {
             fsViewer.show();
         }
         catch (SQLException e1) {
-            // TODO 自动生成的 catch 块
+            e1.printStackTrace();
             JOptionPane.showMessageDialog(window, "错误：无法打开文件，文件系统可能已损坏，您可以尝试重启应用。", "错误",
                     JOptionPane.ERROR_MESSAGE);
         }
