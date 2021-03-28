@@ -49,7 +49,6 @@ public class ConsoleLauncher
     private ConsoleLauncher()
     {
         DynamicConfig.setLauncherMode(EnumLauncherMode.CONSOLE);
-//        UiOutStream.putModel(false);
         ConsoleLauncher.ctl = new DiskAppController();
         worker = Executors.newSingleThreadExecutor();
         ConsoleLauncher.commandTips = "kiftd:您可以输入以下指令以控制服务器：\r\n-start 启动服务器\r\n-stop 停止服务器\r\n-exit 停止服务器并退出应用\r\n-restart 重启服务器\r\n-files 文件管理\r\n-status 查看服务器状态\r\n-help 显示帮助文本";

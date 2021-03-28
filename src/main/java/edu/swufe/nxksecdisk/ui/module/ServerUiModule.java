@@ -2,6 +2,7 @@ package edu.swufe.nxksecdisk.ui.module;
 
 import edu.swufe.nxksecdisk.server.util.ConfigureReader;
 import edu.swufe.nxksecdisk.system.AppSystem;
+import edu.swufe.nxksecdisk.system.Decorator;
 import edu.swufe.nxksecdisk.ui.callback.*;
 
 import javax.imageio.ImageIO;
@@ -676,12 +677,12 @@ public class ServerUiModule extends DiskDynamicWindow
 
     public void println(final String context)
     {
-        out.append(decorateWithDate(context));
+        out.append(Decorator.decorateDate(context));
     }
 
     public void printf(final String context, Object... args)
     {
-        out.append(String.format(decorateWithDate(context), args));
+        out.append(String.format(Decorator.decorateDate(context), args));
     }
 
     private String requireFormatDate()
@@ -692,17 +693,6 @@ public class ServerUiModule extends DiskDynamicWindow
             return sdf.format(d);
         }
         return sdf.format(new Date());
-    }
-
-    public String decorateWithDate(String context)
-    {
-        return new StringBuilder()
-                .append("[")
-                .append(this.requireFormatDate())
-                .append("]")
-                .append(context)
-                .append("\n")
-                .toString();
     }
 
     public static void setGetServerTime(final GetServerTime serverTime)

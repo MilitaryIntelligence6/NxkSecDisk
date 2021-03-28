@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.Properties;
 
 /**
@@ -69,15 +70,15 @@ public class DiskDynamicWindow
                 path = classPath.substring(0, classPath.lastIndexOf(File.separator));
             }
         }
-        String confdir = path + File.separator + "conf" + File.separator;
+        String confDir = String.format("%s%sconf%s", path, File.separator, File.separator);
         // 检查conf文件夹中是否包含名为“init.txt”的设置文件，若有，则使用其中定义的缩放比；否则使用程序计算的缩放比。
-        File settingFile = new File(confdir, "init.txt");
-        Properties settingp = new Properties();
+        File settingFile = new File(confDir, "init.txt");
+        Properties settingProp = new Properties();
         try
         {
-            settingp.load(new FileInputStream(settingFile));
+            settingProp.load(new FileInputStream(settingFile));
             // 缩放比的设置项必须是scale=?形式;
-            String udp = settingp.getProperty("scale");
+            String udp = settingProp.getProperty("scale");
             if (udp != null)
             {
                 double udpi = Double.parseDouble(udp);
@@ -89,6 +90,10 @@ public class DiskDynamicWindow
                 // 如果上述条件均满足，则使用用户定义的比例替换程序计算的比例;
                 proportion = udpi;
             }
+        }
+        catch (FileNotFoundException e)
+        {
+            System.out.println("未发现 init.txt 配置，使用计算的缩放比");
         }
         catch (Exception e1)
         {

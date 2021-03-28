@@ -10,8 +10,6 @@ final class UiOutStream implements IOutputStream
 {
     private static UiOutStream instance = null;
 
-//    private static boolean uiModel;
-
     private static ServerUiModule serverUi;
 
     private UiOutStream()
@@ -42,21 +40,6 @@ final class UiOutStream implements IOutputStream
         }
         return instance;
     }
-
-//    public static void putModel(final boolean uiModel)
-//    {
-//        if (uiModel)
-//        {
-//            try
-//            {
-//                UiOutStream.uiModel = uiModel;
-//            }
-//            catch (Exception e)
-//            {
-//                e.printStackTrace();
-//            }
-//        }
-//    }
 
     @Override
     public void println(final String context)

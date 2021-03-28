@@ -9,7 +9,7 @@ import edu.swufe.nxksecdisk.server.util.ServerTimeUtil;
  * @Description TODO
  * @CreateTime 2021年03月27日 18:35:00
  */
-final class Decorator
+public final class Decorator
 {
     private static final StringBuffer buffer = new StringBuffer();
 

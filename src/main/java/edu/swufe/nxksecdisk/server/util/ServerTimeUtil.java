@@ -18,37 +18,38 @@ import java.util.Locale;
  * @author 青阳龙野(kohgylw)
  * @version 1.0
  */
-public class ServerTimeUtil
+public final class ServerTimeUtil
 {
+    private ServerTimeUtil() {}
+    
     public static String accurateToSecond()
     {
-        LocalDateTime ldt = LocalDateTime.now();
-        DateTimeFormatter dtfDateTimeFormatter = DateTimeFormatter.ofPattern("yyyy年MM月dd日 HH:mm:ss");
-        return dtfDateTimeFormatter.format(ldt);
+        return accurateFormat("yyyy年MM月dd日 HH:mm:ss");
     }
 
     public static String accurateToMinute()
     {
-        LocalDateTime ldt = LocalDateTime.now();
-        DateTimeFormatter dtfDateTimeFormatter = DateTimeFormatter.ofPattern("yyyy年MM月dd日 HH:mm");
-        return dtfDateTimeFormatter.format(ldt);
+        return accurateFormat("yyyy年MM月dd日 HH:mm");
     }
 
     public static String accurateToDay()
     {
-        LocalDateTime ldt = LocalDateTime.now();
-        DateTimeFormatter dtfDateTimeFormatter = DateTimeFormatter.ofPattern("yyyy年MM月dd日");
-        return dtfDateTimeFormatter.format(ldt);
+        return accurateFormat("yyyy年MM月dd日");
     }
 
     public static String accurateToLogName()
     {
-        LocalDateTime ldt = LocalDateTime.now();
-        DateTimeFormatter dtfDateTimeFormatter = DateTimeFormatter.ofPattern("yyyy_MM_dd");
-        return dtfDateTimeFormatter.format(ldt);
+        return accurateFormat("yyyy_MM_dd");
     }
 
-    public static Date getServerTime()
+    private static String accurateFormat(String format)
+    {
+        return DateTimeFormatter
+                .ofPattern(format)
+                .format(LocalDateTime.now());
+    }
+
+    public static Date serverTime()
     {
         return new Date();
     }

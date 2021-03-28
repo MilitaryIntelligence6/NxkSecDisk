@@ -38,13 +38,12 @@ public class UiLauncher
     {
         initSkin();
         DynamicConfig.setLauncherMode(EnumLauncherMode.UI);
-//        UiOutStream.putModel(true);
         final ServerUiModule serverUi = ServerUiModule.getInstance();
         // 服务器控制层，用于连接UI与服务器内核;
         DiskAppController appController = new DiskAppController();
         ServerUiModule.setStartServer(appController::start);
         ServerUiModule.setOnCloseServer(appController::stop);
-        ServerUiModule.setGetServerTime(ServerTimeUtil::getServerTime);
+        ServerUiModule.setGetServerTime(ServerTimeUtil::serverTime);
         ServerUiModule.setGetServerStatus(new GetServerStatus()
         {
             @Override

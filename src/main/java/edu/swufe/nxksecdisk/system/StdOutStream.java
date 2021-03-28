@@ -33,16 +33,13 @@ final class StdOutStream implements IOutputStream
     @Override
     public void println(String context)
     {
-        System.out.printf("[%s]%s\r\n%n",
-                ServerTimeUtil.accurateToSecond(),
-                context);
+        System.out.println(Decorator.decorateDate(context));
     }
 
     @Override
     public void printf(String context, Object... args)
     {
-        System.out.printf("[%s]%s\r\n%n",
-                ServerTimeUtil.accurateToSecond(),
-                context);
+        System.out.printf(Decorator.decorateDate(context),
+                args);
     }
 }
