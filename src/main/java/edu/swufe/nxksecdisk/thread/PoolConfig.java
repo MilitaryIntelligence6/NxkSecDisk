@@ -11,13 +11,13 @@ import java.util.concurrent.TimeUnit;
  * @Description TODO
  * @CreateTime 2021年03月28日 20:16:00
  */
-public  final class ThreadPoolConfig {
+public  final class PoolConfig {
 
     private static final int QUEUE_SIZE = 12;
 
-    public static final int corePoolSize = 24;
+    public static final int corePoolSize = 16;
 
-    public static final int maximumPoolSize = 30;
+    public static final int maximumPoolSize = 24;
 
     public static final long keepAliveTime = 60;
 
@@ -25,5 +25,5 @@ public  final class ThreadPoolConfig {
 
     public static final BlockingQueue<Runnable> workQueue = new LinkedBlockingDeque<>(QUEUE_SIZE);
 
-    private ThreadPoolConfig() {}
+    private PoolConfig() {}
 }

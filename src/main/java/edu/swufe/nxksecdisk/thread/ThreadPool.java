@@ -22,11 +22,11 @@ public final class ThreadPool extends ThreadPoolExecutor {
     }
 
     private ThreadPool() {
-        this(ThreadPoolConfig.corePoolSize,
-                ThreadPoolConfig.maximumPoolSize,
-                ThreadPoolConfig.keepAliveTime,
-                ThreadPoolConfig.unit,
-                ThreadPoolConfig.workQueue);
+        this(PoolConfig.corePoolSize,
+                PoolConfig.maximumPoolSize,
+                PoolConfig.keepAliveTime,
+                PoolConfig.unit,
+                PoolConfig.workQueue);
     }
 
     public static ThreadPool getInstance() {
