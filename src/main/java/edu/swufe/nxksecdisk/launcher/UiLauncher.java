@@ -36,6 +36,7 @@ public class UiLauncher {
     static {
         initSkin();
     }
+
     /**
      * 实例化图形界面并显示它，同时将图形界面的各个操作与服务器控制器对应起来;
      */
