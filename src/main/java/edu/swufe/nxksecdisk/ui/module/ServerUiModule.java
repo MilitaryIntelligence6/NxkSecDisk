@@ -93,7 +93,7 @@ public class ServerUiModule extends DiskDynamicWindow {
     private static MenuItem filesViewer;
 
     private ServerUiModule() {
-        setUIFont();
+        initUiFont();
         setWindow(new JFrame("kiftd-服务器控制台"));
         getWindow().setSize(originSizeWidth, originSizeHeight);
         getWindow().setLocation(100, 100);

@@ -84,7 +84,7 @@ public class SettingWindow extends DiskDynamicWindow {
 
     private SettingWindow() {
         // 全局字体设置;
-        setUIFont();
+        initUiFont();
         // 窗口主体相关设置
         setWindow(new JDialog(serverUi.getWindow(), "kiftd-设置"));
         getWindow().setModal(true);

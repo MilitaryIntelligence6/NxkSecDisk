@@ -40,7 +40,6 @@ public class UiLauncher {
      * 实例化图形界面并显示它，同时将图形界面的各个操作与服务器控制器对应起来;
      */
     private UiLauncher() {
-        initSkin();
         DynamicConfig.setLauncherMode(EnumLauncherMode.UI);
         final ServerUiModule serverUi = ServerUiModule.getInstance();
         // 服务器控制层，用于连接UI与服务器内核;
@@ -178,7 +177,7 @@ public class UiLauncher {
 
     private static void initSkin() {
         try {
-            UIManager.setLookAndFeel(new FlatDarkLaf());
+            UIManager.setLookAndFeel(new FlatDarculaLaf());
         }
         catch (UnsupportedLookAndFeelException e) {
             e.printStackTrace();

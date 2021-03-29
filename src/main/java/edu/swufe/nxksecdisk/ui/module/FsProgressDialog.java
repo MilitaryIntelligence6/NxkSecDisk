@@ -39,7 +39,7 @@ public class FsProgressDialog extends DiskDynamicWindow {
     private static boolean listen;
 
     private FsProgressDialog() {
-        setUIFont();//自动设置字体大小
+        initUiFont();//自动设置字体大小
         (window = new JDialog(FsViewer.window, "执行中...")).setModal(true);
         window.setSize(380, 120);
         window.setLocation(200, 200);

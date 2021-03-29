@@ -99,7 +99,7 @@ public class FsViewer extends DiskDynamicWindow {
      * @throws SQLException
      */
     private FsViewer() throws SQLException {
-        setUIFont();
+        initUiFont();
         worker = Executors.newSingleThreadExecutor();
         window = new JDialog(serverUi.getWindow(), "kiftd-ROOT");
         window.setSize(750, 450);

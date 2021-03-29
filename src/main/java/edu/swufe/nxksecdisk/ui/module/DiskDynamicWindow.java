@@ -146,15 +146,15 @@ public class DiskDynamicWindow {
      *
      * @author 青阳龙野(kohgylw)
      */
-    protected void setUIFont() {
-        Font f = new Font("宋体", Font.PLAIN, (int) (13 * proportion));
-        String names[] = {"Label", "CheckBox", "PopupMenu", "MenuItem", "CheckBoxMenuItem", "JRadioButtonMenuItem",
+    protected void initUiFont() {
+        Font font = new Font("宋体", Font.PLAIN, (int) (13 * proportion));
+        String[] names = {"Label", "CheckBox", "PopupMenu", "MenuItem", "CheckBoxMenuItem", "JRadioButtonMenuItem",
                 "ComboBox", "Button", "Tree", "ScrollPane", "TabbedPane", "EditorPane", "TitledBorder", "Menu",
                 "TextArea", "OptionPane", "MenuBar", "ToolBar", "ToggleButton", "ToolTip", "ProgressBar", "TableHeader",
                 "Panel", "List", "ColorChooser", "PasswordField", "TextField", "Table", "Label", "Viewport",
                 "RadioButtonMenuItem", "RadioButton", "DesktopPane", "InternalFrame"};
         for (String item : names) {
-            UIManager.put(item + ".font", f);
+            UIManager.put(String.format("%s.font", item), font);
         }
     }
 }

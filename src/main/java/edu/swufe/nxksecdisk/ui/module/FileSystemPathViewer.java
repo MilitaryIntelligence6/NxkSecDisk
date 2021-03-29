@@ -84,8 +84,9 @@ public class FileSystemPathViewer extends DiskDynamicWindow {
      */
     private FileSystemPathViewer() {
         encoder = Charset.forName("ISO-8859-1").newEncoder();
-        setUIFont();
-        (window = new JDialog(settingWindow.getWindow(), "管理文件系统路径")).setModal(true);
+        initUiFont();
+        window = new JDialog(settingWindow.getWindow(), "管理文件系统路径");
+        window.setModal(true);
         window.setSize(600, 240);
         window.setDefaultCloseOperation(1);
         window.setLocation(200, 200);
