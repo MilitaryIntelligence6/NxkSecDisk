@@ -42,7 +42,8 @@ public class UiLauncher {
         ServerUiModule.setStartServer(appController::start);
         ServerUiModule.setOnCloseServer(appController::stop);
         ServerUiModule.setGetServerTime(ServerTimeUtil::serverTime);
-
+        // 这个别放在类中, 因为类加载时机会加载ConfigReader, 其识别了ui模式和控制台模式;
+        // 初始化时模式为控制台模式, 会在控制台打印信息, 所以要放在这里;
         final ConfigReader config = ConfigReader.getInstance();
 
         ServerUiModule.setGetServerStatus(new GetServerStatus() {
