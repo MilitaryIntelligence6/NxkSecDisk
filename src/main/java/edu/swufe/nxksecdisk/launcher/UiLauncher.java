@@ -1,6 +1,7 @@
 package edu.swufe.nxksecdisk.launcher;
 
 import com.formdev.flatlaf.FlatDarculaLaf;
+import com.formdev.flatlaf.FlatDarkLaf;
 import edu.swufe.nxksecdisk.config.DynamicConfig;
 import edu.swufe.nxksecdisk.constant.EnumLauncherMode;
 import edu.swufe.nxksecdisk.server.app.DiskAppController;
@@ -30,6 +31,11 @@ public class UiLauncher {
 
     private volatile static UiLauncher instance;
 
+    private final ServerUiModule serverUi = ServerUiModule.getInstance();
+
+    static {
+        initSkin();
+    }
     /**
      * 实例化图形界面并显示它，同时将图形界面的各个操作与服务器控制器对应起来;
      */
@@ -39,14 +45,14 @@ public class UiLauncher {
         final ServerUiModule serverUi = ServerUiModule.getInstance();
         // 服务器控制层，用于连接UI与服务器内核;
         DiskAppController appController = new DiskAppController();
-        ServerUiModule.setStartServer(appController::start);
-        ServerUiModule.setOnCloseServer(appController::stop);
-        ServerUiModule.setGetServerTime(ServerTimeUtil::serverTime);
+        serverUi.setStartServer(appController::start);
+        serverUi.setOnCloseServer(appController::stop);
+        serverUi.setGetServerTime(ServerTimeUtil::serverTime);
         // 这个别放在类中, 因为类加载时机会加载ConfigReader, 其识别了ui模式和控制台模式;
         // 初始化时模式为控制台模式, 会在控制台打印信息, 所以要放在这里;
         final ConfigReader config = ConfigReader.getInstance();
 
-        ServerUiModule.setGetServerStatus(new GetServerStatus() {
+        serverUi.setGetServerStatus(new GetServerStatus() {
             @Override
             public boolean getServerStatus() {
                 return appController.started();
@@ -170,9 +176,9 @@ public class UiLauncher {
         return getInstance();
     }
 
-    private void initSkin() {
+    private static void initSkin() {
         try {
-            UIManager.setLookAndFeel(new FlatDarculaLaf());
+            UIManager.setLookAndFeel(new FlatDarkLaf());
         }
         catch (UnsupportedLookAndFeelException e) {
             e.printStackTrace();

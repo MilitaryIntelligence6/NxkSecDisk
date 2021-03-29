@@ -30,6 +30,8 @@ public class SettingWindow extends DiskDynamicWindow {
 
     private volatile static SettingWindow instance;
 
+    private final ServerUiModule serverUi = ServerUiModule.getInstance();
+
     protected static JDialog window;
 
     private static JTextField portInput;
@@ -84,18 +86,12 @@ public class SettingWindow extends DiskDynamicWindow {
         // 全局字体设置;
         setUIFont();
         // 窗口主体相关设置
-
-        window = new JDialog(ServerUiModule.window, "kiftd-设置");
+        window = new JDialog(serverUi.getWindow(), "kiftd-设置");
         window.setModal(true);
-
         window.setSize(420, 425);
-
         window.setLocation(150, 150);
-
         window.setDefaultCloseOperation(1);
-
         window.setResizable(false);
-
         window.setLayout(new BoxLayout(
                 window.getContentPane(), 3));
         final JPanel titlebox = new JPanel(new FlowLayout(1));

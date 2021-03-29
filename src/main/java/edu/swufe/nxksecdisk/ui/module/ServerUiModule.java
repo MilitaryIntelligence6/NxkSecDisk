@@ -1,5 +1,6 @@
 package edu.swufe.nxksecdisk.ui.module;
 
+import com.formdev.flatlaf.FlatDarkLaf;
 import edu.swufe.nxksecdisk.server.util.ConfigReader;
 import edu.swufe.nxksecdisk.system.AppSystem;
 import edu.swufe.nxksecdisk.system.Decorator;
@@ -25,45 +26,45 @@ public class ServerUiModule extends DiskDynamicWindow {
 
     private volatile static ServerUiModule instance;
 
-    protected static JFrame window;
+    private JFrame window;
 
-    private static SystemTray tray;
+    private SystemTray tray;
 
-    private static TrayIcon trayIcon;
+    private TrayIcon trayIcon;
 
     private static final JTextArea out = new JTextArea();
 
-    private static SettingWindow settingWindow;
+    private SettingWindow settingWindow;
 
-    private static FsViewer fsViewer;
+    private FsViewer fsViewer;
 
-    private static OnCloseServer closeServer;
+    private OnCloseServer closeServer;
 
-    private static OnStartServer startServer;
+    private OnStartServer startServer;
 
-    private static GetServerStatus serverStatus;
+    private GetServerStatus serverStatus;
 
-    private static GetServerTime serverTime;
+    private GetServerTime serverTime;
 
-    private static JButton start;
+    private JButton start;
 
-    private static JButton stop;
+    private JButton stop;
 
-    private static JButton restart;
+    private JButton restart;
 
-    private static JButton setting;
+    private JButton setting;
 
-    private static JButton fileIoUtil;
+    private JButton fileIoUtil;
 
-    private static JButton exit;
+    private JButton exit;
 
-    private static JLabel serverStatusLab;
+    private JLabel serverStatusLab;
 
-    private static JLabel portStatusLab;
+    private JLabel portStatusLab;
 
-    private static JLabel logLevelLab;
+    private JLabel logLevelLab;
 
-    private static JLabel bufferSizeLab;
+    private JLabel bufferSizeLab;
 
     private static final String S_STOP = "停止[Stopped]";
 
@@ -81,8 +82,6 @@ public class ServerUiModule extends DiskDynamicWindow {
 
     private SimpleDateFormat sdf;
 
-    private final ConfigReader config = ConfigReader.getInstance();
-
     /**
      * 窗口原始宽度
      */
@@ -96,19 +95,20 @@ public class ServerUiModule extends DiskDynamicWindow {
 
     private ServerUiModule() {
         setUIFont();
-        window = new JFrame("kiftd-服务器控制台");
-        window.setSize(originSizeWidth, originSizeHeight);
-        window.setLocation(100, 100);
-        window.setResizable(false);
+        setWindow(new JFrame("kiftd-服务器控制台"));
+        getWindow().setSize(originSizeWidth, originSizeHeight);
+        getWindow().setLocation(100, 100);
+        getWindow().setResizable(false);
         try {
-            window.setIconImage(
+            getWindow().setIconImage(
                     ImageIO.read(this.getClass().getResourceAsStream("/icon/icon.png")));
         }
         catch (NullPointerException | IOException e) {
             e.printStackTrace();
         }
         if (SystemTray.isSupported()) {
-            window.setDefaultCloseOperation(1);
+            // 选择到底是hide还是exit;
+            getWindow().setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
             tray = SystemTray.getSystemTray();
             String iconType = "/icon/icon_tray.png";
             if (System.getProperty("os.name").toLowerCase().indexOf("window") >= 0) {
@@ -129,27 +129,22 @@ public class ServerUiModule extends DiskDynamicWindow {
             trayIcon.addMouseListener(new MouseListener() {
                 @Override
                 public void mouseReleased(MouseEvent e) {
-                    // TODO 自动生成的方法存根
                 }
 
                 @Override
                 public void mousePressed(MouseEvent e) {
-                    // TODO 自动生成的方法存根
                 }
 
                 @Override
                 public void mouseExited(MouseEvent e) {
-                    // TODO 自动生成的方法存根
                 }
 
                 @Override
                 public void mouseEntered(MouseEvent e) {
-                    // TODO 自动生成的方法存根
                 }
 
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    // TODO 自动生成的方法存根
                     if (e.getClickCount() == 2) {
                         show();
                     }
@@ -176,21 +171,21 @@ public class ServerUiModule extends DiskDynamicWindow {
                 e.printStackTrace();
             }
         } else {
-            window.setDefaultCloseOperation(1);
+            getWindow().setDefaultCloseOperation(1);
         }
-        window.setLayout(new BoxLayout(window.getContentPane(), 3));
+        getWindow().setLayout(new BoxLayout(getWindow().getContentPane(), 3));
         final JPanel titleBox = new JPanel(new FlowLayout(1));
         titleBox.setBorder(new EmptyBorder(0, 0, (int) (-25 * proportion), 0));
         final JLabel title = new JLabel("kiftd");
         title.setFont(new Font("宋体", 1, (int) (30 * proportion)));
         titleBox.add(title);
-        window.add(titleBox);
+        getWindow().add(titleBox);
         final JPanel subtitleBox = new JPanel(new FlowLayout(1));
         subtitleBox.setBorder(new EmptyBorder(0, 0, (int) (-20 * proportion), 0));
         final JLabel subtitle = new JLabel("青阳网络文件系统-服务器");
         subtitle.setFont(new Font("宋体", 0, (int) (13 * proportion)));
         subtitleBox.add(subtitle);
-        window.add(subtitleBox);
+        getWindow().add(subtitleBox);
         final JPanel statusBox = new JPanel(new GridLayout(4, 1));
         statusBox.setBorder(BorderFactory.createEtchedBorder());
         final JPanel serverStatusPanel = new JPanel(new FlowLayout());
@@ -213,7 +208,7 @@ public class ServerUiModule extends DiskDynamicWindow {
         bufferStatus.add(new JLabel("下载缓冲区(Buffer)："));
         bufferStatus.add(bufferSizeLab = new JLabel("--"));
         statusBox.add(bufferStatus);
-        window.add(statusBox);
+        getWindow().add(statusBox);
         final JPanel buttonBox = new JPanel(new GridLayout(6, 1));
         buttonBox.add(start = new JButton("开启(Start)>>"));
         buttonBox.add(stop = new JButton("关闭(Stop)||"));
@@ -221,7 +216,7 @@ public class ServerUiModule extends DiskDynamicWindow {
         buttonBox.add(fileIoUtil = new JButton("文件(Files)[*]"));
         buttonBox.add(setting = new JButton("设置(Setting)[/]"));
         buttonBox.add(exit = new JButton("退出(Exit)[X]"));
-        window.add(buttonBox);
+        getWindow().add(buttonBox);
         final JPanel outputBox = new JPanel(new FlowLayout(1));
         outputBox.add(new JLabel("[输出信息(Server Message)]："));
 
@@ -234,35 +229,31 @@ public class ServerUiModule extends DiskDynamicWindow {
 
             @Override
             public void removeUpdate(DocumentEvent e) {
-                // TODO 自动生成的方法存根
             }
 
             @Override
             public void insertUpdate(DocumentEvent e) {
-                // TODO 自动生成的方法存根
                 AppSystem.pool.execute(ServerUiModule.this::runInsertUpdate);
             }
 
             @Override
             public void changedUpdate(DocumentEvent e) {
-                // TODO 自动生成的方法存根
                 out.selectAll();
                 out.setCaretPosition(out.getSelectedText().length());
                 out.requestFocus();
             }
         });
         outputBox.add(new JScrollPane(out));
-        window.add(outputBox);
+        getWindow().add(outputBox);
         final JPanel bottomBox = new JPanel(new FlowLayout(1));
         bottomBox.setBorder(new EmptyBorder(0, 0, (int) (-30 * proportion), 0));
         bottomBox.add(new JLabel("--青阳龙野@kohgylw--"));
-        window.add(bottomBox);
+        getWindow().add(bottomBox);
         start.setEnabled(false);
         stop.setEnabled(false);
         restart.setEnabled(false);
         setting.setEnabled(false);
         start.addActionListener(e -> {
-            // TODO 自动生成的方法存根
             start.setEnabled(false);
             setting.setEnabled(false);
             fileIoUtil.setEnabled(false);
@@ -276,7 +267,6 @@ public class ServerUiModule extends DiskDynamicWindow {
             }
         });
         stop.addActionListener(e -> {
-            // TODO 自动生成的方法存根
             stop.setEnabled(false);
             restart.setEnabled(false);
             fileIoUtil.setEnabled(false);
@@ -287,7 +277,6 @@ public class ServerUiModule extends DiskDynamicWindow {
             AppSystem.pool.execute(this::runClose);
         });
         exit.addActionListener(e -> {
-            // TODO 自动生成的方法存根
             fileIoUtil.setEnabled(false);
             if (filesViewer != null) {
                 filesViewer.setEnabled(false);
@@ -295,7 +284,6 @@ public class ServerUiModule extends DiskDynamicWindow {
             exit();
         });
         restart.addActionListener(e -> {
-            // TODO 自动生成的方法存根
             stop.setEnabled(false);
             restart.setEnabled(false);
             fileIoUtil.setEnabled(false);
@@ -305,7 +293,6 @@ public class ServerUiModule extends DiskDynamicWindow {
             AppSystem.pool.execute(ServerUiModule.this::runReboot);
         });
         setting.addActionListener(e -> {
-            // TODO 自动生成的方法存根
             settingWindow = SettingWindow.getInstance();
             AppSystem.pool.execute(settingWindow::show);
         });
@@ -316,7 +303,7 @@ public class ServerUiModule extends DiskDynamicWindow {
             }
             AppSystem.pool.execute(this::runReadFile);
         });
-        modifyComponentSize(window);
+        modifyComponentSize(getWindow());
         init();
     }
 
@@ -329,11 +316,11 @@ public class ServerUiModule extends DiskDynamicWindow {
     }
 
     public void show() {
-        window.setVisible(true);
+        getWindow().setVisible(true);
         updateServerStatus();
     }
 
-    public static void setOnCloseServer(final OnCloseServer cs) {
+    public void setOnCloseServer(final OnCloseServer cs) {
         closeServer = cs;
     }
 
@@ -348,12 +335,12 @@ public class ServerUiModule extends DiskDynamicWindow {
         return instance;
     }
 
-    public static void setStartServer(final OnStartServer ss) {
+    public void setStartServer(final OnStartServer ss) {
         startServer = ss;
     }
 
-    public static void setGetServerStatus(final GetServerStatus st) {
-        serverStatus = st;
+    public void setGetServerStatus(final GetServerStatus st) {
+        this.serverStatus = st;
         SettingWindow.serverStatus = st;
     }
 
@@ -393,8 +380,8 @@ public class ServerUiModule extends DiskDynamicWindow {
         return sdf.format(new Date());
     }
 
-    public static void setGetServerTime(final GetServerTime serverTime) {
-        ServerUiModule.serverTime = serverTime;
+    public void setGetServerTime(final GetServerTime serverTime) {
+        this.serverTime = serverTime;
     }
 
     public static void setUpdateSetting(final UpdateSetting updateSetting) {
@@ -416,6 +403,8 @@ public class ServerUiModule extends DiskDynamicWindow {
     }
 
     private void runBoot() {
+        // 放在里面以免开始就初始化config;
+        final ConfigReader config = ConfigReader.getInstance();
         if (startServer.start()) {
             println("启动完成。正在检查服务器状态...");
             if (serverStatus.getServerStatus()) {
@@ -573,10 +562,18 @@ public class ServerUiModule extends DiskDynamicWindow {
         }
         catch (SQLException e1) {
             e1.printStackTrace();
-            JOptionPane.showMessageDialog(window, "错误：无法打开文件，文件系统可能已损坏，您可以尝试重启应用。", "错误",
+            JOptionPane.showMessageDialog(getWindow(), "错误：无法打开文件，文件系统可能已损坏，您可以尝试重启应用。", "错误",
                     JOptionPane.ERROR_MESSAGE);
         }
         filesViewer.setEnabled(true);
         fileIoUtil.setEnabled(true);
+    }
+
+    public JFrame getWindow() {
+        return window;
+    }
+
+    public void setWindow(JFrame window) {
+        this.window = window;
     }
 }

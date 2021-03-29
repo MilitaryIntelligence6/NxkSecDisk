@@ -41,6 +41,8 @@ public class FsViewer extends DiskDynamicWindow {
      */
     private volatile static FsViewer instance;
 
+    private final ServerUiModule serverUi = ServerUiModule.getInstance();
+
     /**
      * 窗体对象
      */
@@ -99,7 +101,7 @@ public class FsViewer extends DiskDynamicWindow {
     private FsViewer() throws SQLException {
         setUIFont();
         worker = Executors.newSingleThreadExecutor();
-        window = new JDialog(ServerUiModule.window, "kiftd-ROOT");
+        window = new JDialog(serverUi.getWindow(), "kiftd-ROOT");
         window.setSize(750, 450);
         window.setDefaultCloseOperation(1);
         window.setLocation(150, 150);
