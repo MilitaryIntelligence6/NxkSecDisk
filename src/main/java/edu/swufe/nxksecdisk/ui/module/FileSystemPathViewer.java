@@ -32,6 +32,8 @@ public class FileSystemPathViewer extends DiskDynamicWindow {
      */
     private volatile static FileSystemPathViewer instance;
 
+    private final SettingWindow settingWindow = SettingWindow.getInstance();
+
     /**
      * 窗体对象
      */
@@ -83,7 +85,7 @@ public class FileSystemPathViewer extends DiskDynamicWindow {
     private FileSystemPathViewer() {
         encoder = Charset.forName("ISO-8859-1").newEncoder();
         setUIFont();
-        (window = new JDialog(SettingWindow.window, "管理文件系统路径")).setModal(true);
+        (window = new JDialog(settingWindow.getWindow(), "管理文件系统路径")).setModal(true);
         window.setSize(600, 240);
         window.setDefaultCloseOperation(1);
         window.setLocation(200, 200);
@@ -108,12 +110,12 @@ public class FileSystemPathViewer extends DiskDynamicWindow {
         toolBar.addSeparator();
         c.add(toolBar, BorderLayout.NORTH);
         // 各个工具栏按钮的功能实现
-        maxExtendStoresNum = SettingWindow.serverStatus == null ? 0 :
-                SettingWindow.serverStatus.getMaxExtendStoresNum();
+        maxExtendStoresNum = settingWindow.getServerStatus() == null ? 0 :
+                settingWindow.getServerStatus().getMaxExtendStoresNum();
         addBtn.addActionListener((e) ->
         {
             disableAllButtons();
-            if (SettingWindow.extendStores.size() < maxExtendStoresNum) {
+            if (settingWindow.getExtendStores().size() < maxExtendStoresNum) {
                 JFileChooser addExtendStoresChooer = new JFileChooser();
                 addExtendStoresChooer.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
                 addExtendStoresChooer.setPreferredSize(fileChooserSize);
@@ -121,7 +123,7 @@ public class FileSystemPathViewer extends DiskDynamicWindow {
                 if (addExtendStoresChooer.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
                     File newExtendStores = addExtendStoresChooer.getSelectedFile();
                     if (newExtendStores.isDirectory() && newExtendStores.canRead() && newExtendStores.canWrite()) {
-                        if (SettingWindow.extendStores.parallelStream()
+                        if (settingWindow.getExtendStores().parallelStream()
                                 .anyMatch(f -> f.getPath().equals(newExtendStores))) {
                             JOptionPane.showMessageDialog(window, "错误：该路径已被其他扩展存储区占用。", "错误",
                                     JOptionPane.WARNING_MESSAGE);
@@ -130,17 +132,17 @@ public class FileSystemPathViewer extends DiskDynamicWindow {
                             String pathName = newExtendStores.getAbsolutePath();
                             if (encoder.canEncode(pathName) && pathName.indexOf("\\:") < 0
                                     && pathName.indexOf("\\\\") < 0) {
-                                Short[] indexs = SettingWindow.extendStores.parallelStream().map((s) -> s.getIndex())
+                                Short[] indexArray = settingWindow.getExtendStores().parallelStream().map((s) -> s.getIndex())
                                         .toArray(Short[]::new);
                                 short index = 1;
-                                while (Arrays.binarySearch(indexs, index) >= 0) {
+                                while (Arrays.binarySearch(indexArray, index) >= 0) {
                                     index++;
                                 }
                                 FileSystemPath nfsp = new FileSystemPath();
                                 nfsp.setIndex(index);
                                 nfsp.setType(FileSystemPath.EXTEND_STORES_NAME);
                                 nfsp.setPath(addExtendStoresChooer.getSelectedFile());
-                                SettingWindow.extendStores.add(nfsp);
+                                settingWindow.getExtendStores().add(nfsp);
                             }
                             else {
                                 JOptionPane.showMessageDialog(window, INVALID_PATH_ALTER, "错误",
@@ -167,8 +169,8 @@ public class FileSystemPathViewer extends DiskDynamicWindow {
                     JFileChooser mainFileSystemPathChooer = new JFileChooser();
                     mainFileSystemPathChooer.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
                     mainFileSystemPathChooer.setPreferredSize(fileChooserSize);
-                    if (SettingWindow.serverStatus != null) {
-                        File fileSystemPath = new File(SettingWindow.serverStatus.getFileSystemPath());
+                    if (settingWindow.getServerStatus() != null) {
+                        File fileSystemPath = new File(settingWindow.getServerStatus().getFileSystemPath());
                         if (fileSystemPath.isDirectory()) {
                             mainFileSystemPathChooer.setCurrentDirectory(fileSystemPath);
                         }
@@ -177,13 +179,13 @@ public class FileSystemPathViewer extends DiskDynamicWindow {
                     if (mainFileSystemPathChooer.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
                         File selectPath = mainFileSystemPathChooer.getSelectedFile();
                         if (selectPath.isDirectory() && selectPath.canWrite() && selectPath.canRead()) {
-                            if (!SettingWindow.extendStores.parallelStream()
+                            if (!settingWindow.getExtendStores().parallelStream()
                                     .anyMatch(f -> f.getPath().equals(selectPath))) {
                                 String pathName = selectPath.getAbsolutePath();
                                 if (new File(ConfigReader.getInstance().getInitFileSystemPath()).equals(selectPath)
                                         || (encoder.canEncode(pathName) && pathName.indexOf("\\:") < 0
                                         && pathName.indexOf("\\\\") < 0)) {
-                                    SettingWindow.chooserPath = mainFileSystemPathChooer.getSelectedFile();
+                                    settingWindow.setChooserPath(mainFileSystemPathChooer.getSelectedFile());
                                 }
                                 else {
                                     JOptionPane.showMessageDialog(window, INVALID_PATH_ALTER, "错误",
@@ -206,16 +208,16 @@ public class FileSystemPathViewer extends DiskDynamicWindow {
                     mainFileSystemPathChooer.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
                     mainFileSystemPathChooer.setPreferredSize(fileChooserSize);
                     FileSystemPath fsp = null;
-                    for (int i = 0; i < SettingWindow.extendStores.size(); i++) {
-                        if (SettingWindow.extendStores.get(i).getIndex() == index) {
-                            fsp = SettingWindow.extendStores.get(i);
+                    for (int i = 0; i < settingWindow.getExtendStores().size(); i++) {
+                        if (settingWindow.getExtendStores().get(i).getIndex() == index) {
+                            fsp = settingWindow.getExtendStores().get(i);
                             mainFileSystemPathChooer.setCurrentDirectory(fsp.getPath());
                             mainFileSystemPathChooer.setDialogTitle("请选择扩展存储区路径");
                             if (mainFileSystemPathChooer.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
                                 disableAllButtons();
                                 File selectPath = mainFileSystemPathChooer.getSelectedFile();
                                 if (selectPath.isDirectory() && selectPath.canWrite() && selectPath.canRead()) {
-                                    if (fsp.getPath().equals(selectPath) || !SettingWindow.extendStores.parallelStream()
+                                    if (fsp.getPath().equals(selectPath) || !settingWindow.getExtendStores().parallelStream()
                                             .anyMatch(f -> f.getPath().equals(selectPath))) {
                                         String pathName = selectPath.getAbsolutePath();
                                         if (encoder.canEncode(pathName) && pathName.indexOf("\\:") < 0
@@ -251,9 +253,9 @@ public class FileSystemPathViewer extends DiskDynamicWindow {
             if (JOptionPane.showConfirmDialog(window, "确认要移除该扩展存储区么？警告：移除后，该存储区内原先存放的数据将丢失，且设置生效后不可恢复。", "移除扩展存储区",
                     JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
                 short index = pathsTable.getSelectFileSystemIndex();
-                for (int i = 0; i < SettingWindow.extendStores.size(); i++) {
-                    if (SettingWindow.extendStores.get(i).getIndex() == index) {
-                        SettingWindow.extendStores.remove(i);
+                for (int i = 0; i < settingWindow.getExtendStores().size(); i++) {
+                    if (settingWindow.getExtendStores().get(i).getIndex() == index) {
+                        settingWindow.getExtendStores().remove(i);
                         break;
                     }
                 }
@@ -290,16 +292,18 @@ public class FileSystemPathViewer extends DiskDynamicWindow {
         modifyComponentSize(window);
     }
 
-    // 刷新文件列表
+    /**
+     * 刷新文件列表;
+     */
     private void refresh() {
         paths.clear();
         FileSystemPath mainfsp = new FileSystemPath();
         mainfsp.setType(FileSystemPath.MAIN_FILE_SYSTEM_NAME);
-        mainfsp.setPath(SettingWindow.chooserPath);
+        mainfsp.setPath(settingWindow.getChooserPath());
         mainfsp.setIndex((short) 0);// 主文件系统路径的编号必须是0！
         paths.add(mainfsp);
-        if (SettingWindow.extendStores != null) {
-            paths.addAll(SettingWindow.extendStores);
+        if (settingWindow.getExtendStores() != null) {
+            paths.addAll(settingWindow.getExtendStores());
         }
         pathsTable.updateValues(paths);
     }
@@ -345,17 +349,21 @@ public class FileSystemPathViewer extends DiskDynamicWindow {
         return instance;
     }
 
-    // 锁定全部按钮避免重复操作
+    /**
+     * 锁定全部按钮避免重复操作;
+     */
     private void disableAllButtons() {
         addBtn.setEnabled(false);
         changeBtn.setEnabled(false);
         removeBtn.setEnabled(false);
     }
 
-    // 解锁可用按钮
+    /**
+     * 解锁可用按钮;
+     */
     private void enableAllButtons() {
         // 针对一些常规按钮的解锁
-        if (SettingWindow.extendStores.size() < maxExtendStoresNum) {
+        if (settingWindow.getExtendStores().size() < maxExtendStoresNum) {
             addBtn.setEnabled(true);
         }
         else {

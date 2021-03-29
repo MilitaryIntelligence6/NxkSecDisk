@@ -1,6 +1,5 @@
 package edu.swufe.nxksecdisk.ui.module;
 
-import com.formdev.flatlaf.FlatDarkLaf;
 import edu.swufe.nxksecdisk.server.util.ConfigReader;
 import edu.swufe.nxksecdisk.system.AppSystem;
 import edu.swufe.nxksecdisk.system.Decorator;
@@ -26,6 +25,8 @@ public class ServerUiModule extends DiskDynamicWindow {
 
     private volatile static ServerUiModule instance;
 
+    private SettingWindow settingWindow;
+
     private JFrame window;
 
     private SystemTray tray;
@@ -33,8 +34,6 @@ public class ServerUiModule extends DiskDynamicWindow {
     private TrayIcon trayIcon;
 
     private static final JTextArea out = new JTextArea();
-
-    private SettingWindow settingWindow;
 
     private FsViewer fsViewer;
 
@@ -341,7 +340,7 @@ public class ServerUiModule extends DiskDynamicWindow {
 
     public void setGetServerStatus(final GetServerStatus st) {
         this.serverStatus = st;
-        SettingWindow.serverStatus = st;
+        SettingWindow.getInstance().setServerStatus(st);
     }
 
     public void updateServerStatus() {
@@ -384,8 +383,8 @@ public class ServerUiModule extends DiskDynamicWindow {
         this.serverTime = serverTime;
     }
 
-    public static void setUpdateSetting(final UpdateSetting updateSetting) {
-        SettingWindow.updateSetting = updateSetting;
+    public void setUpdateSetting(final UpdateSetting updateSetting) {
+        SettingWindow.getInstance().setUpdateSetting(updateSetting);
     }
 
     private void runInsertUpdate() {

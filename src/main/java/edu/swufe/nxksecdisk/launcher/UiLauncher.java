@@ -146,7 +146,7 @@ public class UiLauncher {
                 return config.getMaxExtendstoresNum();
             }
         });
-        ServerUiModule.setUpdateSetting(config::doUpdate);
+        serverUi.setUpdateSetting(config::doUpdate);
         serverUi.show();
     }
 
