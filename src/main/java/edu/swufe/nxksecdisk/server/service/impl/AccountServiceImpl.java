@@ -50,12 +50,14 @@ public class AccountServiceImpl implements AccountService {
 
     private CharsetEncoder iso88591Encoder;
 
+    private final ConfigReader config = ConfigReader.getInstance();
+
     {
         iso88591Encoder = Charset.forName("ISO-8859-1").newEncoder();
-        if (!ConfigureReader.getInstance().getVCLevel().equals(VcLevel.CLOSE)) {
+        if (!config.getVCLevel().equals(VcLevel.CLOSE)) {
             int line = 0;
             int oval = 0;
-            switch (ConfigureReader.getInstance().getVCLevel()) {
+            switch (config.getVCLevel()) {
                 case STANDARD: {
                     line = 6;
                     oval = 2;
@@ -88,11 +90,11 @@ public class AccountServiceImpl implements AccountService {
                 return "error";
             }
             final String accountId = info.getAccountId();
-            if (!ConfigureReader.getInstance().foundAccount(accountId)) {
+            if (!config.foundAccount(accountId)) {
                 return "accountnotfound";
             }
             // 如果验证码开启且该账户已被关注，则要求提供验证码
-            if (!ConfigureReader.getInstance().getVCLevel().equals(VcLevel.CLOSE)) {
+            if (!config.getVCLevel().equals(VcLevel.CLOSE)) {
                 synchronized (focusAccount) {
                     if (focusAccount.contains(accountId)) {
                         String reqVerCode = request.getParameter("vercode");
@@ -106,10 +108,10 @@ public class AccountServiceImpl implements AccountService {
                     }
                 }
             }
-            if (ConfigureReader.getInstance().checkAccountPwd(accountId, info.getAccountPwd())) {
+            if (config.checkAccountPwd(accountId, info.getAccountPwd())) {
                 session.setAttribute("ACCOUNT", (Object) accountId);
                 // 如果该账户输入正确且是一个被关注的账户，则解除该账户的关注，释放空间
-                if (!ConfigureReader.getInstance().getVCLevel().equals(VcLevel.CLOSE)) {
+                if (!config.getVCLevel().equals(VcLevel.CLOSE)) {
                     synchronized (focusAccount) {
                         focusAccount.remove(accountId);
                     }
@@ -118,7 +120,7 @@ public class AccountServiceImpl implements AccountService {
             }
             // 如果账户密码不匹配，则将该账户加入到关注账户集合，避免对方进一步破解
             synchronized (focusAccount) {
-                if (!ConfigureReader.getInstance().getVCLevel().equals(VcLevel.CLOSE)) {
+                if (!config.getVCLevel().equals(VcLevel.CLOSE)) {
                     focusAccount.add(accountId);
                 }
             }
@@ -145,7 +147,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public void getNewLoginVerCode(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
         try {
-            if (ConfigureReader.getInstance().getVCLevel().equals(VcLevel.CLOSE)) {
+            if (config.getVCLevel().equals(VcLevel.CLOSE)) {
                 response.sendError(404);
             }
             else {
@@ -181,7 +183,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public String changePassword(HttpServletRequest request) {
         // 验证是否开启了用户修改密码功能
-        if (!ConfigureReader.getInstance().isAllowChangePassword()) {
+        if (!config.isAllowChangePassword()) {
             return "illegal";
         }
         // 必须登录了一个账户
@@ -200,7 +202,7 @@ public class AccountServiceImpl implements AccountService {
                 return "error";
             }
             // 如果验证码开启且该账户已被关注，则要求提供验证码
-            if (!ConfigureReader.getInstance().getVCLevel().equals(VcLevel.CLOSE)) {
+            if (!config.getVCLevel().equals(VcLevel.CLOSE)) {
                 synchronized (focusAccount) {
                     if (focusAccount.contains(account)) {
                         String reqVerCode = request.getParameter("vercode");
@@ -213,9 +215,9 @@ public class AccountServiceImpl implements AccountService {
                     }
                 }
             }
-            if (ConfigureReader.getInstance().checkAccountPwd(account, info.getOldPwd())) {
+            if (config.checkAccountPwd(account, info.getOldPwd())) {
                 // 如果该账户输入正确且是一个被关注的账户，则解除该账户的关注，释放空间
-                if (!ConfigureReader.getInstance().getVCLevel().equals(VcLevel.CLOSE)) {
+                if (!config.getVCLevel().equals(VcLevel.CLOSE)) {
                     synchronized (focusAccount) {
                         focusAccount.remove(account);
                     }
@@ -224,7 +226,7 @@ public class AccountServiceImpl implements AccountService {
                 // 新密码合法性检查
                 if (newPassword != null && newPassword.length() >= 3 && newPassword.length() <= 32
                         && iso88591Encoder.canEncode(newPassword)) {
-                    if (ConfigureReader.getInstance().changePassword(account, newPassword)) {
+                    if (config.changePassword(account, newPassword)) {
                         logUtil.writeChangePasswordEvent(request, account, newPassword);
                         return "success";
                     }
@@ -234,7 +236,7 @@ public class AccountServiceImpl implements AccountService {
             else {
                 // 如果账户密码不匹配，则将该账户加入到关注账户集合，避免对方进一步破解
                 synchronized (focusAccount) {
-                    if (!ConfigureReader.getInstance().getVCLevel().equals(VcLevel.CLOSE)) {
+                    if (!config.getVCLevel().equals(VcLevel.CLOSE)) {
                         focusAccount.add(account);
                     }
                 }
@@ -249,13 +251,13 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public String isAllowSignUp() {
-        return ConfigureReader.getInstance().isAllowSignUp() ? "true" : "false";
+        return config.isAllowSignUp() ? "true" : "false";
     }
 
     @Override
     public String doSignUp(HttpServletRequest request) {
         // 验证是否开启了注册功能
-        if (!ConfigureReader.getInstance().isAllowSignUp()) {
+        if (!config.isAllowSignUp()) {
             return "illegal";
         }
         HttpSession session = request.getSession();
@@ -265,7 +267,7 @@ public class AccountServiceImpl implements AccountService {
         }
         // 如果开启了验证码则必须输入
         String reqVerCode = request.getParameter("vercode");
-        if (!ConfigureReader.getInstance().getVCLevel().equals(VcLevel.CLOSE)) {
+        if (!config.getVCLevel().equals(VcLevel.CLOSE)) {
             String trueVerCode = (String) session.getAttribute("VERCODE");
             session.removeAttribute("VERCODE");// 确保一个验证码只会生效一次，无论对错
             if (reqVerCode == null || trueVerCode == null || !trueVerCode.equals(reqVerCode.toLowerCase())) {
@@ -281,7 +283,7 @@ public class AccountServiceImpl implements AccountService {
             if (System.currentTimeMillis() - Long.parseLong(info.getTime()) > TIME_OUT) {
                 return "error";
             }
-            if (ConfigureReader.getInstance().foundAccount(info.getAccount())) {
+            if (config.foundAccount(info.getAccount())) {
                 return "accountexists";
             }
             String account = info.getAccount();
@@ -292,7 +294,7 @@ public class AccountServiceImpl implements AccountService {
                 if (account.indexOf("=") < 0 && account.indexOf(":") < 0 && account.indexOf("#") != 0) {
                     if (password != null && password.length() >= 3 && password.length() <= 32
                             && iso88591Encoder.canEncode(password)) {
-                        if (ConfigureReader.getInstance().createNewAccount(account, password)) {
+                        if (config.createNewAccount(account, password)) {
                             logUtil.writeSignUpEvent(request, account, password);
                             session.setAttribute("ACCOUNT", account);
                             return "success";

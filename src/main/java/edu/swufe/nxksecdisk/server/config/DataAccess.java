@@ -1,6 +1,6 @@
 package edu.swufe.nxksecdisk.server.config;
 
-import edu.swufe.nxksecdisk.server.util.ConfigureReader;
+import edu.swufe.nxksecdisk.server.util.ConfigReader;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.mapper.MapperScannerConfigurer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,28 +26,31 @@ import java.io.File;
 public class DataAccess
 {
     private static Resource[] mapperFiles;
-    private static Resource mybatisConfg;
+
+    private static Resource mybatisConfig;
+
+    private static final ConfigReader config = ConfigReader.getInstance();
 
     @Bean
     public DataSource dataSource()
     {
-        final DriverManagerDataSource ds = new DriverManagerDataSource();
-        ds.setDriverClassName(ConfigureReader.getInstance().getFileNodePathDriver());
-        ds.setUrl(ConfigureReader.getInstance().getFileNodePathURL());
-        ds.setUsername(ConfigureReader.getInstance().getFileNodePathUserName());
-        ds.setPassword(ConfigureReader.getInstance().getFileNodePathPassWord());
-        return (DataSource) ds;
+        final DriverManagerDataSource dataSource = new DriverManagerDataSource();
+        dataSource.setDriverClassName(config.getFileNodePathDriver());
+        dataSource.setUrl(config.getFileNodePathURL());
+        dataSource.setUsername(config.getFileNodePathUserName());
+        dataSource.setPassword(config.getFileNodePathPassWord());
+        return dataSource;
     }
 
     @Bean(name = {"sqlSessionFactory"})
     @Autowired
     public SqlSessionFactoryBean sqlSessionFactoryBean(final DataSource ds)
     {
-        final SqlSessionFactoryBean ssf = new SqlSessionFactoryBean();
-        ssf.setDataSource(ds);
-        ssf.setConfigLocation(DataAccess.mybatisConfg);
-        ssf.setMapperLocations(DataAccess.mapperFiles);
-        return ssf;
+        final SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
+        sqlSessionFactoryBean.setDataSource(ds);
+        sqlSessionFactoryBean.setConfigLocation(DataAccess.mybatisConfig);
+        sqlSessionFactoryBean.setMapperLocations(DataAccess.mapperFiles);
+        return sqlSessionFactoryBean;
     }
 
     @Bean
@@ -62,12 +65,12 @@ public class DataAccess
     static
     {
         final String mybatisResourceFolder = String.format("%s%smybatisResource%s",
-                ConfigureReader.getInstance().getPath(),
+                config.getPath(),
                 File.separator, File.separator);
         final String mapperFilesFolder = mybatisResourceFolder + "mapperXML" + File.separator;
         DataAccess.mapperFiles = new Resource[]{new FileSystemResource(mapperFilesFolder + "NodeMapper.xml"),
                 new FileSystemResource(mapperFilesFolder + "FolderMapper.xml"),
                 new FileSystemResource(mapperFilesFolder + "PropertiesMapper.xml")};
-        DataAccess.mybatisConfg = (Resource) new FileSystemResource(mybatisResourceFolder + "mybatis.xml");
+        DataAccess.mybatisConfig = (Resource) new FileSystemResource(mybatisResourceFolder + "mybatis.xml");
     }
 }

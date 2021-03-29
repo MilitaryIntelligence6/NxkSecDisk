@@ -72,6 +72,8 @@ public class ResourceServiceImpl implements ResourceService {
     @Resource
     private IpAddrGetter ipAddrGetter;
 
+    private final ConfigReader config = ConfigReader.getInstance();
+
     /**
      * 提供资源的输出流，原理与下载相同，但是个别细节有区别;
      *
@@ -85,9 +87,9 @@ public class ResourceServiceImpl implements ResourceService {
         if (fid != null) {
             Node n = nodeMapper.queryById(fid);
             if (n != null) {
-                if (ConfigureReader.getInstance().authorized(account, AccountAuth.DOWNLOAD_FILES,
+                if (config.authorized(account, AccountAuth.DOWNLOAD_FILES,
                         folderUtil.getAllFoldersId(n.getFileParentFolder()))
-                        && ConfigureReader.getInstance().accessFolder(folderMapper.queryById(n.getFileParentFolder())
+                        && config.accessFolder(folderMapper.queryById(n.getFileParentFolder())
                         , account)) {
                     File file = fileBlockUtil.getFileFromBlocks(n);
                     if (file != null && file.isFile()) {
@@ -109,7 +111,7 @@ public class ResourceServiceImpl implements ResourceService {
                                     synchronized (VideoTranscodeUtil.videoTranscodeThreads) {
                                         VideoTranscodeThread vtt = VideoTranscodeUtil.videoTranscodeThreads.get(fid);
                                         if (vtt != null) {// 针对需要转码的视频（在转码列表中存在）
-                                            File f = new File(ConfigureReader.getInstance().getTemporaryfilePath(),
+                                            File f = new File(config.getTemporaryfilePath(),
                                                     vtt.getOutputFileName());
                                             if (f.isFile() && vtt.getProgress().equals("FIN")) {
                                                 // 判断是否转码成功
@@ -235,7 +237,7 @@ public class ResourceServiceImpl implements ResourceService {
             else {
                 requestSize = Long.MAX_VALUE;
             }
-            byte[] buffer = new byte[ConfigureReader.getInstance().getBuffSize()];
+            byte[] buffer = new byte[config.getBuffSize()];
             response.setContentType(contentType);
             response.setHeader("Accept-Ranges", "bytes");
             response.setHeader("ETag", this.fileBlockUtil.getETag(resource));
@@ -314,9 +316,9 @@ public class ResourceServiceImpl implements ResourceService {
         if (fileId != null) {
             Node n = nodeMapper.queryById(fileId);
             if (n != null) {
-                if (ConfigureReader.getInstance().authorized(account, AccountAuth.DOWNLOAD_FILES,
+                if (config.authorized(account, AccountAuth.DOWNLOAD_FILES,
                         folderUtil.getAllFoldersId(n.getFileParentFolder()))
-                        && ConfigureReader.getInstance().accessFolder(folderMapper.queryById(n.getFileParentFolder())
+                        && config.accessFolder(folderMapper.queryById(n.getFileParentFolder())
                         , account)) {
                     File file = fileBlockUtil.getFileFromBlocks(n);
                     if (file != null && file.isFile()) {
@@ -367,9 +369,9 @@ public class ResourceServiceImpl implements ResourceService {
         if (fileId != null) {
             Node n = nodeMapper.queryById(fileId);
             if (n != null) {
-                if (ConfigureReader.getInstance().authorized(account, AccountAuth.DOWNLOAD_FILES,
+                if (config.authorized(account, AccountAuth.DOWNLOAD_FILES,
                         folderUtil.getAllFoldersId(n.getFileParentFolder()))
-                        && ConfigureReader.getInstance().accessFolder(folderMapper.queryById(n.getFileParentFolder())
+                        && config.accessFolder(folderMapper.queryById(n.getFileParentFolder())
                         , account)) {
                     File file = fileBlockUtil.getFileFromBlocks(n);
                     if (file != null && file.isFile()) {
@@ -435,9 +437,9 @@ public class ResourceServiceImpl implements ResourceService {
         if (fileId != null) {
             Node n = nodeMapper.queryById(fileId);
             if (n != null) {
-                if (ConfigureReader.getInstance().authorized(account, AccountAuth.DOWNLOAD_FILES,
+                if (config.authorized(account, AccountAuth.DOWNLOAD_FILES,
                         folderUtil.getAllFoldersId(n.getFileParentFolder()))
-                        && ConfigureReader.getInstance().accessFolder(folderMapper.queryById(n.getFileParentFolder())
+                        && config.accessFolder(folderMapper.queryById(n.getFileParentFolder())
                         , account)) {
                     File file = fileBlockUtil.getFileFromBlocks(n);
                     if (file != null && file.isFile()) {
@@ -500,9 +502,9 @@ public class ResourceServiceImpl implements ResourceService {
         if (fileId != null) {
             Node n = nodeMapper.queryById(fileId);
             if (n != null) {
-                if (ConfigureReader.getInstance().authorized(account, AccountAuth.DOWNLOAD_FILES,
+                if (config.authorized(account, AccountAuth.DOWNLOAD_FILES,
                         folderUtil.getAllFoldersId(n.getFileParentFolder()))
-                        && ConfigureReader.getInstance().accessFolder(folderMapper.queryById(n.getFileParentFolder())
+                        && config.accessFolder(folderMapper.queryById(n.getFileParentFolder())
                         , account)) {
                     File file = fileBlockUtil.getFileFromBlocks(n);
                     if (file != null && file.isFile()) {
@@ -570,7 +572,7 @@ public class ResourceServiceImpl implements ResourceService {
 
     @Override
     public void getNoticeContext(HttpServletRequest request, HttpServletResponse response) {
-        File noticeHTML = new File(ConfigureReader.getInstance().getTemporaryfilePath(), NoticeUtil.NOTICE_OUTPUT_NAME);
+        File noticeHTML = new File(config.getTemporaryfilePath(), NoticeUtil.NOTICE_OUTPUT_NAME);
         String contentType = "text/html";
         if (noticeHTML.isFile() && noticeHTML.canRead()) {
             sendResource(noticeHTML, NoticeUtil.NOTICE_FILE_NAME, contentType, request, response);

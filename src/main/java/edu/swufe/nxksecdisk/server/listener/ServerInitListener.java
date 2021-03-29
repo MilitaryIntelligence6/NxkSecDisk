@@ -43,13 +43,11 @@ public class ServerInitListener implements ServletContextListener {
     /**
      * 用于在服务器启动后动态监听服务器主目录的线程，以便实现某些文件的动态更新
      */
-//    private Thread pathWatchServiceThread;
     private Runnable pathWatchServiceRunnable;
 
     /**
      * 用于在服务器启动后实时清理失效额外权限配置的线程，以便及时清理被删除的文件夹对应的额外权限配置
      */
-//    private Thread cleanInvalidAddedAuthThread;
     private Runnable cleanInvalidAddedAuthRunnable;
 
 
@@ -81,6 +79,8 @@ public class ServerInitListener implements ServletContextListener {
      */
     private LogUtil logUtil;
 
+    private final ConfigReader config = ConfigReader.getInstance();
+
     @Override
     public void contextInitialized(final ServletContextEvent sce) {
         // 获取IOC容器，用于实例化一些必要的工具
@@ -90,7 +90,7 @@ public class ServerInitListener implements ServletContextListener {
         FileNodeUtil.initNodeTableToDataBase();
         // 2，校对文件块并清理临时文件夹
         AppSystem.out.println("文件系统节点信息校对...");
-        final String fsp = ConfigureReader.getInstance().getFileSystemPath();
+        final String fsp = config.getFileSystemPath();
         final File fspf = new File(fsp);
         if (fspf.isDirectory() && fspf.canRead() && fspf.canWrite()) {
             fileBlockUtil = context.getBean(FileBlockUtil.class);
@@ -127,7 +127,7 @@ public class ServerInitListener implements ServletContextListener {
         // 之后当监听到改动操作时再重载内容
         if (pathWatchServiceRunnable == null) {
             // 对服务器主目录进行监听，主要监听文件改动事件
-            Path confPath = Paths.get(ConfigureReader.getInstance().getPath());
+            Path confPath = Paths.get(config.getPath());
             pathWatchServiceRunnable = () -> {
                 try {
                     while (run) {
@@ -167,14 +167,14 @@ public class ServerInitListener implements ServletContextListener {
                 while (continueCheck) {
                     if (needCheck) {
                         List<String> invalidIdList = new ArrayList<>();
-                        List<String> idList = ConfigureReader.getInstance().getAllAddedAuthFoldersId();
+                        List<String> idList = config.getAllAddedAuthFoldersId();
                         for (String id : idList) {
                             if (folderMapper.queryById(id) == null) {
                                 invalidIdList.add(id);
                                 AppSystem.out.println("文件夹ID：" + id + "对应的文件夹不存在或已被删除，相关的额外权限设置将被清理。");
                             }
                         }
-                        if (ConfigureReader.getInstance().removeAddedAuthByFolderId(invalidIdList)) {
+                        if (config.removeAddedAuthByFolderId(invalidIdList)) {
                             AppSystem.out.println("失效的额外权限设置已经清理完成。");
                         }
                         needCheck = false;

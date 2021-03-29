@@ -1,6 +1,6 @@
 package edu.swufe.nxksecdisk.server.filter;
 
-import edu.swufe.nxksecdisk.server.util.ConfigureReader;
+import edu.swufe.nxksecdisk.server.util.ConfigReader;
 import org.springframework.core.annotation.Order;
 
 import javax.servlet.*;
@@ -32,21 +32,23 @@ public class ProtectedUrlFilter implements Filter {
         final String url = hsq.getServletPath();
         switch (url) {
             case "/prv/forbidden.html":
-            case "/prv/error.html":
+            case "/prv/error.html": {
                 hsr.sendRedirect("/home.html");
                 break;
-            case "/prv/login.html":
+            }
+            case "/prv/login.html": {
                 final String account = (String) hsq.getSession().getAttribute("ACCOUNT");
-                if (ConfigureReader.getInstance().foundAccount(account)) {
+                if (ConfigReader.getInstance().foundAccount(account)) {
                     hsr.sendRedirect("/home.html");
-                }
-                else {
+                } else {
                     chain.doFilter(request, response);
                 }
                 break;
-            default:
+            }
+            default: {
                 chain.doFilter(request, response);
                 break;
+            }
         }
     }
 

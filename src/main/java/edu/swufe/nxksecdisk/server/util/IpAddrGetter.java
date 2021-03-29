@@ -35,7 +35,7 @@ public class IpAddrGetter {
      * @author 青阳龙野(kohgylw)
      */
     public String getIpAddr(HttpServletRequest request) {
-        if (ConfigureReader.getInstance().isIpXFFAnalysis()) {
+        if (ConfigReader.getInstance().isIpXFFAnalysis()) {
             for (String ipAddrHeader : ipAddrHeaders) {
                 String ipAddress = request.getHeader(ipAddrHeader);
                 if (ipAddress != null && ipAddress.length() > 0 && !"unknown".equalsIgnoreCase(ipAddress)) {

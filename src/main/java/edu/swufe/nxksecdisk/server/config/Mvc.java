@@ -2,7 +2,7 @@ package edu.swufe.nxksecdisk.server.config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import edu.swufe.nxksecdisk.server.util.ConfigureReader;
+import edu.swufe.nxksecdisk.server.util.ConfigReader;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.boot.web.servlet.MultipartConfigFactory;
 import org.springframework.boot.web.servlet.ServletComponentScan;
@@ -27,19 +27,21 @@ import java.io.File;
  * @version 1.0
  */
 @Configurable
-@ComponentScan({"edu.swufe.nxksecdisk.server.controller", "edu.swufe.nxksecdisk.server.service.impl", "edu.swufe.nxksecdisk.server.util"})
+@ComponentScan({"edu.swufe.nxksecdisk.server.controller", "edu.swufe.nxksecdisk.server.service.impl", "edu.swufe" +
+        ".nxksecdisk.server.util"})
 @ServletComponentScan({"edu.swufe.nxksecdisk.server.listener", "edu.swufe.nxksecdisk.server.filter"})
 @Import({DataAccess.class})
-public class Mvc extends ResourceHttpRequestHandler implements WebMvcConfigurer
-{
+public class Mvc extends ResourceHttpRequestHandler implements WebMvcConfigurer {
+
+    private final ConfigReader config = ConfigReader.getInstance();
+
     /**
      * 启用DefaultServlet用以处理可直接请求的静态资源;
      *
      * @param configurer
      */
     @Override
-    public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer)
-    {
+    public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
         configurer.enable();
     }
 
@@ -49,11 +51,14 @@ public class Mvc extends ResourceHttpRequestHandler implements WebMvcConfigurer
      * @param registry
      */
     @Override
-    public void addResourceHandlers(final ResourceHandlerRegistry registry)
-    {
+    public void addResourceHandlers(final ResourceHandlerRegistry registry) {
         // 将静态页面资源所在文件夹加入至资源路径中
-        registry.addResourceHandler(new String[]{"/**"}).addResourceLocations(new String[]{
-                String.format("file:%s%swebContext%s", ConfigureReader.getInstance().getPath(), File.separator, File.separator)});
+        registry.addResourceHandler("/**")
+                .addResourceLocations(
+                        String.format("file:%s%swebContext%s",
+                                config.getPath(),
+                                File.separator,
+                                File.separator));
     }
 
     /**
@@ -62,11 +67,10 @@ public class Mvc extends ResourceHttpRequestHandler implements WebMvcConfigurer
      * @return
      */
     @Bean
-    public MultipartConfigElement multipartConfigElement()
-    {
+    public MultipartConfigElement multipartConfigElement() {
         final MultipartConfigFactory factory = new MultipartConfigFactory();
         factory.setMaxFileSize(-1L);
-        factory.setLocation(ConfigureReader.getInstance().getTemporaryfilePath());
+        factory.setLocation(config.getTemporaryfilePath());
         return factory.createMultipartConfig();
     }
 
@@ -76,8 +80,7 @@ public class Mvc extends ResourceHttpRequestHandler implements WebMvcConfigurer
      * @return
      */
     @Bean
-    public Gson gson()
-    {
+    public Gson gson() {
         return new GsonBuilder().create();
     }
 }

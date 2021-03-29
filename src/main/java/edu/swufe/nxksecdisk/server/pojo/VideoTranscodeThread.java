@@ -1,6 +1,6 @@
 package edu.swufe.nxksecdisk.server.pojo;
 
-import edu.swufe.nxksecdisk.server.util.ConfigureReader;
+import edu.swufe.nxksecdisk.server.util.ConfigReader;
 import edu.swufe.nxksecdisk.system.AppSystem;
 import org.apache.commons.codec.digest.DigestUtils;
 import ws.schild.jave.*;
@@ -28,14 +28,16 @@ public class VideoTranscodeThread {
 
     private String outputFileName;
 
-    public VideoTranscodeThread(File f,
+    private final ConfigReader config = ConfigReader.getInstance();
+
+    public VideoTranscodeThread(File file,
                                 EncodingAttributes encodingAttributes,
                                 FFMPEGLocator ffmpegLocator)
             throws Exception {
         // 首先计算MD5值
-        md5 = DigestUtils.md5Hex(new FileInputStream(f));
+        md5 = DigestUtils.md5Hex(new FileInputStream(file));
         progress = "0.0";
-        MultimediaObject multimediaObject = new MultimediaObject(f, ffmpegLocator);
+        MultimediaObject multimediaObject = new MultimediaObject(file, ffmpegLocator);
         encoder = new Encoder(ffmpegLocator);
         AppSystem.pool.execute(() -> run(multimediaObject, encodingAttributes));
     }
@@ -62,7 +64,7 @@ public class VideoTranscodeThread {
         if (encoder != null) {
             encoder.abortEncoding();
         }
-        File f = new File(ConfigureReader.getInstance().getTemporaryfilePath(), outputFileName);
+        File f = new File(config.getTemporaryfilePath(), outputFileName);
         if (f.exists()) {
             f.delete();
         }
@@ -72,7 +74,7 @@ public class VideoTranscodeThread {
                      EncodingAttributes encodingAttributes) {
         try {
             outputFileName = String.format("video_%s.mp4", UUID.randomUUID().toString());
-            encoder.encode(multimediaObject, new File(ConfigureReader.getInstance().getTemporaryfilePath(), outputFileName),
+            encoder.encode(multimediaObject, new File(config.getTemporaryfilePath(), outputFileName),
                     encodingAttributes, new EncoderProgressListener() {
                         @Override
                         public void sourceInfo(MultimediaInfo arg0) {

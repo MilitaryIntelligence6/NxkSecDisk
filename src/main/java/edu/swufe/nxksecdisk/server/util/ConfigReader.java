@@ -23,14 +23,14 @@ import java.util.*;
  * @author 青阳龙野(kohgylw)
  * @version 1.0
  */
-public class ConfigureReader {
+public class ConfigReader {
 
     public static final int INVALID_DOWNLOAD_ZIP_SETTING = 15;
 
     /**
      * 自体实体
      */
-    private volatile static ConfigureReader instance;
+    private volatile static ConfigReader instance;
 
     /**
      * 配置设置
@@ -264,7 +264,7 @@ public class ConfigureReader {
      */
     private static final String[] SYS_ACCOUNTS = {"SYS_IN", "Anonymous", "匿名用户"};
 
-    private ConfigureReader() {
+    private ConfigReader() {
         this.propertiesStatus = -1;
         // 开发环境下使用项目工程路径;
         this.path = System.getProperty("user.dir");
@@ -309,15 +309,16 @@ public class ConfigureReader {
             }
         }
         catch (Exception e) {
-            AppSystem.out.printf("错误：无法加载一个或多个配置文件（位于%s路径下），请尝试删除旧的配置文件并重新启动本应用或查看安装路径的权限（必须可读写）。", this.confdir);
+            System.err.printf("错误：无法加载一个或多个配置文件（位于%s路径下），请尝试删除旧的配置文件并重新启动本应用或查看安装路径的权限（必须可读写）\n", this.confdir);
+//            AppSystem.out.printf("错误：无法加载一个或多个配置文件（位于%s路径下），请尝试删除旧的配置文件并重新启动本应用或查看安装路径的权限（必须可读写）。", this.confdir);
         }
     }
 
-    public static ConfigureReader getInstance() {
+    public static ConfigReader getInstance() {
         if (instance == null) {
-            synchronized (ConfigureReader.class) {
+            synchronized (ConfigReader.class) {
                 if (instance == null) {
-                    instance = new ConfigureReader();
+                    instance = new ConfigReader();
                 }
             }
         }

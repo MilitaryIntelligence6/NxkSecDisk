@@ -8,7 +8,7 @@ import edu.swufe.nxksecdisk.server.model.Node;
 import edu.swufe.nxksecdisk.server.pojo.AudioInfoList;
 import edu.swufe.nxksecdisk.server.service.PlayAudioService;
 import edu.swufe.nxksecdisk.server.util.AudioInfoUtil;
-import edu.swufe.nxksecdisk.server.util.ConfigureReader;
+import edu.swufe.nxksecdisk.server.util.ConfigReader;
 import edu.swufe.nxksecdisk.server.util.FolderUtil;
 import org.springframework.stereotype.Service;
 
@@ -37,15 +37,17 @@ public class PlayAudioServiceImpl implements PlayAudioService {
     @Resource
     private FolderMapper folderMapper;
 
+    private final ConfigReader config = ConfigReader.getInstance();
+
     private AudioInfoList foundAudios(final HttpServletRequest request) {
         final String fileId = request.getParameter("fileId");
         if (fileId != null && fileId.length() > 0) {
             Node targetNode = nodeMapper.queryById(fileId);
             if (targetNode != null) {
                 final String account = (String) request.getSession().getAttribute("ACCOUNT");
-                if (ConfigureReader.getInstance().authorized(account, AccountAuth.DOWNLOAD_FILES,
+                if (config.authorized(account, AccountAuth.DOWNLOAD_FILES,
                         folderUtil.getAllFoldersId(targetNode.getFileParentFolder()))
-                        && ConfigureReader.getInstance().accessFolder(folderMapper.queryById(targetNode.getFileParentFolder()),
+                        && config.accessFolder(folderMapper.queryById(targetNode.getFileParentFolder()),
                         account)) {
                     final List<Node> blocks = (List<Node>) this.nodeMapper.queryBySomeFolder(fileId);
                     return this.audioInfoUtil.transformToAudioInfoList(blocks, fileId);

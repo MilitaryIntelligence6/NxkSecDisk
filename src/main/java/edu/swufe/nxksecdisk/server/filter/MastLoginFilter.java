@@ -1,6 +1,6 @@
 package edu.swufe.nxksecdisk.server.filter;
 
-import edu.swufe.nxksecdisk.server.util.ConfigureReader;
+import edu.swufe.nxksecdisk.server.util.ConfigReader;
 import org.springframework.core.annotation.Order;
 
 import javax.servlet.*;
@@ -25,8 +25,8 @@ public class MastLoginFilter implements Filter {
     @Override
     public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain)
             throws IOException, ServletException {
-        final ConfigureReader cr = ConfigureReader.getInstance();
-        final boolean s = cr.mustLogin();
+        final ConfigReader config = ConfigReader.getInstance();
+        final boolean s = config.mustLogin();
         final HttpServletRequest hsq = (HttpServletRequest) request;
         final HttpServletResponse hsr = (HttpServletResponse) response;
         final String url = hsq.getServletPath();
@@ -34,7 +34,8 @@ public class MastLoginFilter implements Filter {
         if (url.startsWith("/externalLinksController/") || url.startsWith("//externalLinksController/")
                 || url.startsWith("/homeController/getNewVerCode.do")
                 || url.startsWith("//homeController/getNewVerCode.do")) {
-            chain.doFilter(request, response);// 对于外部链接控制器和验证码的请求直接放行。
+            // 对于外部链接控制器和验证码的请求直接放行;
+            chain.doFilter(request, response);
             return;
         }
         // 如果是无需登录的请求，那么直接放行（如果访问者已经登录，那么会被后面的过滤器重定向至主页，此处无需处理）
@@ -54,7 +55,7 @@ public class MastLoginFilter implements Filter {
             if (url.equals("/") || url.endsWith(".html") || url.endsWith(".do")) {
                 if (session.getAttribute("ACCOUNT") != null) {
                     final String account = (String) session.getAttribute("ACCOUNT");
-                    if (cr.foundAccount(account)) {
+                    if (config.foundAccount(account)) {
                         chain.doFilter(request, response);
                     }
                     else {
@@ -72,7 +73,7 @@ public class MastLoginFilter implements Filter {
                 }
                 else if (session.getAttribute("ACCOUNT") != null) {
                     final String account = (String) session.getAttribute("ACCOUNT");
-                    if (cr.foundAccount(account)) {
+                    if (config.foundAccount(account)) {
                         chain.doFilter(request, response);
                     }
                     else {

@@ -43,7 +43,9 @@ public class TxtToPdfUtil {
         PdfWriter pw = PdfWriter.getInstance(doc, out);
         doc.open();
         BaseFont songFont = BaseFont.createFont(
-                ConfigureReader.getInstance().getPath() + File.separator + "fonts/wqy-zenhei.ttc,0",
+                String.format("%s%sfonts/wqy-zenhei.ttc,0",
+                        ConfigReader.getInstance().getPath(),
+                        File.separator),
                 BaseFont.IDENTITY_H,
                 BaseFont.NOT_EMBEDDED);
         // 设置字体格式;

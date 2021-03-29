@@ -48,6 +48,8 @@ public class ExternalDownloadServiceImpl
     @Resource
     private FolderMapper folderMapper;
 
+    private final ConfigReader config = ConfigReader.getInstance();
+
     @Override
     public String getDownloadKey(HttpServletRequest request) {
         // 首先进行权限检查
@@ -58,9 +60,9 @@ public class ExternalDownloadServiceImpl
             final Node f = this.nodeMapper.queryById(fileId);
             if (f != null) {
                 // 权限检查
-                if (ConfigureReader.getInstance().authorized(account, AccountAuth.DOWNLOAD_FILES,
+                if (config.authorized(account, AccountAuth.DOWNLOAD_FILES,
                         folderUtil.getAllFoldersId(f.getFileParentFolder()))
-                        && ConfigureReader.getInstance().accessFolder(folderMapper.queryById(f.getFileParentFolder())
+                        && config.accessFolder(folderMapper.queryById(f.getFileParentFolder())
                         , account)) {
                     // 获取凭证
                     synchronized (downloadKeyMap) {
@@ -100,7 +102,7 @@ public class ExternalDownloadServiceImpl
                     if (target != null && target.isFile()) {
                         String range = request.getHeader("Range");
                         int status = writeRangeFileStream(request, response, target, f.getFileName(), CONTENT_TYPE,
-                                ConfigureReader.getInstance().getDownloadMaxRate(null), fileBlockUtil.getETag(target)
+                                config.getDownloadMaxRate(null), fileBlockUtil.getETag(target)
                                 , true);
                         if (status == HttpServletResponse.SC_OK || (range != null && range.startsWith("bytes=0-"))) {
                             this.logUtil.writeDownloadFileByKeyEvent(request, f);

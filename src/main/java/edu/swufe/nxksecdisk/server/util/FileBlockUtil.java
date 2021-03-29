@@ -59,6 +59,8 @@ public class FileBlockUtil {
     @Resource
     private FolderUtil folderUtil;
 
+    private final ConfigReader config = ConfigReader.getInstance();
+
     /**
      * <h2>清理临时文件夹</h2>
      * <p>
@@ -68,7 +70,7 @@ public class FileBlockUtil {
      * @author 青阳龙野(kohgylw)
      */
     public void initTempDir() {
-        final String tfPath = ConfigureReader.getInstance().getTemporaryfilePath();
+        final String tfPath = config.getTemporaryfilePath();
         final File f = new File(tfPath);
         if (f.isDirectory()) {
             try {
@@ -103,7 +105,7 @@ public class FileBlockUtil {
     public File saveToFileBlocks(final MultipartFile f) {
         // 如果存在扩展存储区，则优先在已有文件块数目最少的扩展存储区中存放文件（避免占用主文件系统）
         // 得到全部扩展存储区;
-        List<ExtendStores> ess = ConfigureReader.getInstance().getExtendStores();
+        List<ExtendStores> ess = config.getExtendStores();
         if (ess.size() > 0) {
             // 将所有扩展存储区按照已存储文件块的数目从小到大进行排序
             Collections.sort(ess, (o1, o2) -> {
@@ -150,7 +152,7 @@ public class FileBlockUtil {
         }
         // 如果不存在扩展存储区或者最大的扩展存储区无法存放目标文件，则尝试将其存放至主文件系统路径下
         try {
-            final File file = createNewBlock("file_", new File(ConfigureReader.getInstance().getFileBlockPath()));
+            final File file = createNewBlock("file_", new File(config.getFileBlockPath()));
             if (file != null) {
                 f.transferTo(file);// 执行存放，并肩文件命名为“file_{UUID}.block”的形式
                 return file;
@@ -248,11 +250,11 @@ public class FileBlockUtil {
             File file = null;
             if (f.getFilePath().startsWith("file_")) {// 存放于主文件系统中
                 // 直接从主文件系统的文件块存放区获得对应的文件块
-                file = new File(ConfigureReader.getInstance().getFileBlockPath(), f.getFilePath());
+                file = new File(config.getFileBlockPath(), f.getFilePath());
             } else {// 存放于扩展存储区
                 short index = Short.parseShort(f.getFilePath().substring(0, f.getFilePath().indexOf('_')));
                 // 根据编号查到对应的扩展存储区路径，进而获取对应的文件块
-                file = new File(ConfigureReader.getInstance().getExtendStores().parallelStream()
+                file = new File(config.getExtendStores().parallelStream()
                         .filter((e) -> e.getIndex() == index).findAny().get().getPath(), f.getFilePath());
             }
             if (file.isFile()) {
@@ -312,7 +314,7 @@ public class FileBlockUtil {
      */
     public String createZip(final List<String> idList, final List<String> fidList, String account) {
         final String zipname = "tf_" + UUID.randomUUID().toString() + ".zip";
-        final String tempPath = ConfigureReader.getInstance().getTemporaryfilePath();
+        final String tempPath = config.getTemporaryfilePath();
         final File f = new File(tempPath, zipname);
         try {
             final List<ZipEntrySource> zs = new ArrayList<>();
@@ -320,7 +322,7 @@ public class FileBlockUtil {
             final List<Folder> folders = new ArrayList<>();
             for (String fid : fidList) {
                 Folder fo = folderMapper.queryById(fid);
-                if (ConfigureReader.getInstance().accessFolder(fo, account) && ConfigureReader.getInstance()
+                if (config.accessFolder(fo, account) && config
                         .authorized(account, AccountAuth.DOWNLOAD_FILES,
                                 folderUtil.getAllFoldersId(fo.getFolderParent()))) {
                     if (fo != null) {
@@ -331,8 +333,8 @@ public class FileBlockUtil {
             final List<Node> nodes = new ArrayList<>();
             for (String id : idList) {
                 Node n = nodeMapper.queryById(id);
-                if (ConfigureReader.getInstance().accessFolder(folderMapper.queryById(n.getFileParentFolder()), account)
-                        && ConfigureReader.getInstance().authorized(account, AccountAuth.DOWNLOAD_FILES,
+                if (config.accessFolder(folderMapper.queryById(n.getFileParentFolder()), account)
+                        && config.authorized(account, AccountAuth.DOWNLOAD_FILES,
                         folderUtil.getAllFoldersId(n.getFileParentFolder()))) {
                     if (n != null) {
                         nodes.add(n);
@@ -354,7 +356,7 @@ public class FileBlockUtil {
                 addFoldersToZipEntrySourceArray(fo, zs, account, "");
             }
             for (Node node : nodes) {
-                if (ConfigureReader.getInstance().accessFolder(folderMapper.queryById(node.getFileParentFolder()),
+                if (config.accessFolder(folderMapper.queryById(node.getFileParentFolder()),
                         account)) {
                     int i = 1;
                     String fname = node.getFileName();
@@ -388,7 +390,7 @@ public class FileBlockUtil {
 
     // 迭代生成ZIP文件夹单元，将一个文件夹内的文件和文件夹也进行打包
     private void addFoldersToZipEntrySourceArray(Folder f, List<ZipEntrySource> zs, String account, String parentPath) {
-        if (f != null && ConfigureReader.getInstance().accessFolder(f, account)) {
+        if (f != null && config.accessFolder(f, account)) {
             String folderName = f.getFolderName();
             String thisPath = parentPath + folderName + "/";
             zs.add(new ZipEntrySource() {
@@ -576,8 +578,8 @@ public class FileBlockUtil {
         checkNodes("root");
         // 检查是否存在未正确对应文件节点的文件块，若有则删除，从而确保文件块不出现遗留问题
         List<File> paths = new ArrayList<>();
-        paths.add(new File(ConfigureReader.getInstance().getFileBlockPath()));
-        for (ExtendStores es : ConfigureReader.getInstance().getExtendStores()) {
+        paths.add(new File(config.getFileBlockPath()));
+        for (ExtendStores es : config.getExtendStores()) {
             paths.add(es.getPath());
         }
         for (File path : paths) {

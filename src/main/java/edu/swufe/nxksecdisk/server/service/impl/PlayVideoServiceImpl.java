@@ -43,6 +43,8 @@ public class PlayVideoServiceImpl implements PlayVideoService {
     @Resource
     private DiskFfmpegLocator diskFfmpegLocator;
 
+    private final ConfigReader config = ConfigReader.getInstance();
+
     private VideoInfo foundVideo(final HttpServletRequest request) {
         final String fileId = request.getParameter("fileId");
         if (fileId != null && fileId.length() > 0) {
@@ -50,9 +52,9 @@ public class PlayVideoServiceImpl implements PlayVideoService {
             final VideoInfo vi = new VideoInfo(f);
             if (f != null) {
                 final String account = (String) request.getSession().getAttribute("ACCOUNT");
-                if (ConfigureReader.getInstance().authorized(account, AccountAuth.DOWNLOAD_FILES,
+                if (config.authorized(account, AccountAuth.DOWNLOAD_FILES,
                         folderUtil.getAllFoldersId(f.getFileParentFolder()))
-                        && ConfigureReader.getInstance().accessFolder(folderMapper.queryById(f.getFileParentFolder())
+                        && config.accessFolder(folderMapper.queryById(f.getFileParentFolder())
                         , account)) {
                     final String fileName = f.getFileName();
                     // 检查视频格式

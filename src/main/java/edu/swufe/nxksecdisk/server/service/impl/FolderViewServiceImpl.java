@@ -10,7 +10,7 @@ import edu.swufe.nxksecdisk.server.pojo.FolderView;
 import edu.swufe.nxksecdisk.server.pojo.RemainingFolderView;
 import edu.swufe.nxksecdisk.server.pojo.SearchView;
 import edu.swufe.nxksecdisk.server.service.FolderViewService;
-import edu.swufe.nxksecdisk.server.util.ConfigureReader;
+import edu.swufe.nxksecdisk.server.util.ConfigReader;
 import edu.swufe.nxksecdisk.server.util.DiskFfmpegLocator;
 import edu.swufe.nxksecdisk.server.util.FolderUtil;
 import edu.swufe.nxksecdisk.server.util.ServerTimeUtil;
@@ -47,9 +47,10 @@ public class FolderViewServiceImpl implements FolderViewService {
     @Resource
     private DiskFfmpegLocator diskFfmpegLocator;
 
+    private final ConfigReader config = ConfigReader.getInstance();
+
     @Override
     public String getFolderViewToJson(final String fid, final HttpSession session, final HttpServletRequest request) {
-        final ConfigureReader cr = ConfigureReader.getInstance();
         if (fid == null || fid.length() == 0) {
             return "ERROR";
         }
@@ -60,7 +61,7 @@ public class FolderViewServiceImpl implements FolderViewService {
         }
         final String account = (String) session.getAttribute("ACCOUNT");
         // 检查访问文件夹视图请求是否合法
-        if (!ConfigureReader.getInstance().accessFolder(vf, account)) {
+        if (!config.accessFolder(vf, account)) {
             // 如无访问权限则直接返回该字段，令页面回到ROOT视图;
             return "notAccess";
         }
@@ -81,7 +82,7 @@ public class FolderViewServiceImpl implements FolderViewService {
         List<Folder> folders = this.folderMapper.queryByParentIdSection(keyMap1);
         List<Folder> fs = new LinkedList<>();
         for (Folder f : folders) {
-            if (ConfigureReader.getInstance().accessFolder(f, account)) {
+            if (config.accessFolder(f, account)) {
                 fs.add(f);
             }
         }
@@ -98,34 +99,34 @@ public class FolderViewServiceImpl implements FolderViewService {
         if (account != null) {
             fv.setAccount(account);
         }
-        if (ConfigureReader.getInstance().isAllowChangePassword()) {
+        if (config.isAllowChangePassword()) {
             fv.setAllowChangePassword("true");
         }
         else {
             fv.setAllowChangePassword("false");
         }
-        if (ConfigureReader.getInstance().isAllowSignUp()) {
+        if (config.isAllowSignUp()) {
             fv.setAllowSignUp("true");
         }
         else {
             fv.setAllowSignUp("false");
         }
         final List<String> authList = new ArrayList<String>();
-        if (cr.authorized(account, AccountAuth.UPLOAD_FILES, folderUtil.getAllFoldersId(fid))) {
+        if (config.authorized(account, AccountAuth.UPLOAD_FILES, folderUtil.getAllFoldersId(fid))) {
             authList.add("U");
         }
-        if (cr.authorized(account, AccountAuth.CREATE_NEW_FOLDER, folderUtil.getAllFoldersId(fid))) {
+        if (config.authorized(account, AccountAuth.CREATE_NEW_FOLDER, folderUtil.getAllFoldersId(fid))) {
             authList.add("C");
         }
-        if (cr.authorized(account, AccountAuth.DELETE_FILE_OR_FOLDER, folderUtil.getAllFoldersId(fid))) {
+        if (config.authorized(account, AccountAuth.DELETE_FILE_OR_FOLDER, folderUtil.getAllFoldersId(fid))) {
             authList.add("D");
         }
-        if (cr.authorized(account, AccountAuth.RENAME_FILE_OR_FOLDER, folderUtil.getAllFoldersId(fid))) {
+        if (config.authorized(account, AccountAuth.RENAME_FILE_OR_FOLDER, folderUtil.getAllFoldersId(fid))) {
             authList.add("R");
         }
-        if (cr.authorized(account, AccountAuth.DOWNLOAD_FILES, folderUtil.getAllFoldersId(fid))) {
+        if (config.authorized(account, AccountAuth.DOWNLOAD_FILES, folderUtil.getAllFoldersId(fid))) {
             authList.add("L");
-            if (cr.isOpenFileChain()) {
+            if (config.isOpenFileChain()) {
                 // 显示永久资源链接;
                 fv.setShowFileChain("true");
             }
@@ -133,19 +134,19 @@ public class FolderViewServiceImpl implements FolderViewService {
                 fv.setShowFileChain("false");
             }
         }
-        if (cr.authorized(account, AccountAuth.MOVE_FILES, folderUtil.getAllFoldersId(fid))) {
+        if (config.authorized(account, AccountAuth.MOVE_FILES, folderUtil.getAllFoldersId(fid))) {
             authList.add("M");
         }
         fv.setAuthList(authList);
         fv.setPublishTime(ServerTimeUtil.accurateToMinute());
         fv.setEnableFfmpeg(diskFfmpegLocator.isEnableFFmpeg());
-        fv.setEnableDownloadZip(ConfigureReader.getInstance().isEnableDownloadByZip());
+        fv.setEnableDownloadZip(config.isEnableDownloadByZip());
         return gson.toJson(fv);
     }
 
     @Override
     public String getSreachViewToJson(HttpServletRequest request) {
-        final ConfigureReader cr = ConfigureReader.getInstance();
+        final ConfigReader cr = config;
         String fid = request.getParameter("fid");
         String keyWorld = request.getParameter("keyworld");
         if (fid == null || fid.length() == 0 || keyWorld == null) {
@@ -158,7 +159,7 @@ public class FolderViewServiceImpl implements FolderViewService {
         Folder vf = this.folderMapper.queryById(fid);
         final String account = (String) request.getSession().getAttribute("ACCOUNT");
         // 检查访问文件夹视图请求是否合法
-        if (!ConfigureReader.getInstance().accessFolder(vf, account)) {
+        if (!config.accessFolder(vf, account)) {
             // 如无访问权限则直接返回该字段，令页面回到ROOT视图;
             return "notAccess";
         }
@@ -190,7 +191,7 @@ public class FolderViewServiceImpl implements FolderViewService {
         if (account != null) {
             sv.setAccount(account);
         }
-        if (ConfigureReader.getInstance().isAllowChangePassword()) {
+        if (config.isAllowChangePassword()) {
             sv.setAllowChangePassword("true");
         }
         else {
@@ -218,7 +219,7 @@ public class FolderViewServiceImpl implements FolderViewService {
         sv.setKeyWorld(keyWorld);
         // 返回公告MD5
         sv.setEnableFfmpeg(diskFfmpegLocator.isEnableFFmpeg());
-        sv.setEnableDownloadZip(ConfigureReader.getInstance().isEnableDownloadByZip());
+        sv.setEnableDownloadZip(config.isEnableDownloadByZip());
         return gson.toJson(sv);
     }
 
@@ -234,7 +235,7 @@ public class FolderViewServiceImpl implements FolderViewService {
      */
     private void sreachFilesAndFolders(String fid, String key, String account, List<Node> ns, List<Folder> fs) {
         for (Folder f : this.folderMapper.queryByParentId(fid)) {
-            if (ConfigureReader.getInstance().accessFolder(f, account)) {
+            if (config.accessFolder(f, account)) {
                 if (f.getFolderName().indexOf(key) >= 0) {
                     f.setFolderName(f.getFolderName());
                     fs.add(f);
@@ -265,7 +266,7 @@ public class FolderViewServiceImpl implements FolderViewService {
         }
         final String account = (String) request.getSession().getAttribute("ACCOUNT");
         // 检查访问文件夹视图请求是否合法
-        if (!ConfigureReader.getInstance().accessFolder(vf, account)) {
+        if (!config.accessFolder(vf, account)) {
             // 如无访问权限则直接返回该字段，令页面回到ROOT视图;
             return "notAccess";
         }
@@ -282,7 +283,7 @@ public class FolderViewServiceImpl implements FolderViewService {
                     List<Folder> folders = this.folderMapper.queryByParentIdSection(keyMap1);
                     List<Folder> fs = new LinkedList<>();
                     for (Folder f : folders) {
-                        if (ConfigureReader.getInstance().accessFolder(f, account)) {
+                        if (config.accessFolder(f, account)) {
                             fs.add(f);
                         }
                     }

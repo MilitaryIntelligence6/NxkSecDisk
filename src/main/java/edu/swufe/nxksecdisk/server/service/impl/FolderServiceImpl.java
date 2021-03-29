@@ -36,6 +36,8 @@ public class FolderServiceImpl implements FolderService {
     @Resource
     private Gson gson;
 
+    private final ConfigReader config = ConfigReader.getInstance();
+
     @Override
     public String newFolder(final HttpServletRequest request) {
         final String parentId = request.getParameter("parentId");
@@ -49,10 +51,10 @@ public class FolderServiceImpl implements FolderService {
             return "errorParameter";
         }
         final Folder parentFolder = this.folderMapper.queryById(parentId);
-        if (parentFolder == null || !ConfigureReader.getInstance().accessFolder(parentFolder, account)) {
+        if (parentFolder == null || !config.accessFolder(parentFolder, account)) {
             return "errorParameter";
         }
-        if (!ConfigureReader.getInstance().authorized(account, AccountAuth.CREATE_NEW_FOLDER,
+        if (!config.authorized(account, AccountAuth.CREATE_NEW_FOLDER,
                 folderUtil.getAllFoldersId(parentId))) {
             return "noAuthorized";
         }
@@ -140,11 +142,11 @@ public class FolderServiceImpl implements FolderService {
             return "deleteFolderSuccess";
         }
         // 检查删除者是否具备删除目标的访问许可
-        if (!ConfigureReader.getInstance().accessFolder(folder, account)) {
+        if (!config.accessFolder(folder, account)) {
             return "noAuthorized";
         }
         // 检查权限
-        if (!ConfigureReader.getInstance().authorized(account, AccountAuth.DELETE_FILE_OR_FOLDER,
+        if (!config.authorized(account, AccountAuth.DELETE_FILE_OR_FOLDER,
                 folderUtil.getAllFoldersId(folder.getFolderParent()))) {
             return "noAuthorized";
         }
@@ -182,10 +184,10 @@ public class FolderServiceImpl implements FolderService {
         if (folder == null) {
             return "errorParameter";
         }
-        if (!ConfigureReader.getInstance().accessFolder(folder, account)) {
+        if (!config.accessFolder(folder, account)) {
             return "noAuthorized";
         }
-        if (!ConfigureReader.getInstance().authorized(account, AccountAuth.RENAME_FILE_OR_FOLDER,
+        if (!config.authorized(account, AccountAuth.RENAME_FILE_OR_FOLDER,
                 folderUtil.getAllFoldersId(folder.getFolderParent()))) {
             return "noAuthorized";
         }
@@ -243,8 +245,8 @@ public class FolderServiceImpl implements FolderService {
         if (p == null) {
             return "deleteError";
         }
-        if (!ConfigureReader.getInstance().authorized(account, AccountAuth.DELETE_FILE_OR_FOLDER,
-                folderUtil.getAllFoldersId(parentId)) || !ConfigureReader.getInstance().accessFolder(p, account)) {
+        if (!config.authorized(account, AccountAuth.DELETE_FILE_OR_FOLDER,
+                folderUtil.getAllFoldersId(parentId)) || !config.accessFolder(p, account)) {
             return "deleteError";
         }
         final Folder[] repeatFolders = this.folderMapper.queryByParentId(parentId).parallelStream()
@@ -252,7 +254,7 @@ public class FolderServiceImpl implements FolderService {
                         .equals(folderName))
                 .toArray(Folder[]::new);
         for (Folder rf : repeatFolders) {
-            if (!ConfigureReader.getInstance().accessFolder(rf, account)) {
+            if (!config.accessFolder(rf, account)) {
                 return "deleteError";
             }
             final List<Folder> l = this.folderUtil.getParentList(rf.getFolderId());
@@ -284,11 +286,11 @@ public class FolderServiceImpl implements FolderService {
             return gson.toJson(cnfbnr);
         }
         final Folder parentFolder = this.folderMapper.queryById(parentId);
-        if (parentFolder == null || !ConfigureReader.getInstance().accessFolder(parentFolder, account)) {
+        if (parentFolder == null || !config.accessFolder(parentFolder, account)) {
             cnfbnr.setResult("error");
             return gson.toJson(cnfbnr);
         }
-        if (!ConfigureReader.getInstance().authorized(account, AccountAuth.CREATE_NEW_FOLDER,
+        if (!config.authorized(account, AccountAuth.CREATE_NEW_FOLDER,
                 folderUtil.getAllFoldersId(parentId))) {
             cnfbnr.setResult("error");
             return gson.toJson(cnfbnr);

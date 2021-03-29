@@ -39,6 +39,8 @@ public class FileNodeUtil {
      */
     public static final int MAXIMUM_NUM_OF_SINGLE_FOLDER = Integer.MAX_VALUE;
 
+    private static final ConfigReader config = ConfigReader.getInstance();
+
     /**
      * <h2>为数据库建立初始化节点表</h2>
      * <p>
@@ -51,13 +53,13 @@ public class FileNodeUtil {
         AppSystem.out.println("初始化文件节点...");
         try {
             if (conn == null) {
-                Class.forName(ConfigureReader.getInstance().getFileNodePathDriver()).newInstance();
+                Class.forName(config.getFileNodePathDriver()).newInstance();
             }
-            String newUrl = ConfigureReader.getInstance().getFileNodePathURL();
+            String newUrl = config.getFileNodePathURL();
             // 判断当前位置是否初始化文件节点
             if (url == null || !url.equals(newUrl)) {
-                conn = DriverManager.getConnection(newUrl, ConfigureReader.getInstance().getFileNodePathUserName(),
-                        ConfigureReader.getInstance().getFileNodePathPassWord());
+                conn = DriverManager.getConnection(newUrl, config.getFileNodePathUserName(),
+                        config.getFileNodePathPassWord());
                 url = newUrl;
                 final Statement state1 = conn.createStatement();
                 state1.execute(
@@ -81,14 +83,14 @@ public class FileNodeUtil {
                                 "file_path varchar(128) NOT NULL)");
                 state2.close();
                 // 为了匹配之前的版本而设计的兼容性字段设置，后续可能会删除
-                if (!ConfigureReader.getInstance().useMySQL()) {
+                if (!config.useMySQL()) {
                     final Statement state3 = conn.createStatement();
                     state3.execute(
                             "ALTER TABLE FOLDER ADD COLUMN IF NOT EXISTS folder_constraint INT NOT NULL DEFAULT 0");
                     state3.close();
                 }
                 // 为数据库生成索引，此处分为MySQL和H2两种操作
-                if (ConfigureReader.getInstance().useMySQL()) {
+                if (config.useMySQL()) {
                     final Statement state4 = conn.createStatement();
                     ResultSet indexCount = state4.executeQuery("SHOW INDEX FROM FILE WHERE Key_name = 'file_index'");
                     if (!indexCount.next()) {

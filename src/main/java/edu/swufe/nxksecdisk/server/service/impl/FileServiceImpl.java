@@ -91,6 +91,8 @@ public class FileServiceImpl
     @Resource
     private IpAddrGetter ipAddrGetter;
 
+    private final ConfigReader config = ConfigReader.getInstance();
+
     /**
      * 检查上传文件列表的实现（上传文件的前置操作）;
      *
@@ -115,9 +117,9 @@ public class FileServiceImpl
             return ERROR_PARAMETER;
         }
         // 权限检查
-        if (!ConfigureReader.getInstance().authorized(account, AccountAuth.UPLOAD_FILES,
+        if (!config.authorized(account, AccountAuth.UPLOAD_FILES,
                 folderUtil.getAllFoldersId(folderId))
-                || !ConfigureReader.getInstance().accessFolder(folder, account)) {
+                || !config.accessFolder(folder, account)) {
             return NO_AUTHORIZED;
         }
         // 获得上传文件名列表
@@ -131,7 +133,7 @@ public class FileServiceImpl
             long mufs = Long.parseLong(maxUploadFileSize);
             // 获取最大文件的名称
             String mfname = namelistObj.get(Integer.parseInt(maxUploadFileIndex));
-            long pMaxUploadSize = ConfigureReader.getInstance().getUploadFileSize(account);
+            long pMaxUploadSize = config.getUploadFileSize(account);
             if (pMaxUploadSize >= 0) {
                 if (mufs > pMaxUploadSize) {
                     cufr.setCheckResult("fileTooLarge");
@@ -227,13 +229,13 @@ public class FileServiceImpl
             return UPLOAD_ERROR;
         }
         // 检查上传权限
-        if (!ConfigureReader.getInstance().authorized(account, AccountAuth.UPLOAD_FILES,
+        if (!config.authorized(account, AccountAuth.UPLOAD_FILES,
                 folderUtil.getAllFoldersId(folderId))
-                || !ConfigureReader.getInstance().accessFolder(folder, account)) {
+                || !config.accessFolder(folder, account)) {
             return UPLOAD_ERROR;
         }
         // 检查上传文件体积是否超限
-        long mufs = ConfigureReader.getInstance().getUploadFileSize(account);
+        long mufs = config.getUploadFileSize(account);
         if (mufs >= 0 && file.getSize() > mufs) {
             return UPLOAD_ERROR;
         }
@@ -250,7 +252,7 @@ public class FileServiceImpl
                     // 如果要覆盖的文件是某个文件块的众多副本之一，那么“覆盖”就是新存入一个文件块，然后再更新原节点信息（除了文件名、父目录和ID之外的全部信息）。
                     case "cover":
                         // 特殊操作权限检查，“覆盖”操作同时还要求用户必须具备删除权限，否则不能执行
-                        if (!ConfigureReader.getInstance().authorized(account, AccountAuth.DELETE_FILE_OR_FOLDER,
+                        if (!config.authorized(account, AccountAuth.DELETE_FILE_OR_FOLDER,
                                 folderUtil.getAllFoldersId(folderId))) {
                             return UPLOAD_ERROR;
                         }
@@ -365,9 +367,9 @@ public class FileServiceImpl
         }
         final Folder f = this.folderMapper.queryById(node.getFileParentFolder());
         // 权限检查
-        if (!ConfigureReader.getInstance().authorized(account, AccountAuth.DELETE_FILE_OR_FOLDER,
+        if (!config.authorized(account, AccountAuth.DELETE_FILE_OR_FOLDER,
                 folderUtil.getAllFoldersId(node.getFileParentFolder()))
-                || !ConfigureReader.getInstance().accessFolder(f, account)) {
+                || !config.accessFolder(f, account)) {
             return NO_AUTHORIZED;
         }
         // 从节点删除
@@ -396,17 +398,17 @@ public class FileServiceImpl
         if (fileId != null) {
             final Node f = this.nodeMapper.queryById(fileId);
             if (f != null) {
-                if (ConfigureReader.getInstance().authorized(account, AccountAuth.DOWNLOAD_FILES,
+                if (config.authorized(account, AccountAuth.DOWNLOAD_FILES,
                         folderUtil.getAllFoldersId(f.getFileParentFolder()))) {
                     Folder folder = folderMapper.queryById(f.getFileParentFolder());
-                    if (ConfigureReader.getInstance().accessFolder(folder, account)) {
+                    if (config.accessFolder(folder, account)) {
                         // 执行写出
                         final File fo = this.fileBlockUtil.getFileFromBlocks(f);
                         final String ip = ipAddrGetter.getIpAddr(request);
                         final String range = request.getHeader("Range");
                         if (fo != null) {
                             int status = writeRangeFileStream(request, response, fo, f.getFileName(), CONTENT_TYPE,
-                                    ConfigureReader.getInstance().getDownloadMaxRate(account),
+                                    config.getDownloadMaxRate(account),
                                     fileBlockUtil.getETag(fo), true);
                             // 日志记录（仅针对一次下载）
                             if (status == HttpServletResponse.SC_OK
@@ -450,11 +452,11 @@ public class FileServiceImpl
             return ERROR_PARAMETER;
         }
         final Folder folder = folderMapper.queryById(file.getFileParentFolder());
-        if (!ConfigureReader.getInstance().accessFolder(folder, account)) {
+        if (!config.accessFolder(folder, account)) {
             return NO_AUTHORIZED;
         }
         // 权限检查
-        if (!ConfigureReader.getInstance().authorized(account, AccountAuth.RENAME_FILE_OR_FOLDER,
+        if (!config.authorized(account, AccountAuth.RENAME_FILE_OR_FOLDER,
                 folderUtil.getAllFoldersId(file.getFileParentFolder()))) {
             return NO_AUTHORIZED;
         }
@@ -501,10 +503,10 @@ public class FileServiceImpl
                     continue;
                 }
                 final Folder folder = folderMapper.queryById(file.getFileParentFolder());
-                if (!ConfigureReader.getInstance().accessFolder(folder, account)) {
+                if (!config.accessFolder(folder, account)) {
                     return NO_AUTHORIZED;
                 }
-                if (!ConfigureReader.getInstance().authorized(account, AccountAuth.DELETE_FILE_OR_FOLDER,
+                if (!config.authorized(account, AccountAuth.DELETE_FILE_OR_FOLDER,
                         folderUtil.getAllFoldersId(file.getFileParentFolder()))) {
                     return NO_AUTHORIZED;
                 }
@@ -527,10 +529,10 @@ public class FileServiceImpl
                 if (folder == null) {
                     continue;
                 }
-                if (!ConfigureReader.getInstance().accessFolder(folder, account)) {
+                if (!config.accessFolder(folder, account)) {
                     return NO_AUTHORIZED;
                 }
-                if (!ConfigureReader.getInstance().authorized(account, AccountAuth.DELETE_FILE_OR_FOLDER,
+                if (!config.authorized(account, AccountAuth.DELETE_FILE_OR_FOLDER,
                         folderUtil.getAllFoldersId(folder.getFolderParent()))) {
                     return NO_AUTHORIZED;
                 }
@@ -561,7 +563,7 @@ public class FileServiceImpl
      */
     @Override
     public String downloadCheckedFiles(final HttpServletRequest request) {
-        if (ConfigureReader.getInstance().isEnableDownloadByZip()) {
+        if (config.isEnableDownloadByZip()) {
             final String account = (String) request.getSession().getAttribute("ACCOUNT");
             final String strIdList = request.getParameter("strIdList");
             final String strFidList = request.getParameter("strFidList");
@@ -593,12 +595,12 @@ public class FileServiceImpl
         final String zipname = request.getParameter("zipId");
         final String account = (String) request.getSession().getAttribute("ACCOUNT");
         if (zipname != null && !zipname.equals("ERROR")) {
-            final String tfPath = ConfigureReader.getInstance().getTemporaryfilePath();
+            final String tfPath = config.getTemporaryfilePath();
             final File zip = new File(tfPath, zipname);
             String fname = "kiftd_" + ServerTimeUtil.accurateToDay() + "_\u6253\u5305\u4e0b\u8f7d.zip";
             if (zip.exists()) {
                 writeRangeFileStream(request, response, zip, fname, CONTENT_TYPE,
-                        ConfigureReader.getInstance().getDownloadMaxRate(account), fileBlockUtil.getETag(zip), true);
+                        config.getDownloadMaxRate(account), fileBlockUtil.getETag(zip), true);
                 zip.delete();
             }
         }
@@ -606,7 +608,7 @@ public class FileServiceImpl
 
     @Override
     public String getPackTime(final HttpServletRequest request) {
-        if (ConfigureReader.getInstance().isEnableDownloadByZip()) {
+        if (config.isEnableDownloadByZip()) {
             final String account = (String) request.getSession().getAttribute("ACCOUNT");
             final String strIdList = request.getParameter("strIdList");
             final String strFidList = request.getParameter("strFidList");
@@ -621,9 +623,9 @@ public class FileServiceImpl
                 long packTime = 0L;
                 for (final String fid : idList) {
                     final Node n = this.nodeMapper.queryById(fid);
-                    if (ConfigureReader.getInstance().authorized(account, AccountAuth.DOWNLOAD_FILES,
+                    if (config.authorized(account, AccountAuth.DOWNLOAD_FILES,
                             folderUtil.getAllFoldersId(n.getFileParentFolder()))
-                            && ConfigureReader.getInstance().accessFolder(folderMapper.queryById(n.getFileParentFolder()),
+                            && config.accessFolder(folderMapper.queryById(n.getFileParentFolder()),
                             account)) {
                         final File f = fileBlockUtil.getFileFromBlocks(n);
                         if (f != null && f.exists()) {
@@ -664,7 +666,7 @@ public class FileServiceImpl
      */
     private void countFolderFilesId(String account, String fid, List<String> idList) {
         Folder f = folderMapper.queryById(fid);
-        if (ConfigureReader.getInstance().accessFolder(f, account)) {
+        if (config.accessFolder(f, account)) {
             try {
                 idList.addAll(Arrays.asList(nodeMapper.queryByParentFolderId(fid).parallelStream().map((e) -> e.getFileId())
                         .toArray(String[]::new)));
@@ -715,11 +717,11 @@ public class FileServiceImpl
             return ERROR_PARAMETER;
         }
         // 再检查是否有权访问目标文件夹
-        if (!ConfigureReader.getInstance().accessFolder(targetFolder, account)) {
+        if (!config.accessFolder(targetFolder, account)) {
             return NO_AUTHORIZED;
         }
         // 以及是否具备操作权限
-        if (!ConfigureReader.getInstance().authorized(account, AccountAuth.MOVE_FILES,
+        if (!config.authorized(account, AccountAuth.MOVE_FILES,
                 folderUtil.getAllFoldersId(locationpath))) {
             return NO_AUTHORIZED;
         }
@@ -750,12 +752,12 @@ public class FileServiceImpl
                     continue;
                 }
                 // 权限检查
-                if (!ConfigureReader.getInstance().accessFolder(folderMapper.queryById(node.getFileParentFolder()),
+                if (!config.accessFolder(folderMapper.queryById(node.getFileParentFolder()),
                         account)) {
                     // 无权访问节点所在的文件夹;
                     return NO_AUTHORIZED;
                 }
-                if (!ConfigureReader.getInstance().authorized(account, AccountAuth.MOVE_FILES,
+                if (!config.authorized(account, AccountAuth.MOVE_FILES,
                         folderUtil.getAllFoldersId(node.getFileParentFolder()))) {
                     // 无操作权限;
                     return NO_AUTHORIZED;
@@ -775,7 +777,7 @@ public class FileServiceImpl
                     switch (optMap.get(id)) {
                         case "cover":
                             // 覆盖，需要额外的“删除”操作权限
-                            if (!ConfigureReader.getInstance().authorized(account, AccountAuth.DELETE_FILE_OR_FOLDER,
+                            if (!config.authorized(account, AccountAuth.DELETE_FILE_OR_FOLDER,
                                     folderUtil.getAllFoldersId(locationpath))) {
                                 // 无删除权限不能执行;
                                 return NO_AUTHORIZED;
@@ -903,10 +905,10 @@ public class FileServiceImpl
                 if (folder.getFolderParent().equals(locationpath) && !isCopy) {
                     continue;
                 }
-                if (!ConfigureReader.getInstance().accessFolder(folder, account)) {
+                if (!config.accessFolder(folder, account)) {
                     return NO_AUTHORIZED;
                 }
-                if (!ConfigureReader.getInstance().authorized(account, AccountAuth.MOVE_FILES,
+                if (!config.authorized(account, AccountAuth.MOVE_FILES,
                         folderUtil.getAllFoldersId(folder.getFolderParent()))) {
                     return NO_AUTHORIZED;
                 }
@@ -930,7 +932,7 @@ public class FileServiceImpl
                     switch (optMap.get(fid)) {
                         case "cover": {
                             // 覆盖，需要额外的“删除”权限
-                            if (!ConfigureReader.getInstance().authorized(account, AccountAuth.DELETE_FILE_OR_FOLDER,
+                            if (!config.authorized(account, AccountAuth.DELETE_FILE_OR_FOLDER,
                                     folderUtil.getAllFoldersId(locationpath))) {
                                 return NO_AUTHORIZED;
                             }
@@ -1118,7 +1120,7 @@ public class FileServiceImpl
         Folder targetFolder = folderMapper.queryById(locationpath);
         int needMovefilesCount = 0;// 记录可以合法移动（或复制）的文件数目
         int needMoveFoldersCount = 0;// 同理，记录可以合法移动（或复制）的文件夹数目
-        if (ConfigureReader.getInstance().accessFolder(targetFolder, account) && ConfigureReader.getInstance()
+        if (config.accessFolder(targetFolder, account) && config
                 .authorized(account, AccountAuth.MOVE_FILES, folderUtil.getAllFoldersId(locationpath))) {
             try {
                 final List<String> idList = gson.fromJson(strIdList, new TypeToken<List<String>>() {
@@ -1139,10 +1141,10 @@ public class FileServiceImpl
                     if (node.getFileParentFolder().equals(locationpath) && !isCopy) {
                         continue;// 又不是复制模式，又已经在目标文件夹里了，则直接跳过
                     }
-                    if (!ConfigureReader.getInstance().accessFolder(folderMapper.queryById(node.getFileParentFolder()), account)) {
+                    if (!config.accessFolder(folderMapper.queryById(node.getFileParentFolder()), account)) {
                         return NO_AUTHORIZED;// 无权访问目标文件夹
                     }
-                    if (!ConfigureReader.getInstance().authorized(account, AccountAuth.MOVE_FILES,
+                    if (!config.authorized(account, AccountAuth.MOVE_FILES,
                             folderUtil.getAllFoldersId(node.getFileParentFolder()))) {
                         return NO_AUTHORIZED;// 无权操作
                     }
@@ -1167,10 +1169,10 @@ public class FileServiceImpl
                     if (folder.getFolderParent().equals(locationpath) && !isCopy) {
                         continue;
                     }
-                    if (!ConfigureReader.getInstance().accessFolder(folder, account)) {
+                    if (!config.accessFolder(folder, account)) {
                         return NO_AUTHORIZED;
                     }
-                    if (!ConfigureReader.getInstance().authorized(account, AccountAuth.MOVE_FILES,
+                    if (!config.authorized(account, AccountAuth.MOVE_FILES,
                             folderUtil.getAllFoldersId(folder.getFolderParent()))) {
                         return NO_AUTHORIZED;
                     }
@@ -1245,11 +1247,11 @@ public class FileServiceImpl
             return gson.toJson(cifr);
         }
         // 先行权限检查
-        if (!ConfigureReader.getInstance().authorized(account, AccountAuth.UPLOAD_FILES,
+        if (!config.authorized(account, AccountAuth.UPLOAD_FILES,
                 folderUtil.getAllFoldersId(folderId))
-                || !ConfigureReader.getInstance().authorized(account, AccountAuth.CREATE_NEW_FOLDER,
+                || !config.authorized(account, AccountAuth.CREATE_NEW_FOLDER,
                 folderUtil.getAllFoldersId(folderId))
-                || !ConfigureReader.getInstance().accessFolder(folder, account)) {
+                || !config.accessFolder(folder, account)) {
             cifr.setResult(NO_AUTHORIZED);
             return gson.toJson(cifr);
         }
@@ -1257,11 +1259,11 @@ public class FileServiceImpl
         try {
             // 获取最大文件体积（以Byte为单位）
             long mufs = Long.parseLong(maxUploadFileSize);
-            long pMaxUploadSize = ConfigureReader.getInstance().getUploadFileSize(account);
+            long pMaxUploadSize = config.getUploadFileSize(account);
             if (pMaxUploadSize >= 0) {
                 if (mufs > pMaxUploadSize) {
                     cifr.setResult("fileOverSize");
-                    cifr.setMaxSize(formatMaxUploadFileSize(ConfigureReader.getInstance().getUploadFileSize(account)));
+                    cifr.setMaxSize(formatMaxUploadFileSize(config.getUploadFileSize(account)));
                     return gson.toJson(cifr);
                 }
             }
@@ -1275,7 +1277,7 @@ public class FileServiceImpl
         try {
             Folder testFolder = folders.stream().parallel()
                     .filter((n) -> n.getFolderName().equals(folderName)).findAny().get();
-            if (ConfigureReader.getInstance().accessFolder(testFolder, account) && ConfigureReader.getInstance()
+            if (config.accessFolder(testFolder, account) && config
                     .authorized(account, AccountAuth.DELETE_FILE_OR_FOLDER, folderUtil.getAllFoldersId(folderId))) {
                 cifr.setResult("repeatFolder_coverOrBoth");
             }
@@ -1321,15 +1323,15 @@ public class FileServiceImpl
             return UPLOAD_ERROR;
         }
         // 检查上传权限
-        if (!ConfigureReader.getInstance().authorized(account, AccountAuth.UPLOAD_FILES,
+        if (!config.authorized(account, AccountAuth.UPLOAD_FILES,
                 folderUtil.getAllFoldersId(folderId))
-                || !ConfigureReader.getInstance().authorized(account, AccountAuth.CREATE_NEW_FOLDER,
+                || !config.authorized(account, AccountAuth.CREATE_NEW_FOLDER,
                 folderUtil.getAllFoldersId(folderId))
-                || !ConfigureReader.getInstance().accessFolder(folder, account)) {
+                || !config.accessFolder(folder, account)) {
             return UPLOAD_ERROR;
         }
         // 检查上传文件体积是否超限
-        long mufs = ConfigureReader.getInstance().getUploadFileSize(account);
+        long mufs = config.getUploadFileSize(account);
         if (mufs >= 0 && file.getSize() > mufs) {
             return UPLOAD_ERROR;
         }

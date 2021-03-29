@@ -8,7 +8,7 @@ import edu.swufe.nxksecdisk.server.model.Node;
 import edu.swufe.nxksecdisk.server.pojo.PictureInfo;
 import edu.swufe.nxksecdisk.server.pojo.PictureViewList;
 import edu.swufe.nxksecdisk.server.service.ShowPictureService;
-import edu.swufe.nxksecdisk.server.util.ConfigureReader;
+import edu.swufe.nxksecdisk.server.util.ConfigReader;
 import edu.swufe.nxksecdisk.server.util.FileBlockUtil;
 import edu.swufe.nxksecdisk.server.util.FolderUtil;
 import edu.swufe.nxksecdisk.server.util.LogUtil;
@@ -48,6 +48,8 @@ public class ShowPictureServiceImpl implements ShowPictureService {
     @Resource
     private LogUtil logUtil;
 
+    private final ConfigReader config = ConfigReader.getInstance();
+
     /**
      * <h2>获取所有同级目录下的图片并封装为PictureViewList对象</h2>
      * <p>
@@ -65,9 +67,9 @@ public class ShowPictureServiceImpl implements ShowPictureService {
             final String account = (String) request.getSession().getAttribute("ACCOUNT");
             Node p = nodeMapper.queryById(fileId);
             if (p != null) {
-                if (ConfigureReader.getInstance().authorized(account, AccountAuth.DOWNLOAD_FILES,
+                if (config.authorized(account, AccountAuth.DOWNLOAD_FILES,
                         folderUtil.getAllFoldersId(p.getFileParentFolder()))
-                        && ConfigureReader.getInstance().accessFolder(folderMapper.queryById(p.getFileParentFolder())
+                        && config.accessFolder(folderMapper.queryById(p.getFileParentFolder())
                         , account)) {
                     final List<Node> nodes = this.nodeMapper.queryBySomeFolder(fileId);
                     final List<PictureInfo> pictureViewList = new ArrayList<>();
@@ -131,15 +133,16 @@ public class ShowPictureServiceImpl implements ShowPictureService {
         if (fileId != null) {
             Node node = nodeMapper.queryById(fileId);
             if (node != null) {
-                if (ConfigureReader.getInstance().authorized(account, AccountAuth.DOWNLOAD_FILES,
+                if (config.authorized(account, AccountAuth.DOWNLOAD_FILES,
                         folderUtil.getAllFoldersId(node.getFileParentFolder()))
-                        && ConfigureReader.getInstance().accessFolder(folderMapper.queryById(node.getFileParentFolder()),
+                        && config.accessFolder(folderMapper.queryById(node.getFileParentFolder()),
                         account)) {
                     File pBlock = fileBlockUtil.getFileFromBlocks(node);
                     if (pBlock != null && pBlock.exists()) {
                         try {
                             int pSize = Integer.parseInt(node.getFileSize());
-                            String format = "JPG";// 压缩后的格式
+                            // 压缩后的格式;
+                            String format = "JPG";
                             if (pSize < 3) {
                                 Thumbnails.of(pBlock).size(1080, 1080).outputFormat(format)
                                         .toOutputStream(response.getOutputStream());

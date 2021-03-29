@@ -1,7 +1,7 @@
 package edu.swufe.nxksecdisk.server.app;
 
 import edu.swufe.nxksecdisk.server.config.Mvc;
-import edu.swufe.nxksecdisk.server.util.ConfigureReader;
+import edu.swufe.nxksecdisk.server.util.ConfigReader;
 import edu.swufe.nxksecdisk.system.AppSystem;
 import org.apache.catalina.Context;
 import org.apache.catalina.connector.Connector;
@@ -38,6 +38,8 @@ public class DiskAppController {
 
     private static boolean run;
 
+    private final ConfigReader config = ConfigReader.getInstance();
+
     /**
      * 这里负责设置一些系统参数;
      */
@@ -60,8 +62,8 @@ public class DiskAppController {
         final String[] args = new String[0];
         if (!DiskAppController.run) {
             // 启动服务器前重新检查各项设置并加载;
-            ConfigureReader.getInstance().reTestServerPropertiesAndEffect();
-            if (ConfigureReader.getInstance().getPropertiesStatus() == 0) {
+            config.reTestServerPropertiesAndEffect();
+            if (config.getPropertiesStatus() == 0) {
                 try {
                     AppSystem.out.println("正在开启服务器引擎...");
                     SpringApplication springApplication = new SpringApplication(DiskAppController.class);
@@ -136,7 +138,7 @@ public class DiskAppController {
     public ServletWebServerFactory servletContainer() {
         // 创建Tomcat容器引擎，分为开启https和不开启https两种模式
         TomcatServletWebServerFactory tomcat = null;
-        if (ConfigureReader.getInstance().openHttps()) {
+        if (config.openHttps()) {
             // 对于开启https模式，则将http端口的请求全部转发至https端口处理
             tomcat = new TomcatServletWebServerFactory() {
                 // 设置默认http处理转发
@@ -144,10 +146,10 @@ public class DiskAppController {
                 protected void customizeConnector(Connector connector) {
                     connector.setScheme("http");
                     // Connector监听的http的端口号
-                    connector.setPort(ConfigureReader.getInstance().getPort());
+                    connector.setPort(config.getPort());
                     connector.setSecure(false);
                     // 监听到http的端口号后转向到的https的端口号
-                    connector.setRedirectPort(ConfigureReader.getInstance().getHttpsPort());
+                    connector.setRedirectPort(config.getHttpsPort());
                 }
 
                 // 设置默认http处理
@@ -167,7 +169,7 @@ public class DiskAppController {
         else {
             // 对于不开启https模式，以常规方法生成容器
             tomcat = new TomcatServletWebServerFactory();
-            tomcat.setPort(ConfigureReader.getInstance().getPort());
+            tomcat.setPort(config.getPort());
         }
         // 设置错误处理页面
         tomcat.addErrorPages(
@@ -189,16 +191,16 @@ public class DiskAppController {
         // 设置请求协议头;
         connector.setScheme("https");
         // 设置https请求端口;
-        connector.setPort(ConfigureReader.getInstance().getHttpsPort());
+        connector.setPort(config.getHttpsPort());
         Http11NioProtocol protocol = (Http11NioProtocol) connector.getProtocolHandler();
         // 开启SSL加密通信;
         protocol.setSSLEnabled(true);
         // 设置证书文件;
-        protocol.setKeystoreFile(ConfigureReader.getInstance().getHttpsKeyFile());
+        protocol.setKeystoreFile(config.getHttpsKeyFile());
         // 设置加密类别（PKCS12/JKS）;
-        protocol.setKeystoreType(ConfigureReader.getInstance().getHttpsKeyType());
+        protocol.setKeystoreType(config.getHttpsKeyType());
         // 设置证书密码;
-        protocol.setKeystorePass(ConfigureReader.getInstance().getHttpsKeyPass());
+        protocol.setKeystorePass(config.getHttpsKeyPass());
         return connector;
     }
 }

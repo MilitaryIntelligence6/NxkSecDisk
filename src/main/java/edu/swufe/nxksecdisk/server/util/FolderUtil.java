@@ -28,6 +28,8 @@ public class FolderUtil {
     @Resource
     private FileBlockUtil fileBlockUtil;
 
+    private final ConfigReader config = ConfigReader.getInstance();
+
     /**
      * <h2>获得指定文件夹的所有上级文件夹</h2>
      * <p>
@@ -91,7 +93,7 @@ public class FolderUtil {
 
     public Folder createNewFolder(final String parentId, String account, String folderName, String folderConstraint)
             throws FoldersTotalOutOfLimitException {
-        if (!ConfigureReader.getInstance().authorized(account, AccountAuth.CREATE_NEW_FOLDER,
+        if (!config.authorized(account, AccountAuth.CREATE_NEW_FOLDER,
                 getAllFoldersId(parentId))) {
             return null;
         }
@@ -105,7 +107,7 @@ public class FolderUtil {
         if (parentFolder == null) {
             return null;
         }
-        if (!ConfigureReader.getInstance().accessFolder(parentFolder, account)) {
+        if (!config.accessFolder(parentFolder, account)) {
             return null;
         }
         if (folderMapper.queryByParentId(parentId).parallelStream().anyMatch((e) -> e.getFolderName().equals(folderName))) {

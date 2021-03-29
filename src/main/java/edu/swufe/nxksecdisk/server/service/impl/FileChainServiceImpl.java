@@ -49,10 +49,12 @@ public class FileChainServiceImpl
     @Resource
     private FolderUtil folderUtil;
 
+    private final ConfigReader config = ConfigReader.getInstance();
+
     @Override
     public void getResourceByChainKey(HttpServletRequest request, HttpServletResponse response) {
         int statusCode = 403;
-        if (ConfigureReader.getInstance().isOpenFileChain()) {
+        if (config.isOpenFileChain()) {
             final String ckey = request.getParameter("ckey");
             // 权限凭证有效性并确认其对应的资源
             if (ckey != null) {
@@ -72,7 +74,7 @@ public class FileChainServiceImpl
                                 String range = request.getHeader("Range");
                                 int status = writeRangeFileStream(request, response, target, f.getFileName(),
                                         contentTypeMap.getContentType(suffix),
-                                        ConfigureReader.getInstance().getDownloadMaxRate(null),
+                                        config.getDownloadMaxRate(null),
                                         fileBlockUtil.getETag(target), false);
                                 if (status == HttpServletResponse.SC_OK
                                         || (range != null && range.startsWith("bytes=0-"))) {
@@ -94,7 +96,7 @@ public class FileChainServiceImpl
             }
         }
         try {
-            //  处理无法下载的资源
+            // 处理无法下载的资源
             response.sendError(statusCode);
         }
         catch (IOException e) {
@@ -104,20 +106,21 @@ public class FileChainServiceImpl
 
     @Override
     public String getChainKeyByFid(HttpServletRequest request) {
-        if (ConfigureReader.getInstance().isOpenFileChain()) {
+        if (config.isOpenFileChain()) {
             String fid = request.getParameter("fid");
             String account = (String) request.getSession().getAttribute("ACCOUNT");
             if (fid != null) {
                 final Node f = this.nodeMapper.queryById(fid);
                 if (f != null) {
-                    if (ConfigureReader.getInstance().authorized(account, AccountAuth.DOWNLOAD_FILES,
+                    if (config.authorized(account, AccountAuth.DOWNLOAD_FILES,
                             folderUtil.getAllFoldersId(f.getFileParentFolder()))) {
                         Folder folder = folderMapper.queryById(f.getFileParentFolder());
-                        if (ConfigureReader.getInstance().accessFolder(folder, account)) {
+                        if (config.accessFolder(folder, account)) {
                             // 将指定的fid加密为ckey并返回。
                             try {
                                 Property keyProp = propertiesMapper.selectByKey("chain_aes_key");
-                                if (keyProp == null) {// 如果没有生成过永久性AES密钥，则先生成再加密
+                                if (keyProp == null) {
+                                    // 如果没有生成过永久性AES密钥，则先生成再加密
                                     String aesKey = cipher.generateRandomKey();
                                     Property chainAESKey = new Property();
                                     chainAESKey.setPropertyKey("chain_aes_key");
@@ -126,7 +129,8 @@ public class FileChainServiceImpl
                                         return cipher.encrypt(aesKey, fid);
                                     }
                                 }
-                                else {// 如果已经有了，则直接用其加密
+                                else {
+                                    // 如果已经有了，则直接用其加密
                                     return cipher.encrypt(keyProp.getPropertyValue(), fid);
                                 }
                             }

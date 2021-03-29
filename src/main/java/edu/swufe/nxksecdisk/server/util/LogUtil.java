@@ -43,6 +43,8 @@ public class LogUtil {
     @Resource
     private FileBlockUtil fileBlockUtil;
 
+    private final ConfigReader config = ConfigReader.getInstance();
+
     private ExecutorService writerThread;
 
     private FileWriter writer;
@@ -55,7 +57,7 @@ public class LogUtil {
 
     public LogUtil() {
         sep = File.separator;
-        logs = String.format("%s%slogs", ConfigureReader.getInstance().getPath(), sep);
+        logs = String.format("%s%slogs", config.getPath(), sep);
         writerThread = Executors.newSingleThreadExecutor();
         File logFile = new File(logs);
         if (!logFile.exists()) {
@@ -78,7 +80,7 @@ public class LogUtil {
      * @param e Exception 需要记录的异常对象
      */
     public void writeException(Exception e) {
-        if (ConfigureReader.getInstance().inspectLogLevel(LogLevel.RUNTIME_EXCEPTION)) {
+        if (config.inspectLogLevel(LogLevel.RUNTIME_EXCEPTION)) {
             StringBuffer exceptionInfo = new StringBuffer(e.toString());
             StackTraceElement[] stackTraceArray = e.getStackTrace();
             for (int i = 0; i < stackTraceArray.length && i < 10; i++) {
@@ -103,7 +105,7 @@ public class LogUtil {
      * </p>
      */
     public void writeCreateFolderEvent(HttpServletRequest request, Folder f) {
-        if (ConfigureReader.getInstance().inspectLogLevel(LogLevel.EVENT)) {
+        if (config.inspectLogLevel(LogLevel.EVENT)) {
             String account = (String) request.getSession().getAttribute("ACCOUNT");
             if (account == null || account.length() == 0) {
                 account = "Anonymous";
@@ -140,7 +142,7 @@ public class LogUtil {
                                        Folder f,
                                        String newName,
                                        String newConstraint) {
-        if (ConfigureReader.getInstance().inspectLogLevel(LogLevel.EVENT)) {
+        if (config.inspectLogLevel(LogLevel.EVENT)) {
             String account = (String) request.getSession().getAttribute("ACCOUNT");
             if (account == null || account.length() == 0) {
                 account = "Anonymous";
@@ -176,7 +178,7 @@ public class LogUtil {
      * </p>
      */
     public void writeDeleteFolderEvent(HttpServletRequest request, Folder f, List<Folder> l) {
-        if (ConfigureReader.getInstance().inspectLogLevel(LogLevel.EVENT)) {
+        if (config.inspectLogLevel(LogLevel.EVENT)) {
             String account = (String) request.getSession().getAttribute("ACCOUNT");
             if (account == null || account.length() == 0) {
                 account = "Anonymous";
@@ -207,7 +209,7 @@ public class LogUtil {
      * </p>
      */
     public void writeDeleteFileEvent(HttpServletRequest request, Node f) {
-        if (ConfigureReader.getInstance().inspectLogLevel(LogLevel.EVENT)) {
+        if (config.inspectLogLevel(LogLevel.EVENT)) {
             String account = (String) request.getSession().getAttribute("ACCOUNT");
             if (account == null || account.length() == 0) {
                 account = "Anonymous";
@@ -241,7 +243,7 @@ public class LogUtil {
      * </p>
      */
     public void writeUploadFileEvent(HttpServletRequest request, Node f, String account) {
-        if (ConfigureReader.getInstance().inspectLogLevel(LogLevel.EVENT)) {
+        if (config.inspectLogLevel(LogLevel.EVENT)) {
             if (account == null || account.length() == 0) {
                 account = "Anonymous";
             }
@@ -277,7 +279,7 @@ public class LogUtil {
      * </p>
      */
     public void writeDownloadFileEvent(String account, String ip, Node f) {
-        if (ConfigureReader.getInstance().inspectLogLevel(LogLevel.EVENT)) {
+        if (config.inspectLogLevel(LogLevel.EVENT)) {
             if (account == null || account.length() == 0) {
                 account = "Anonymous";
             }
@@ -309,7 +311,7 @@ public class LogUtil {
      * </p>
      */
     public void writeChainEvent(HttpServletRequest request, Node f) {
-        if (ConfigureReader.getInstance().inspectLogLevel(LogLevel.EVENT)) {
+        if (config.inspectLogLevel(LogLevel.EVENT)) {
             String ip = ipAddrGetter.getIpAddr(request);
             writerThread.execute(() ->
             {
@@ -340,7 +342,7 @@ public class LogUtil {
      * @author 青阳龙野(kohgylw)
      */
     public void writeDownloadFileByKeyEvent(HttpServletRequest request, Node f) {
-        if (ConfigureReader.getInstance().inspectLogLevel(LogLevel.EVENT)) {
+        if (config.inspectLogLevel(LogLevel.EVENT)) {
             String ip = ipAddrGetter.getIpAddr(request);
             writerThread.execute(() ->
             {
@@ -370,7 +372,7 @@ public class LogUtil {
      * @author 青阳龙野(kohgylw)
      */
     public void writeShareFileURLEvent(HttpServletRequest request, Node f) {
-        if (ConfigureReader.getInstance().inspectLogLevel(LogLevel.EVENT)) {
+        if (config.inspectLogLevel(LogLevel.EVENT)) {
             String account = (String) request.getSession().getAttribute("ACCOUNT");
             if (account == null || account.length() == 0) {
                 account = "Anonymous";
@@ -404,7 +406,7 @@ public class LogUtil {
      * </p>
      */
     public void writeRenameFileEvent(HttpServletRequest request, Node f, String newName) {
-        if (ConfigureReader.getInstance().inspectLogLevel(LogLevel.EVENT)) {
+        if (config.inspectLogLevel(LogLevel.EVENT)) {
             String account = (String) request.getSession().getAttribute("ACCOUNT");
             if (account == null || account.length() == 0) {
                 account = "Anonymous";
@@ -446,7 +448,7 @@ public class LogUtil {
      * @author 青阳龙野(kohgylw)
      */
     public void writeMoveFileEvent(String account, String ip, String originPath, String finalPath, boolean isCopy) {
-        if (ConfigureReader.getInstance().inspectLogLevel(LogLevel.EVENT)) {
+        if (config.inspectLogLevel(LogLevel.EVENT)) {
             if (account == null || account.length() == 0) {
                 account = "Anonymous";
             }
@@ -478,7 +480,7 @@ public class LogUtil {
      * @author 青阳龙野(kohgylw)
      */
     public void writeMoveFolderEvent(String account, String ip, String originPath, String finalPath, boolean isCopy) {
-        if (ConfigureReader.getInstance().inspectLogLevel(LogLevel.EVENT)) {
+        if (config.inspectLogLevel(LogLevel.EVENT)) {
             if (account == null || account.length() == 0) {
                 account = "Anonymous";
             }
@@ -529,7 +531,7 @@ public class LogUtil {
      * </p>
      */
     public void writeDownloadCheckedFileEvent(HttpServletRequest request, List<String> idList, List<String> fidList) {
-        if (ConfigureReader.getInstance().inspectLogLevel(LogLevel.EVENT)) {
+        if (config.inspectLogLevel(LogLevel.EVENT)) {
             String account = (String) request.getSession().getAttribute("ACCOUNT");
             if (account == null || account.length() == 0) {
                 account = "Anonymous";
@@ -565,7 +567,7 @@ public class LogUtil {
      * </p>
      */
     public void writeChangePasswordEvent(HttpServletRequest request, String account, String newPassword) {
-        if (ConfigureReader.getInstance().inspectLogLevel(LogLevel.EVENT)) {
+        if (config.inspectLogLevel(LogLevel.EVENT)) {
             String ip = ipAddrGetter.getIpAddr(request);
             writerThread.execute(() ->
             {
@@ -583,7 +585,7 @@ public class LogUtil {
      * </p>
      */
     public void writeSignUpEvent(HttpServletRequest request, String account, String password) {
-        if (ConfigureReader.getInstance().inspectLogLevel(LogLevel.EVENT)) {
+        if (config.inspectLogLevel(LogLevel.EVENT)) {
             String ip = ipAddrGetter.getIpAddr(request);
             writerThread.execute(() ->
             {

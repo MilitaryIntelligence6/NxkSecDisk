@@ -1,6 +1,6 @@
 package edu.swufe.nxksecdisk.server.filter;
 
-import edu.swufe.nxksecdisk.server.util.ConfigureReader;
+import edu.swufe.nxksecdisk.server.util.ConfigReader;
 import edu.swufe.nxksecdisk.server.util.IpAddrGetter;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.annotation.Order;
@@ -25,6 +25,8 @@ public class IpFilter implements Filter {
 
     private IpAddrGetter ipAddrGetter;
 
+    private final ConfigReader config = ConfigReader.getInstance();
+
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         ApplicationContext context = WebApplicationContextUtils
@@ -35,9 +37,9 @@ public class IpFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
-        if (ConfigureReader.getInstance().enableIPRule()) {
+        if (config.enableIPRule()) {
             HttpServletRequest hsr = (HttpServletRequest) request;
-            if (ConfigureReader.getInstance().filterAccessIP(ipAddrGetter.getIpAddr(hsr))) {
+            if (config.filterAccessIP(ipAddrGetter.getIpAddr(hsr))) {
                 chain.doFilter(request, response);
             }
             else {

@@ -36,6 +36,8 @@ public class DiskFfmpegLocator extends FFMPEGLocator {
 
     private boolean isWindows;
 
+    private final ConfigReader config = ConfigReader.getInstance();
+
     /**
      * <h2>实例化ffmpeg引擎构造器</h2>
      * <p>
@@ -82,13 +84,13 @@ public class DiskFfmpegLocator extends FFMPEGLocator {
      */
     private String initFFMPEGExecutablePath() {
         // 首先判断是否启用了在线解码功能，若未启用则无需初始化ffmpeg执行路径
-        if (!ConfigureReader.getInstance().isEnableFFMPEG()) {
+        if (!config.isEnableFFMPEG()) {
             enableFFmpeg = false;
             return null;
         }
         // 是否在程序主目录下放置了自定义的ffmpeg可执行文件“ffmpeg.exe”/“ffmpeg”？
         File ffmpegFile;
-        File customFFMPEGexef = new File(ConfigureReader.getInstance().getPath(), isWindows ? "ffmpeg.exe" : "ffmpeg");
+        File customFFMPEGexef = new File(config.getPath(), isWindows ? "ffmpeg.exe" : "ffmpeg");
         // 如果有，那么优先使用自定义的ffmpeg可执行文件。
         if (customFFMPEGexef.isFile() && customFFMPEGexef.canRead()) {
             ffmpegFile = new File(dirFolder, customFFMPEGexef.getName());

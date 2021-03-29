@@ -1,6 +1,6 @@
 package edu.swufe.nxksecdisk.ui.module;
 
-import edu.swufe.nxksecdisk.server.util.ConfigureReader;
+import edu.swufe.nxksecdisk.server.util.ConfigReader;
 import edu.swufe.nxksecdisk.system.AppSystem;
 import edu.swufe.nxksecdisk.system.Decorator;
 import edu.swufe.nxksecdisk.ui.callback.*;
@@ -80,6 +80,8 @@ public class ServerUiModule extends DiskDynamicWindow {
     protected static final String L_NONE = "不记录(NONE)";
 
     private SimpleDateFormat sdf;
+
+    private final ConfigReader config = ConfigReader.getInstance();
 
     /**
      * 窗口原始宽度
@@ -422,37 +424,37 @@ public class ServerUiModule extends DiskDynamicWindow {
                 println("KIFT服务器未能成功启动，请检查设置或查看异常信息。");
             }
         } else {
-            if (ConfigureReader.getInstance().getPropertiesStatus() != 0) {
-                switch (ConfigureReader.getInstance().getPropertiesStatus()) {
-                    case ConfigureReader.INVALID_PORT: {
+            if (config.getPropertiesStatus() != 0) {
+                switch (config.getPropertiesStatus()) {
+                    case ConfigReader.INVALID_PORT: {
                         println("KIFT无法启动：端口设置无效。");
                         break;
                     }
-                    case ConfigureReader.INVALID_BUFFER_SIZE: {
+                    case ConfigReader.INVALID_BUFFER_SIZE: {
                         println("KIFT无法启动：缓存设置无效。");
                         break;
                     }
-                    case ConfigureReader.INVALID_FILE_SYSTEM_PATH: {
+                    case ConfigReader.INVALID_FILE_SYSTEM_PATH: {
                         println("KIFT无法启动：文件系统路径或某一扩展存储区设置无效。");
                         break;
                     }
-                    case ConfigureReader.INVALID_LOG: {
+                    case ConfigReader.INVALID_LOG: {
                         println("KIFT无法启动：日志设置无效。");
                         break;
                     }
-                    case ConfigureReader.INVALID_VC: {
+                    case ConfigReader.INVALID_VC: {
                         println("KIFT无法启动：登录验证码设置无效。");
                         break;
                     }
-                    case ConfigureReader.INVALID_MUST_LOGIN_SETTING: {
+                    case ConfigReader.INVALID_MUST_LOGIN_SETTING: {
                         println("KIFT无法启动：必须登入设置无效。");
                         break;
                     }
-                    case ConfigureReader.INVALID_CHANGE_PASSWORD_SETTING: {
+                    case ConfigReader.INVALID_CHANGE_PASSWORD_SETTING: {
                         println("KIFT无法启动：用户修改账户密码设置无效。");
                         break;
                     }
-                    case ConfigureReader.INVALID_FILE_CHAIN_SETTING: {
+                    case ConfigReader.INVALID_FILE_CHAIN_SETTING: {
                         println("KIFT无法启动：永久资源链接设置无效。");
                         break;
                     }

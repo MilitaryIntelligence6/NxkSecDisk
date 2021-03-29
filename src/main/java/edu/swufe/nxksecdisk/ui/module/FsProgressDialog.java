@@ -133,7 +133,7 @@ public class FsProgressDialog extends DiskDynamicWindow {
     //终止当前操作
     private void canncel() {
         if (JOptionPane.showConfirmDialog(window, "操作仍在进行中，确认要立即终止？", "警告", JOptionPane.YES_NO_OPTION) == 0) {
-            FileSystemManager.getInstance().cannel();
+            FileSystemManager.getInstance().cancel();
             window.dispose();
         }
     }

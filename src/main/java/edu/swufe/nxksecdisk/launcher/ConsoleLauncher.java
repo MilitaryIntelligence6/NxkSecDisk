@@ -6,7 +6,7 @@ import edu.swufe.nxksecdisk.server.app.DiskAppController;
 import edu.swufe.nxksecdisk.server.exception.FilesTotalOutOfLimitException;
 import edu.swufe.nxksecdisk.server.exception.FoldersTotalOutOfLimitException;
 import edu.swufe.nxksecdisk.server.model.Node;
-import edu.swufe.nxksecdisk.server.util.ConfigureReader;
+import edu.swufe.nxksecdisk.server.util.ConfigReader;
 import edu.swufe.nxksecdisk.server.util.FileNodeUtil;
 import edu.swufe.nxksecdisk.system.AppSystem;
 import edu.swufe.nxksecdisk.util.filesysmng.FileSystemManager;
@@ -46,16 +46,31 @@ public class ConsoleLauncher {
 
     private ExecutorService worker;
 
+    private final ConfigReader config = ConfigReader.getInstance();
+
+    private final FileSystemManager fileSysManager = FileSystemManager.getInstance();
+
     private ConsoleLauncher() {
         DynamicConfig.setLauncherMode(EnumLauncherMode.CONSOLE);
-        ConsoleLauncher.appController = new DiskAppController();
+        appController = new DiskAppController();
         worker = Executors.newSingleThreadExecutor();
-        ConsoleLauncher.commandTips = "kiftd:您可以输入以下指令以控制服务器：\r\n-start 启动服务器\r\n-stop 停止服务器\r\n-exit " +
+        commandTips = "kiftd:您可以输入以下指令以控制服务器：\r\n-start 启动服务器\r\n-stop 停止服务器\r\n-exit " +
                 "停止服务器并退出应用\r\n-restart 重启服务器\r\n-files 文件管理\r\n-status 查看服务器状态\r\n-help 显示帮助文本";
-        ConsoleLauncher.fsCommandTips = "kiftd files:您可以输入以下指令进行文件管理：\r\nls 显示当前文件夹内容\r\ncd {“文件夹名称” 或 “--文件夹序号”} " +
+        fsCommandTips = "kiftd files:您可以输入以下指令进行文件管理：\r\nls 显示当前文件夹内容\r\ncd {“文件夹名称” 或 “--文件夹序号”} " +
                 "进入指定文件夹（示例：“cd foo” 或 “cd --1”，如需返回上一级请输入“cd ../”）\r\nimport {要导入的本地文件（必须使用完整路径）} " +
                 "将本地文件或文件夹导入至此\r\nexport {“目标名称” 或 “--目标序号”（省略该项则导出当前文件夹的全部内容）} {要导出至本地的路径（必须使用完整路径）} " +
                 "将指定文件或文件夹导出本地\r\nrm {“文件夹名称” 或 “--文件夹序号”} 删除指定文件或文件夹\r\nexit 退出文件管理并返回kiftd控制台\r\nhelp 显示帮助文本";
+    }
+
+    private static ConsoleLauncher getInstance() {
+        if (instance == null) {
+            synchronized (ConsoleLauncher.class) {
+                if (instance == null) {
+                    instance = new ConsoleLauncher();
+                }
+            }
+        }
+        return instance;
     }
 
     /**
@@ -71,17 +86,6 @@ public class ConsoleLauncher {
     public static ConsoleLauncher build(final String[] args) {
         getInstance();
         instance.execute(args);
-        return instance;
-    }
-
-    private static ConsoleLauncher getInstance() {
-        if (instance == null) {
-            synchronized (ConsoleLauncher.class) {
-                if (instance == null) {
-                    instance = new ConsoleLauncher();
-                }
-            }
-        }
         return instance;
     }
 
@@ -132,25 +136,25 @@ public class ConsoleLauncher {
         } else if (ConsoleLauncher.appController.start()) {
             AppSystem.out.println("kiftd服务器已启动，可以正常访问了，您可以使用 -status 指令查看运行状态。");
         } else {
-            if (ConfigureReader.getInstance().getPropertiesStatus() != 0) {
-                switch (ConfigureReader.getInstance().getPropertiesStatus()) {
-                    case ConfigureReader.INVALID_PORT: {
+            if (config.getPropertiesStatus() != 0) {
+                switch (config.getPropertiesStatus()) {
+                    case ConfigReader.INVALID_PORT: {
                         AppSystem.out.println("错误：kiftd服务器未能启动，端口设置无效。");
                         break;
                     }
-                    case ConfigureReader.INVALID_BUFFER_SIZE: {
+                    case ConfigReader.INVALID_BUFFER_SIZE: {
                         AppSystem.out.println("错误：kiftd服务器未能启动，缓存设置无效。");
                         break;
                     }
-                    case ConfigureReader.INVALID_FILE_SYSTEM_PATH: {
+                    case ConfigReader.INVALID_FILE_SYSTEM_PATH: {
                         AppSystem.out.println("错误：kiftd服务器未能启动，文件系统路径或某一扩展存储区设置无效。");
                         break;
                     }
-                    case ConfigureReader.INVALID_LOG: {
+                    case ConfigReader.INVALID_LOG: {
                         AppSystem.out.println("错误：kiftd服务器未能启动，日志设置无效。");
                         break;
                     }
-                    case ConfigureReader.INVALID_VC: {
+                    case ConfigReader.INVALID_VC: {
                         AppSystem.out.println("错误：kiftd服务器未能启动，登录验证码设置无效。");
                         break;
                     }
@@ -215,11 +219,11 @@ public class ConsoleLauncher {
     private void printServerStatus() {
         AppSystem.out.printf("服务器状态：\r\n<Port>端口号:%d\r\n<LogLevel>日志等级:%s\r\n<BufferSize>缓冲区大小:%d " +
                         "B\r\n<FileSystemPath>文件系统存储路径：%s\r\n<MustLogin>是否必须登录：%s\r\n<Running>运行状态：%s",
-                ConfigureReader.getInstance().getPort(),
-                ConfigureReader.getInstance().getLogLevel(),
-                ConfigureReader.getInstance().getBuffSize(),
-                ConfigureReader.getInstance().getFileSystemPath(),
-                ConfigureReader.getInstance().mustLogin(),
+                config.getPort(),
+                config.getLogLevel(),
+                config.getBuffSize(),
+                config.getFileSystemPath(),
+                config.mustLogin(),
                 ConsoleLauncher.appController.started());
     }
 
@@ -230,8 +234,12 @@ public class ConsoleLauncher {
         AppSystem.out.println("已进入文件管理功能。");
         try {
             FileNodeUtil.initNodeTableToDataBase();
-            if (currentFolder == null || currentFolder.getCurrent() == null || FileSystemManager.getInstance()
-                    .selectFolderById(currentFolder.getCurrent().getFolderId()) == null) {
+            if (currentFolder == null
+                    || currentFolder.getCurrent() == null
+                    || fileSysManager.selectFolderById(
+                            currentFolder
+                                    .getCurrent()
+                                    .getFolderId()) == null) {
                 getFolderView("root");
             }
         }
@@ -296,7 +304,7 @@ public class ConsoleLauncher {
      * @throws SQLException
      */
     private void getFolderView(String fid) throws SQLException {
-        currentFolder = FileSystemManager.getInstance().requireFolderView(fid);
+        currentFolder = fileSysManager.requireFolderView(fid);
     }
 
     /**
@@ -305,11 +313,11 @@ public class ConsoleLauncher {
     private void showCurrentFolder() {
         try {
             String folderId = currentFolder.getCurrent().getFolderId();
-            if (Math.max(FileSystemManager.getInstance().getFilesTotalNumByFoldersId(folderId),
-                    FileSystemManager.getInstance().getFoldersTotalNumByFoldersId(folderId)) > Integer.MAX_VALUE) {
+            if (Math.max(fileSysManager.getFilesTotalNumByFoldersId(folderId),
+                    fileSysManager.getFoldersTotalNumByFoldersId(folderId)) > Integer.MAX_VALUE) {
                 System.out.println("警告：文件夹列表长度超过最大限值，只能显示前" + Integer.MAX_VALUE + "行。");
             }
-            currentFolder = FileSystemManager.getInstance().requireFolderView(folderId);
+            currentFolder = fileSysManager.requireFolderView(folderId);
         }
         catch (SQLException e) {
             openFolderError();
@@ -336,7 +344,7 @@ public class ConsoleLauncher {
      */
     private void gotoFolder(String fname) {
         try {
-            currentFolder = FileSystemManager.getInstance().requireFolderView(currentFolder.getCurrent().getFolderId());
+            currentFolder = fileSysManager.requireFolderView(currentFolder.getCurrent().getFolderId());
             String fid = getSelectFolderId(fname);
             if (fid != null) {
                 getFolderView(fid);
@@ -362,15 +370,15 @@ public class ConsoleLauncher {
                 String parent = "null";
                 for (int i = 1; i < paths.length - 1; i++) {
                     String folderName = paths[i];
-                    parent = FileSystemManager.getInstance().getFoldersByParentId(parent).parallelStream()
+                    parent = fileSysManager.getFoldersByParentId(parent).parallelStream()
                             .filter((e) -> e.getFolderName().equals(folderName)).findFirst().get().getFolderId();
                 }
                 String fname = paths[paths.length - 1];
-                List<Folder> folders = FileSystemManager.getInstance().getFoldersByParentId(parent);
+                List<Folder> folders = fileSysManager.getFoldersByParentId(parent);
                 if (path.endsWith("/") || folders.parallelStream().anyMatch((e) -> e.getFolderName().equals(fname))) {
                     return folders.parallelStream().filter((e) -> e.getFolderName().equals(fname)).findFirst().get();
                 } else {
-                    return FileSystemManager.getInstance().selectNodesByFolderId(parent).parallelStream()
+                    return fileSysManager.selectNodesByFolderId(parent).parallelStream()
                             .filter((e) -> e.getFileName().equals(fname)).findFirst().get();
                 }
             }
@@ -482,7 +490,7 @@ public class ConsoleLauncher {
             if (args.length == 2) {
                 importTarget = args[1];
                 importPath = "/ROOT";
-                path = FileSystemManager.getInstance().selectFolderById("root");
+                path = fileSysManager.selectFolderById("root");
                 target = new File(importTarget);
             } else if (args.length == 3 || args.length == 4) {
                 importPath = args[1];
@@ -504,7 +512,7 @@ public class ConsoleLauncher {
             }
             File[] files = new File[]{target};
             String type;
-            if (FileSystemManager.getInstance().hasExistsFilesOrFolders(files, folderId) > 0) {
+            if (fileSysManager.hasExistsFilesOrFolders(files, folderId) > 0) {
                 if (args.length == 4) {
                     switch (args[3]) {
                         case "-C": {
@@ -529,7 +537,7 @@ public class ConsoleLauncher {
             } else {
                 type = "cancel";
             }
-            if (FileSystemManager.getInstance().importFrom(files, folderId, type)) {
+            if (fileSysManager.importFrom(files, folderId, type)) {
                 return;
             } else {
                 AppSystem.out.println("错误：导入失败，可能导入全部文件。");
@@ -556,7 +564,7 @@ public class ConsoleLauncher {
         File[] importFiles = new File[]{f};
         ProgressListener pl = null;
         try {
-            if (FileSystemManager.getInstance().hasExistsFilesOrFolders(importFiles, targetFolder) > 0) {
+            if (fileSysManager.hasExistsFilesOrFolders(importFiles, targetFolder) > 0) {
                 System.out.println("提示：该路径下已经存在同名文件或文件夹（" + f.getName() + "），您希望？[C]取消 [V]覆盖 [B]保留两者");
                 q:
                 while (true) {
@@ -584,7 +592,7 @@ public class ConsoleLauncher {
             AppSystem.out.println("正在导入，请稍候...");
             pl = new ProgressListener();
             worker.execute(pl);
-            FileSystemManager.getInstance().importFrom(importFiles, targetFolder, type);
+            fileSysManager.importFrom(importFiles, targetFolder, type);
             pl.c = false;
             AppSystem.out.println("导入完成。");
         }
@@ -621,7 +629,7 @@ public class ConsoleLauncher {
                 exportPath = args[1];
                 exportTarget = "/ROOT";
                 path = new File(exportPath);
-                target = FileSystemManager.getInstance().selectFolderById("root");
+                target = fileSysManager.selectFolderById("root");
             } else if (args.length == 3 || args.length == 4) {
                 exportTarget = args[1];
                 exportPath = args[2];
@@ -652,7 +660,7 @@ public class ConsoleLauncher {
                 AppSystem.out.println("错误：导出失败，出现意外错误。");
                 return;
             }
-            if (FileSystemManager.getInstance().hasExistsFilesOrFolders(foldersId, filesId, path) > 0) {
+            if (fileSysManager.hasExistsFilesOrFolders(foldersId, filesId, path) > 0) {
                 if (args.length == 4) {
                     switch (args[3]) {
                         case "-C": {
@@ -677,7 +685,7 @@ public class ConsoleLauncher {
             } else {
                 type = "cancel";
             }
-            if (FileSystemManager.getInstance().exportTo(foldersId, filesId, path, type)) {
+            if (fileSysManager.exportTo(foldersId, filesId, path, type)) {
                 return;
             } else {
                 AppSystem.out.println("错误：导出失败，可能导出全部文件。");
@@ -729,7 +737,7 @@ public class ConsoleLauncher {
                     AppSystem.out.println("错误：要导出的文件（或文件夹）不合法，只允许在当前文件夹内的选择（" + path + "）。");
                     return;
                 }
-                if (FileSystemManager.getInstance().hasExistsFilesOrFolders(foldersId, filesId, targetPath) > 0) {
+                if (fileSysManager.hasExistsFilesOrFolders(foldersId, filesId, targetPath) > 0) {
                     System.out.println("提示：该路径下已经存在同名文件或文件夹（" + targetPath.getName() + "），您希望？[C]取消 [V]覆盖 [B]保留两者");
                     q:
                     while (true) {
@@ -757,7 +765,7 @@ public class ConsoleLauncher {
                 AppSystem.out.println("正在导出，请稍候...");
                 pl = new ProgressListener();
                 worker.execute(pl);
-                FileSystemManager.getInstance().exportTo(foldersId, filesId, targetPath, type);
+                fileSysManager.exportTo(foldersId, filesId, targetPath, type);
                 pl.c = false;
                 AppSystem.out.println("导出完成。");
             }
@@ -780,7 +788,7 @@ public class ConsoleLauncher {
     private void doDelete(String fname) {
         ProgressListener pl = null;
         try {
-            currentFolder = FileSystemManager.getInstance().requireFolderView(currentFolder.getCurrent().getFolderId());
+            currentFolder = fileSysManager.requireFolderView(currentFolder.getCurrent().getFolderId());
         }
         catch (SQLException e2) {
             openFolderError();
@@ -793,7 +801,7 @@ public class ConsoleLauncher {
                     AppSystem.out.println("正在删除文件夹，请稍候...");
                     pl = new ProgressListener();
                     worker.execute(pl);
-                    if (FileSystemManager.getInstance().delete(new String[]{id}, new String[]{})) {
+                    if (fileSysManager.delete(new String[]{id}, new String[]{})) {
                         AppSystem.out.println("删除完毕。");
                     } else {
                         AppSystem.out.println("删除失败，可能未能删除该文件夹，请重试。");
@@ -809,7 +817,7 @@ public class ConsoleLauncher {
                     AppSystem.out.println("正在删除文件，请稍候...");
                     pl = new ProgressListener();
                     worker.execute(pl);
-                    if (FileSystemManager.getInstance().delete(new String[]{}, new String[]{id})) {
+                    if (fileSysManager.delete(new String[]{}, new String[]{id})) {
                         AppSystem.out.println("删除完毕。");
                     } else {
                         AppSystem.out.println("删除失败，可能未能删除该文件，请重试。");
@@ -891,7 +899,7 @@ public class ConsoleLauncher {
             switch (command) {
                 case "Y": {
                     try {
-                        currentFolder = FileSystemManager.getInstance().requireFolderView("root");
+                        currentFolder = fileSysManager.requireFolderView("root");
                     }
                     catch (SQLException e1) {
                         AppSystem.out.println("错误：无法读取根目录，请尝试重新打开文件管理系统或重启kiftd。");
@@ -911,7 +919,7 @@ public class ConsoleLauncher {
 
     private void runInit() {
         AppSystem.out.println("正在初始化服务器...");
-        if (ConfigureReader.getInstance().getPropertiesStatus() == 0) {
+        if (config.getPropertiesStatus() == 0) {
             this.awaiting();
         }
     }

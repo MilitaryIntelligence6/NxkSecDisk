@@ -1,6 +1,6 @@
 package edu.swufe.nxksecdisk.ui.module;
 
-import edu.swufe.nxksecdisk.server.util.ConfigureReader;
+import edu.swufe.nxksecdisk.server.util.ConfigReader;
 import edu.swufe.nxksecdisk.system.AppSystem;
 import edu.swufe.nxksecdisk.ui.pojo.FileSystemPath;
 import edu.swufe.nxksecdisk.ui.util.PathsTable;
@@ -180,7 +180,7 @@ public class FileSystemPathViewer extends DiskDynamicWindow {
                             if (!SettingWindow.extendStores.parallelStream()
                                     .anyMatch(f -> f.getPath().equals(selectPath))) {
                                 String pathName = selectPath.getAbsolutePath();
-                                if (new File(ConfigureReader.getInstance().getInitFileSystemPath()).equals(selectPath)
+                                if (new File(ConfigReader.getInstance().getInitFileSystemPath()).equals(selectPath)
                                         || (encoder.canEncode(pathName) && pathName.indexOf("\\:") < 0
                                         && pathName.indexOf("\\\\") < 0)) {
                                     SettingWindow.chooserPath = mainFileSystemPathChooer.getSelectedFile();

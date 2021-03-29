@@ -7,7 +7,7 @@ import edu.swufe.nxksecdisk.server.app.DiskAppController;
 import edu.swufe.nxksecdisk.server.enumeration.LogLevel;
 import edu.swufe.nxksecdisk.server.enumeration.VcLevel;
 import edu.swufe.nxksecdisk.server.pojo.ExtendStores;
-import edu.swufe.nxksecdisk.server.util.ConfigureReader;
+import edu.swufe.nxksecdisk.server.util.ConfigReader;
 import edu.swufe.nxksecdisk.server.util.ServerTimeUtil;
 import edu.swufe.nxksecdisk.ui.callback.GetServerStatus;
 import edu.swufe.nxksecdisk.ui.module.ServerUiModule;
@@ -32,10 +32,8 @@ public class UiLauncher {
 
     /**
      * 实例化图形界面并显示它，同时将图形界面的各个操作与服务器控制器对应起来;
-     *
-     * @throws Exception
      */
-    private UiLauncher() throws Exception {
+    private UiLauncher() {
         initSkin();
         DynamicConfig.setLauncherMode(EnumLauncherMode.UI);
         final ServerUiModule serverUi = ServerUiModule.getInstance();
@@ -44,59 +42,54 @@ public class UiLauncher {
         ServerUiModule.setStartServer(appController::start);
         ServerUiModule.setOnCloseServer(appController::stop);
         ServerUiModule.setGetServerTime(ServerTimeUtil::serverTime);
+
+        final ConfigReader config = ConfigReader.getInstance();
+
         ServerUiModule.setGetServerStatus(new GetServerStatus() {
             @Override
             public boolean getServerStatus() {
-                // TODO 自动生成的方法存根
                 return appController.started();
             }
 
             @Override
             public int getPropertiesStatus() {
-                // TODO 自动生成的方法存根
-                return ConfigureReader.getInstance().getPropertiesStatus();
+                return config.getPropertiesStatus();
             }
 
             @Override
             public int getPort() {
-                // TODO 自动生成的方法存根
-                return ConfigureReader.getInstance().getPort();
+                return config.getPort();
             }
 
             @Override
             public boolean getMustLogin() {
-                // TODO 自动生成的方法存根
-                return ConfigureReader.getInstance().mustLogin();
+                return config.mustLogin();
             }
 
             @Override
             public LogLevel getLogLevel() {
-                // TODO 自动生成的方法存根
-                return ConfigureReader.getInstance().getLogLevel();
+                return config.getLogLevel();
             }
 
             @Override
             public String getFileSystemPath() {
-                // TODO 自动生成的方法存根
-                return ConfigureReader.getInstance().getFileSystemPath();
+                return config.getFileSystemPath();
             }
 
             @Override
             public int getBufferSize() {
-                // TODO 自动生成的方法存根
-                return ConfigureReader.getInstance().getBuffSize();
+                return config.getBuffSize();
             }
 
             @Override
             public VcLevel getVCLevel() {
-                // TODO 自动生成的方法存根
-                return ConfigureReader.getInstance().getVCLevel();
+                return config.getVCLevel();
             }
 
             @Override
             public List<FileSystemPath> getExtendStores() {
                 List<FileSystemPath> fileSystemPathList = new ArrayList<>();
-                for (ExtendStores es : ConfigureReader.getInstance().getExtendStores()) {
+                for (ExtendStores es : config.getExtendStores()) {
                     FileSystemPath fileSystemPath = new FileSystemPath();
                     fileSystemPath.setIndex(es.getIndex());
                     fileSystemPath.setPath(es.getPath());
@@ -108,61 +101,49 @@ public class UiLauncher {
 
             @Override
             public LogLevel getInitLogLevel() {
-                // TODO 自动生成的方法存根
-                return ConfigureReader.getInstance().getInitLogLevel();
+                return config.getInitLogLevel();
             }
 
             @Override
             public VcLevel getInitVCLevel() {
-                // TODO 自动生成的方法存根
-                return ConfigureReader.getInstance().getInitVCLevel();
+                return config.getInitVCLevel();
             }
 
             @Override
             public String getInitFileSystemPath() {
-                // TODO 自动生成的方法存根
-                return ConfigureReader.getInstance().getInitFileSystemPath();
+                return config.getInitFileSystemPath();
             }
 
             @Override
             public String getInitProt() {
-                // TODO 自动生成的方法存根
-                return ConfigureReader.getInstance().getInitPort();
+                return config.getInitPort();
             }
 
             @Override
             public String getInitBufferSize() {
-                // TODO 自动生成的方法存根
-                return ConfigureReader.getInstance().getInitBuffSize();
+                return config.getInitBuffSize();
             }
 
             @Override
             public boolean isAllowChangePassword() {
-                // TODO 自动生成的方法存根
-                return ConfigureReader.getInstance().isAllowChangePassword();
+                return config.isAllowChangePassword();
             }
 
             @Override
             public boolean isOpenFileChain() {
-                // TODO 自动生成的方法存根
-                return ConfigureReader.getInstance().isOpenFileChain();
+                return config.isOpenFileChain();
             }
 
             @Override
             public int getMaxExtendStoresNum() {
-                // TODO 自动生成的方法存根
-                return ConfigureReader.getInstance().getMaxExtendstoresNum();
+                return config.getMaxExtendstoresNum();
             }
         });
-        ServerUiModule.setUpdateSetting(s ->
-        {
-            // TODO 自动生成的方法存根
-            return ConfigureReader.getInstance().doUpdate(s);
-        });
+        ServerUiModule.setUpdateSetting(config::doUpdate);
         serverUi.show();
     }
 
-    public static UiLauncher getInstance() throws Exception {
+    public static UiLauncher getInstance() {
         if (instance == null) {
             synchronized (UiLauncher.class) {
                 if (instance == null) {
@@ -184,7 +165,7 @@ public class UiLauncher {
      * @throws Exception
      * @author 青阳龙野(kohgylw)
      */
-    public static UiLauncher build() throws Exception {
+    public static UiLauncher build() {
         return getInstance();
     }
 

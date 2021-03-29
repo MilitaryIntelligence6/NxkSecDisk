@@ -4,7 +4,7 @@ import edu.swufe.nxksecdisk.server.exception.FilesTotalOutOfLimitException;
 import edu.swufe.nxksecdisk.server.exception.FoldersTotalOutOfLimitException;
 import edu.swufe.nxksecdisk.server.model.Node;
 import edu.swufe.nxksecdisk.server.pojo.ExtendStores;
-import edu.swufe.nxksecdisk.server.util.ConfigureReader;
+import edu.swufe.nxksecdisk.server.util.ConfigReader;
 import edu.swufe.nxksecdisk.server.util.FileNodeUtil;
 import edu.swufe.nxksecdisk.server.util.ServerTimeUtil;
 import edu.swufe.nxksecdisk.system.AppSystem;
@@ -96,6 +96,8 @@ public class FileSystemManager {
     private PreparedStatement countFoldersByParentFolderId;
 
     private PreparedStatement selectNodesByPathExcludeById;
+
+    private final ConfigReader config = ConfigReader.getInstance();
 
     /**
      * 加载资源;
@@ -353,7 +355,12 @@ public class FileSystemManager {
         return folders;
     }
 
-    // 根据ID查询文件夹对象，无符合对象则返回null
+    /**
+     * 根据ID查询文件夹对象，无符合对象则返回null;
+     * @param folderId
+     * @return
+     * @throws SQLException
+     */
     public Folder selectFolderById(String folderId) throws SQLException {
         selectFolderById.setString(1, folderId);
         ResultSet r = selectFolderById.executeQuery();
@@ -363,7 +370,12 @@ public class FileSystemManager {
         return null;
     }
 
-    // 根据ID查询文件节点对象，无符合对象则返回null
+    /**
+     * 根据ID查询文件节点对象，无符合对象则返回null;
+     * @param nodeId
+     * @return
+     * @throws SQLException
+     */
     private Node selectNodeById(String nodeId) throws SQLException {
         selectNodeById.setString(1, nodeId);
         ResultSet r = selectNodeById.executeQuery();
@@ -373,7 +385,12 @@ public class FileSystemManager {
         return null;
     }
 
-    // 查询指定文件夹内的所有文件节点，如无符合则返回空List
+    /**
+     * 查询指定文件夹内的所有文件节点，如无符合则返回空List;
+     * @param folderId
+     * @return
+     * @throws SQLException
+     */
     public List<Node> selectNodesByFolderId(String folderId) throws SQLException {
         List<Node> nodes = new ArrayList<>();
         selectNodesByFolderId.setString(1, folderId);
@@ -384,7 +401,13 @@ public class FileSystemManager {
         return nodes;
     }
 
-    // 查询指定Block ID对应的所有文件节点，但不会包括指定ID的文件节点，如无符合则返回空List
+    /**
+     * 查询指定Block ID对应的所有文件节点，但不会包括指定ID的文件节点，如无符合则返回空List;
+     * @param path
+     * @param fileId
+     * @return
+     * @throws SQLException
+     */
     private List<Node> selectNodesByPathExcludeById(String path, String fileId) throws SQLException {
         List<Node> nodes = new ArrayList<>();
         selectNodesByPathExcludeById.setString(1, path);
@@ -396,7 +419,12 @@ public class FileSystemManager {
         return nodes;
     }
 
-    // 插入一个新的文件节点并返回插入结果，0失败，1成功
+    /**
+     * 插入一个新的文件节点并返回插入结果，0失败，1成功;
+     * @param n
+     * @return
+     * @throws SQLException
+     */
     private int insertNode(Node n) throws SQLException {
         insertNode.setString(1, n.getFileId());
         insertNode.setString(2, n.getFileName());
@@ -409,7 +437,12 @@ public class FileSystemManager {
         return insertNode.getUpdateCount();
     }
 
-    // 插入一个新的文件夹节点，返回值同上
+    /**
+     * 插入一个新的文件夹节点，返回值同上;
+     * @param f
+     * @return
+     * @throws SQLException
+     */
     private int insertFolder(Folder f) throws SQLException {
         insertFolder.setString(1, f.getFolderId());
         insertFolder.setString(2, f.getFolderName());
@@ -421,7 +454,12 @@ public class FileSystemManager {
         return insertFolder.getUpdateCount();
     }
 
-    // 将SQL结果集封装为Node对象
+    /**
+     * 将SQL结果集封装为Node对象;
+     * @param r
+     * @return
+     * @throws SQLException
+     */
     private Node resultSetAccessNode(ResultSet r) throws SQLException {
         Node node = new Node();
         node.setFileId(r.getString("file_id"));
@@ -434,7 +472,12 @@ public class FileSystemManager {
         return node;
     }
 
-    // 将SQL结果集封装为Folder对象
+    /**
+     * 将SQL结果集封装为Folder对象;
+     * @param r
+     * @return
+     * @throws SQLException
+     */
     private Folder resultSetAccessFolder(ResultSet r) throws SQLException {
         Folder folder = new Folder();
         folder.setFolderId(r.getString("folder_id"));
@@ -446,7 +489,13 @@ public class FileSystemManager {
         return folder;
     }
 
-    // 将一个本地文件导入到文件系统中，注意，导入的必须是文件而不是文件夹
+    /**
+     * 将一个本地文件导入到文件系统中，注意，导入的必须是文件而不是文件夹;
+     * @param f
+     * @param folderId
+     * @param type
+     * @throws Exception
+     */
     private void importFileInto(File f, String folderId, String type) throws Exception {
         if (f.isFile()) {
             String name = f.getName();
@@ -575,7 +624,13 @@ public class FileSystemManager {
         throw new IllegalArgumentException();
     }
 
-    // 将一个本地文件夹导入至文件系统，必须是文件夹而不是文件。它会自动将其中的文件和文件夹也一并导入。
+    /**
+     * 将一个本地文件夹导入至文件系统，必须是文件夹而不是文件。它会自动将其中的文件和文件夹也一并导入;
+     * @param f
+     * @param folderId
+     * @param type
+     * @throws Exception
+     */
     private void importFolderInto(File f, String folderId, String type) throws Exception {
         if (f.isDirectory()) {
             String name = f.getName();
@@ -658,21 +713,36 @@ public class FileSystemManager {
         }
     }
 
-    // 删除一个文件节点
+    /**
+     * 删除一个文件节点;
+     * @param nodeId
+     * @return
+     * @throws SQLException
+     */
     private int deleteNodeById(String nodeId) throws SQLException {
         deleteNodeById.setString(1, nodeId);
         deleteNodeById.execute();
         return deleteNodeById.getUpdateCount();
     }
 
-    // 删除一个文件夹
+    /**
+     * 删除一个文件夹;
+     * @param folderId
+     * @return
+     * @throws SQLException
+     */
     private int deleteFolderById(String folderId) throws SQLException {
         deleteFolderById.setString(1, folderId);
         deleteFolderById.execute();
         return deleteFolderById.getUpdateCount();
     }
 
-    // 修改节点
+    /**
+     * 修改节点;
+     * @param n
+     * @return
+     * @throws SQLException
+     */
     private int updateNode(Node n) throws SQLException {
         updateNodeById.setString(1, n.getFileName());
         updateNodeById.setString(2, n.getFileSize());
@@ -685,7 +755,12 @@ public class FileSystemManager {
         return updateNodeById.getUpdateCount();
     }
 
-    // 修改文件夹
+    /**
+     * 修改文件夹;
+     * @param f
+     * @return
+     * @throws SQLException
+     */
     private int updateFolder(Folder f) throws SQLException {
         updateFolderById.setString(1, f.getFolderName());
         updateFolderById.setString(2, f.getFolderCreationDate());
@@ -697,7 +772,11 @@ public class FileSystemManager {
         return updateFolderById.getUpdateCount();
     }
 
-    // 删除一个文件夹
+    /**
+     * 删除一个文件夹;
+     * @param folderId
+     * @throws SQLException
+     */
     private void deleteFolder(String folderId) throws SQLException {
         Folder f = selectFolderById(folderId);
         List<Node> nodes = selectNodesByFolderId(folderId);
@@ -726,7 +805,11 @@ public class FileSystemManager {
         throw new SQLException();
     }
 
-    // 删除一个文件
+    /**
+     * 删除一个文件;
+     * @param nodeId
+     * @throws SQLException
+     */
     private void deleteFile(String nodeId) throws SQLException {
         Node n = selectNodeById(nodeId);
         per = 50;
@@ -753,7 +836,13 @@ public class FileSystemManager {
         }
     }
 
-    // 导出一个文件节点
+    /**
+     * 导出一个文件节点;
+     * @param nodeId
+     * @param path
+     * @param type
+     * @throws Exception
+     */
     private void exportNode(String nodeId, File path, String type) throws Exception {
         Node node = selectNodeById(nodeId);
         File target = null;
@@ -805,7 +894,13 @@ public class FileSystemManager {
         throw new IllegalArgumentException();
     }
 
-    // 导出一个文件夹
+    /**
+     * 导出一个文件夹;
+     * @param folderId
+     * @param path
+     * @param type
+     * @throws Exception
+     */
     private void exportFolder(String folderId, File path, String type) throws Exception {
         Folder folder = selectFolderById(folderId);
         File target = null;
@@ -863,7 +958,7 @@ public class FileSystemManager {
      *
      * @author 青阳龙野(kohgylw)
      */
-    public void cannel() {
+    public void cancel() {
         message = "正在终止，请稍候...";
         gono = false;
     }
@@ -874,12 +969,12 @@ public class FileSystemManager {
             File file = null;
             if (f.getFilePath().startsWith("file_")) {// 存放于主文件系统中
                 // 直接从主文件系统的文件块存放区获得对应的文件块
-                file = new File(ConfigureReader.getInstance().getFileBlockPath(), f.getFilePath());
+                file = new File(config.getFileBlockPath(), f.getFilePath());
             }
             else {// 存放于扩展存储区
                 short index = Short.parseShort(f.getFilePath().substring(0, f.getFilePath().indexOf('_')));
                 // 根据编号查到对应的扩展存储区路径，进而获取对应的文件块
-                file = new File(ConfigureReader.getInstance().getExtendStores().parallelStream()
+                file = new File(config.getExtendStores().parallelStream()
                         .filter((e) -> e.getIndex() == index).findAny().get().getPath(), f.getFilePath());
             }
             if (file.isFile()) {
@@ -894,7 +989,8 @@ public class FileSystemManager {
 
     public File saveToFileBlocks(final File f) {
         // 如果存在扩展存储区，则优先在文件块最少的扩展存储区中存放文件（避免占用主文件系统）
-        List<ExtendStores> ess = ConfigureReader.getInstance().getExtendStores();// 得到全部扩展存储区
+        // 得到全部扩展存储区
+        List<ExtendStores> ess = config.getExtendStores();
         if (ess.size() > 0) {// 如果存在
             Collections.sort(ess, new Comparator<ExtendStores>() {
                 @Override
@@ -929,11 +1025,9 @@ public class FileSystemManager {
                             continue;
                         }
                     }
-                    catch (IOException e) {
-                        // 如果无法存入（由于体积过大或其他问题），那么继续尝试其他扩展存储区
-                        continue;
-                    }
                     catch (Exception e) {
+                        // 如果无法存入（由于体积过大或其他问题），那么继续尝试其他扩展存储区
+                        e.printStackTrace();
                         AppSystem.out.println(e.getMessage());
                         continue;
                     }
@@ -942,19 +1036,26 @@ public class FileSystemManager {
         }
         // 如果不存在扩展存储区或者最大的扩展存储区无法存放目标文件，则尝试将其存放至主文件系统路径下
         try {
-            final File target = createNewBlock("file_", new File(ConfigureReader.getInstance().getFileBlockPath()));
+            final File target = createNewBlock("file_", new File(config.getFileBlockPath()));
             if (target != null) {
-                transferFile(f, target);// 执行存放，并肩文件命名为“file_{UUID}.block”的形式
+                // 执行存放，并肩文件命名为“file_{UUID}.block”的形式;
+                transferFile(f, target);
                 return target;
             }
         }
         catch (Exception e) {
-            AppSystem.out.println("错误：文件块生成失败，无法存入新的文件数据。详细信息：" + e.getMessage());
+            AppSystem.out.printf("错误：文件块生成失败，无法存入新的文件数据。详细信息：%s", e.getMessage());
         }
         return null;
     }
 
-    // 生成创建一个在指定路径下名称（编号）绝对不重复的新文件块
+    /**
+     * 生成创建一个在指定路径下名称（编号）绝对不重复的新文件块;
+     * @param prefix
+     * @param parent
+     * @return
+     * @throws IOException
+     */
     private File createNewBlock(String prefix, File parent) throws IOException {
         int appendIndex = 0;
         int retryNum = 0;

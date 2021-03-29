@@ -47,6 +47,8 @@ public class NoticeUtil {
     @Resource
     private TxtCharsetGetter txtCharsetGetter;
 
+    private final ConfigReader config = ConfigReader.getInstance();
+
     public NoticeUtil() {
         options = new MutableDataSet();
         options.setFrom(ParserEmulationProfile.MARKDOWN);
@@ -63,9 +65,9 @@ public class NoticeUtil {
      * @author 青阳龙野(kohgylw)
      */
     public void loadNotice() {
-        File noticeMD = new File(ConfigureReader.getInstance().getPath(), NOTICE_FILE_NAME);
+        File noticeMD = new File(config.getPath(), NOTICE_FILE_NAME);
         // 转化后的输出位置;
-        File noticeHTML = new File(ConfigureReader.getInstance().getTemporaryfilePath(), NOTICE_OUTPUT_NAME);
+        File noticeHTML = new File(config.getTemporaryfilePath(), NOTICE_OUTPUT_NAME);
         if (noticeMD.isFile() && noticeMD.canRead()) {
             AppSystem.out.println("正在载入公告信息...");
             try {
