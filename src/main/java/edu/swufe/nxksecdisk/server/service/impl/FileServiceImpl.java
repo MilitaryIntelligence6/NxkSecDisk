@@ -422,7 +422,7 @@ public class FileServiceImpl
             }
         }
         try {
-            //  处理无法下载的资源
+            // 处理无法下载的资源
             response.sendError(404);
         }
         catch (IOException e) {
