@@ -90,7 +90,7 @@ public class DiskFfmpegLocator extends FFMPEGLocator {
         }
         // 是否在程序主目录下放置了自定义的ffmpeg可执行文件“ffmpeg.exe”/“ffmpeg”？
         File ffmpegFile;
-        File customFFMPEGexef = new File(config.getPath(), isWindows ? "ffmpeg.exe" : "ffmpeg");
+        File customFFMPEGexef = new File(config.requirePath(), isWindows ? "ffmpeg.exe" : "ffmpeg");
         // 如果有，那么优先使用自定义的ffmpeg可执行文件。
         if (customFFMPEGexef.isFile() && customFFMPEGexef.canRead()) {
             ffmpegFile = new File(dirFolder, customFFMPEGexef.getName());

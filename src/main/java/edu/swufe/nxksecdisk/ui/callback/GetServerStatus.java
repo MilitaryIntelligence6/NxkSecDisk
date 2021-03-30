@@ -11,37 +11,37 @@ import java.util.List;
  */
 public interface GetServerStatus {
 
-    int getPropertiesStatus();
+    int requirePropertiesStatus();
 
-    boolean getServerStatus();
+    boolean requireServerStatus();
 
-    int getPort();
+    int requirePort();
 
-    String getInitProt();
+    String requireInitPort();
 
-    int getBufferSize();
+    int requireBufferSize();
 
-    String getInitBufferSize();
+    String requireInitBufferSize();
 
-    LogLevel getLogLevel();
+    LogLevel requireLogLevel();
 
-    LogLevel getInitLogLevel();
+    LogLevel requireInitLogLevel();
 
-    VcLevel getVCLevel();
+    VcLevel requireVcLevel();
 
-    VcLevel getInitVCLevel();
+    VcLevel requireInitVcLevel();
 
-    String getFileSystemPath();
+    String requireFileSystemPath();
 
-    String getInitFileSystemPath();
+    String requireInitFileSystemPath();
 
-    boolean getMustLogin();
+    boolean requireMustLogin();
 
     boolean isAllowChangePassword();
 
     boolean isOpenFileChain();
 
-    List<FileSystemPath> getExtendStores();
+    List<FileSystemPath> requireExtendStores();
 
-    int getMaxExtendStoresNum();
+    int requireMaxExtendStoresNum();
 }

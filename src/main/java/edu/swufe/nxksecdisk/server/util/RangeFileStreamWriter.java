@@ -156,7 +156,7 @@ public class RangeFileStreamWriter {
         // 设置请求体长度;
         response.setHeader("Content-Length", "" + contentLength);
         // 写出缓冲
-        byte[] buf = new byte[ConfigReader.getInstance().getBuffSize()];
+        byte[] buf = new byte[ConfigReader.getInstance().requireBuffSize()];
         // 读取文件并写处至输出流
         try (RandomAccessFile raf = new RandomAccessFile(fo, "r")) {
             BufferedOutputStream out = maxRate >= 0

@@ -53,49 +53,49 @@ public class UiLauncher {
 
         serverUi.setGetServerStatus(new GetServerStatus() {
             @Override
-            public boolean getServerStatus() {
+            public boolean requireServerStatus() {
                 return appController.started();
             }
 
             @Override
-            public int getPropertiesStatus() {
-                return config.getPropertiesStatus();
+            public int requirePropertiesStatus() {
+                return config.requirePropertiesStatus();
             }
 
             @Override
-            public int getPort() {
-                return config.getPort();
+            public int requirePort() {
+                return config.requirePort();
             }
 
             @Override
-            public boolean getMustLogin() {
+            public boolean requireMustLogin() {
                 return config.mustLogin();
             }
 
             @Override
-            public LogLevel getLogLevel() {
-                return config.getLogLevel();
+            public LogLevel requireLogLevel() {
+                return config.requireLogLevel();
             }
 
             @Override
-            public String getFileSystemPath() {
-                return config.getFileSystemPath();
+            public String requireFileSystemPath() {
+                return config.requireFileSystemPath();
             }
 
             @Override
-            public int getBufferSize() {
-                return config.getBuffSize();
+            public int requireBufferSize() {
+                return config.requireBuffSize();
             }
 
             @Override
-            public VcLevel getVCLevel() {
-                return config.getVCLevel();
+            public VcLevel requireVcLevel() {
+                return config.requireVcLevel();
             }
 
             @Override
-            public List<FileSystemPath> getExtendStores() {
+            public List<FileSystemPath> requireExtendStores() {
                 List<FileSystemPath> fileSystemPathList = new ArrayList<>();
-                for (ExtendStores es : config.getExtendStores()) {
+                for (ExtendStores es : config.requireExtendStores()) {
                     FileSystemPath fileSystemPath = new FileSystemPath();
                     fileSystemPath.setIndex(es.getIndex());
                     fileSystemPath.setPath(es.getPath());
@@ -106,28 +106,28 @@ public class UiLauncher {
             }
 
             @Override
-            public LogLevel getInitLogLevel() {
-                return config.getInitLogLevel();
+            public LogLevel requireInitLogLevel() {
+                return config.requireInitLogLevel();
             }
 
             @Override
-            public VcLevel getInitVCLevel() {
-                return config.getInitVCLevel();
+            public VcLevel requireInitVcLevel() {
+                return config.requireInitVcLevel();
             }
 
             @Override
-            public String getInitFileSystemPath() {
-                return config.getInitFileSystemPath();
+            public String requireInitFileSystemPath() {
+                return config.requireInitFileSystemPath();
             }
 
             @Override
-            public String getInitProt() {
-                return config.getInitPort();
+            public String requireInitPort() {
+                return config.requireInitPort();
             }
 
             @Override
-            public String getInitBufferSize() {
-                return config.getInitBuffSize();
+            public String requireInitBufferSize() {
+                return config.requireInitBuffSize();
             }
 
             @Override
@@ -141,7 +141,7 @@ public class UiLauncher {
             }
 
             @Override
-            public int getMaxExtendStoresNum() {
+            public int requireMaxExtendStoresNum() {
                 return config.getMaxExtendstoresNum();
             }
         });

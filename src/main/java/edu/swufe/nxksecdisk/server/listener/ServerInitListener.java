@@ -90,7 +90,7 @@ public class ServerInitListener implements ServletContextListener {
         FileNodeUtil.initNodeTableToDataBase();
         // 2，校对文件块并清理临时文件夹
         AppSystem.out.println("文件系统节点信息校对...");
-        final String fsp = config.getFileSystemPath();
+        final String fsp = config.requireFileSystemPath();
         final File fspf = new File(fsp);
         if (fspf.isDirectory() && fspf.canRead() && fspf.canWrite()) {
             fileBlockUtil = context.getBean(FileBlockUtil.class);
@@ -127,7 +127,7 @@ public class ServerInitListener implements ServletContextListener {
         // 之后当监听到改动操作时再重载内容
         if (pathWatchServiceRunnable == null) {
             // 对服务器主目录进行监听，主要监听文件改动事件
-            Path confPath = Paths.get(config.getPath());
+            Path confPath = Paths.get(config.requirePath());
             pathWatchServiceRunnable = () -> {
                 try {
                     while (run) {
@@ -167,7 +167,7 @@ public class ServerInitListener implements ServletContextListener {
                 while (continueCheck) {
                     if (needCheck) {
                         List<String> invalidIdList = new ArrayList<>();
-                        List<String> idList = config.getAllAddedAuthFoldersId();
+                        List<String> idList = config.requireAllAddedAuthFoldersId();
                         for (String id : idList) {
                             if (folderMapper.queryById(id) == null) {
                                 invalidIdList.add(id);

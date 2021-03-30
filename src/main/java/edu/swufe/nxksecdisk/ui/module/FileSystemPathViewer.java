@@ -112,7 +112,7 @@ public class FileSystemPathViewer extends DiskDynamicWindow {
         c.add(toolBar, BorderLayout.NORTH);
         // 各个工具栏按钮的功能实现
         maxExtendStoresNum = settingWindow.getServerStatus() == null ? 0 :
-                settingWindow.getServerStatus().getMaxExtendStoresNum();
+                settingWindow.getServerStatus().requireMaxExtendStoresNum();
         addBtn.addActionListener((e) ->
         {
             disableAllButtons();
@@ -171,7 +171,7 @@ public class FileSystemPathViewer extends DiskDynamicWindow {
                     mainFileSystemPathChooer.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
                     mainFileSystemPathChooer.setPreferredSize(fileChooserSize);
                     if (settingWindow.getServerStatus() != null) {
-                        File fileSystemPath = new File(settingWindow.getServerStatus().getFileSystemPath());
+                        File fileSystemPath = new File(settingWindow.getServerStatus().requireFileSystemPath());
                         if (fileSystemPath.isDirectory()) {
                             mainFileSystemPathChooer.setCurrentDirectory(fileSystemPath);
                         }
@@ -183,7 +183,7 @@ public class FileSystemPathViewer extends DiskDynamicWindow {
                             if (!settingWindow.getExtendStores().parallelStream()
                                     .anyMatch(f -> f.getPath().equals(selectPath))) {
                                 String pathName = selectPath.getAbsolutePath();
-                                if (new File(ConfigReader.getInstance().getInitFileSystemPath()).equals(selectPath)
+                                if (new File(ConfigReader.getInstance().requireInitFileSystemPath()).equals(selectPath)
                                         || (encoder.canEncode(pathName) && pathName.indexOf("\\:") < 0
                                         && pathName.indexOf("\\\\") < 0)) {
                                     settingWindow.setChooserPath(mainFileSystemPathChooer.getSelectedFile());

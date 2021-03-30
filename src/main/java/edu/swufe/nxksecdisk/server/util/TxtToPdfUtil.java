@@ -44,7 +44,7 @@ public class TxtToPdfUtil {
         doc.open();
         BaseFont songFont = BaseFont.createFont(
                 String.format("%s%sfonts/wqy-zenhei.ttc,0",
-                        ConfigReader.getInstance().getPath(),
+                        ConfigReader.getInstance().requirePath(),
                         File.separator),
                 BaseFont.IDENTITY_H,
                 BaseFont.NOT_EMBEDDED);

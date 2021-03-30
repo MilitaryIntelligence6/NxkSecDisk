@@ -77,7 +77,7 @@ public class VideoTranscodeUtil {
                 if ("FIN".equals(vtt.getProgress())) {
                     String md5 = DigestUtils.md5Hex(new FileInputStream(f));
                     if (md5.equals(vtt.getMd5())
-                            && new File(ConfigReader.getInstance().getTemporaryfilePath(), vtt.getOutputFileName())
+                            && new File(ConfigReader.getInstance().requireTmpFilePath(), vtt.getOutputFileName())
                             .isFile()) {
                         return vtt.getProgress();
                     }

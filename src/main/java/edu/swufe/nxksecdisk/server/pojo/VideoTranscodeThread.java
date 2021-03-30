@@ -64,7 +64,7 @@ public class VideoTranscodeThread {
         if (encoder != null) {
             encoder.abortEncoding();
         }
-        File f = new File(config.getTemporaryfilePath(), outputFileName);
+        File f = new File(config.requireTmpFilePath(), outputFileName);
         if (f.exists()) {
             f.delete();
         }
@@ -74,7 +74,7 @@ public class VideoTranscodeThread {
                      EncodingAttributes encodingAttributes) {
         try {
             outputFileName = String.format("video_%s.mp4", UUID.randomUUID().toString());
-            encoder.encode(multimediaObject, new File(config.getTemporaryfilePath(), outputFileName),
+            encoder.encode(multimediaObject, new File(config.requireTmpFilePath(), outputFileName),
                     encodingAttributes, new EncoderProgressListener() {
                         @Override
                         public void sourceInfo(MultimediaInfo arg0) {

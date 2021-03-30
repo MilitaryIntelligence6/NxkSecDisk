@@ -134,8 +134,8 @@ public class ConsoleLauncher {
         } else if (ConsoleLauncher.appController.start()) {
             AppSystem.out.println("kiftd服务器已启动，可以正常访问了，您可以使用 -status 指令查看运行状态。");
         } else {
-            if (config.getPropertiesStatus() != 0) {
-                switch (config.getPropertiesStatus()) {
+            if (config.requirePropertiesStatus() != 0) {
+                switch (config.requirePropertiesStatus()) {
                     case ConfigReader.INVALID_PORT: {
                         AppSystem.out.println("错误：kiftd服务器未能启动，端口设置无效。");
                         break;
@@ -217,10 +217,10 @@ public class ConsoleLauncher {
     private void printServerStatus() {
         AppSystem.out.printf("服务器状态：\r\n<Port>端口号:%d\r\n<LogLevel>日志等级:%s\r\n<BufferSize>缓冲区大小:%d " +
                         "B\r\n<FileSystemPath>文件系统存储路径：%s\r\n<MustLogin>是否必须登录：%s\r\n<Running>运行状态：%s",
-                config.getPort(),
-                config.getLogLevel(),
-                config.getBuffSize(),
-                config.getFileSystemPath(),
+                config.requirePort(),
+                config.requireLogLevel(),
+                config.requireBuffSize(),
+                config.requireFileSystemPath(),
                 config.mustLogin(),
                 ConsoleLauncher.appController.started());
     }
@@ -917,7 +917,7 @@ public class ConsoleLauncher {
 
     private void runInit() {
         AppSystem.out.println("正在初始化服务器...");
-        if (config.getPropertiesStatus() == 0) {
+        if (config.requirePropertiesStatus() == 0) {
             this.awaiting();
         }
     }

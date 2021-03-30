@@ -57,7 +57,7 @@ public class LogUtil {
 
     public LogUtil() {
         sep = File.separator;
-        logs = String.format("%s%slogs", config.getPath(), sep);
+        logs = String.format("%s%slogs", config.requirePath(), sep);
         writerThread = Executors.newSingleThreadExecutor();
         File logFile = new File(logs);
         if (!logFile.exists()) {

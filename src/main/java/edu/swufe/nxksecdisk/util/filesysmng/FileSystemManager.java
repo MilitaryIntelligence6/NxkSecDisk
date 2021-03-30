@@ -969,12 +969,12 @@ public class FileSystemManager {
             File file = null;
             if (f.getFilePath().startsWith("file_")) {// 存放于主文件系统中
                 // 直接从主文件系统的文件块存放区获得对应的文件块
-                file = new File(config.getFileBlockPath(), f.getFilePath());
+                file = new File(config.requireFileBlockPath(), f.getFilePath());
             }
             else {// 存放于扩展存储区
                 short index = Short.parseShort(f.getFilePath().substring(0, f.getFilePath().indexOf('_')));
                 // 根据编号查到对应的扩展存储区路径，进而获取对应的文件块
-                file = new File(config.getExtendStores().parallelStream()
+                file = new File(config.requireExtendStores().parallelStream()
                         .filter((e) -> e.getIndex() == index).findAny().get().getPath(), f.getFilePath());
             }
             if (file.isFile()) {
@@ -990,7 +990,7 @@ public class FileSystemManager {
     public File saveToFileBlocks(final File f) {
         // 如果存在扩展存储区，则优先在文件块最少的扩展存储区中存放文件（避免占用主文件系统）
         // 得到全部扩展存储区
-        List<ExtendStores> ess = config.getExtendStores();
+        List<ExtendStores> ess = config.requireExtendStores();
         if (ess.size() > 0) {// 如果存在
             Collections.sort(ess, new Comparator<ExtendStores>() {
                 @Override
@@ -1036,7 +1036,7 @@ public class FileSystemManager {
         }
         // 如果不存在扩展存储区或者最大的扩展存储区无法存放目标文件，则尝试将其存放至主文件系统路径下
         try {
-            final File target = createNewBlock("file_", new File(config.getFileBlockPath()));
+            final File target = createNewBlock("file_", new File(config.requireFileBlockPath()));
             if (target != null) {
                 // 执行存放，并肩文件命名为“file_{UUID}.block”的形式;
                 transferFile(f, target);

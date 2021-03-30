@@ -63,7 +63,7 @@ public class DiskAppController {
         if (!DiskAppController.run) {
             // 启动服务器前重新检查各项设置并加载;
             config.reTestServerPropertiesAndEffect();
-            if (config.getPropertiesStatus() == 0) {
+            if (config.requirePropertiesStatus() == 0) {
                 try {
                     AppSystem.out.println("正在开启服务器引擎...");
                     SpringApplication springApplication = new SpringApplication(DiskAppController.class);
@@ -146,7 +146,7 @@ public class DiskAppController {
                 protected void customizeConnector(Connector connector) {
                     connector.setScheme("http");
                     // Connector监听的http的端口号
-                    connector.setPort(config.getPort());
+                    connector.setPort(config.requirePort());
                     connector.setSecure(false);
                     // 监听到http的端口号后转向到的https的端口号
                     connector.setRedirectPort(config.getHttpsPort());
@@ -169,7 +169,7 @@ public class DiskAppController {
         else {
             // 对于不开启https模式，以常规方法生成容器
             tomcat = new TomcatServletWebServerFactory();
-            tomcat.setPort(config.getPort());
+            tomcat.setPort(config.requirePort());
         }
         // 设置错误处理页面
         tomcat.addErrorPages(

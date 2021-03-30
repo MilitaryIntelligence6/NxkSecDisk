@@ -65,7 +65,7 @@ public class DataAccess
     static
     {
         final String mybatisResourceFolder = String.format("%s%smybatisResource%s",
-                config.getPath(),
+                config.requirePath(),
                 File.separator, File.separator);
         final String mapperFilesFolder = mybatisResourceFolder + "mapperXML" + File.separator;
         DataAccess.mapperFiles = new Resource[]{new FileSystemResource(mapperFilesFolder + "NodeMapper.xml"),

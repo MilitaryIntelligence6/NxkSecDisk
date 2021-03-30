@@ -32,7 +32,7 @@ public class DocxToPdfFontFactory extends FontFactoryImp {
         i += registerDirectory("/usr/X11R6/lib/X11/fonts", true);
         i += registerDirectory("/Library/Fonts");
         i += registerDirectory("/System/Library/Fonts");
-        i += registerDirectory(ConfigReader.getInstance().getPath() + File.separator + "fonts");
+        i += registerDirectory(ConfigReader.getInstance().requirePath() + File.separator + "fonts");
         i += registerDirectory(System.getenv("LICENSE_HOME"), true);
         return i;
     }

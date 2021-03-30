@@ -65,9 +65,9 @@ public class NoticeUtil {
      * @author 青阳龙野(kohgylw)
      */
     public void loadNotice() {
-        File noticeMD = new File(config.getPath(), NOTICE_FILE_NAME);
+        File noticeMD = new File(config.requirePath(), NOTICE_FILE_NAME);
         // 转化后的输出位置;
-        File noticeHTML = new File(config.getTemporaryfilePath(), NOTICE_OUTPUT_NAME);
+        File noticeHTML = new File(config.requireTmpFilePath(), NOTICE_OUTPUT_NAME);
         if (noticeMD.isFile() && noticeMD.canRead()) {
             AppSystem.out.println("正在载入公告信息...");
             try {

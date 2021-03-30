@@ -133,7 +133,7 @@ public class FileServiceImpl
             long mufs = Long.parseLong(maxUploadFileSize);
             // 获取最大文件的名称
             String mfname = namelistObj.get(Integer.parseInt(maxUploadFileIndex));
-            long pMaxUploadSize = config.getUploadFileSize(account);
+            long pMaxUploadSize = config.requireUploadFileSize(account);
             if (pMaxUploadSize >= 0) {
                 if (mufs > pMaxUploadSize) {
                     cufr.setCheckResult("fileTooLarge");
@@ -235,7 +235,7 @@ public class FileServiceImpl
             return UPLOAD_ERROR;
         }
         // 检查上传文件体积是否超限
-        long mufs = config.getUploadFileSize(account);
+        long mufs = config.requireUploadFileSize(account);
         if (mufs >= 0 && file.getSize() > mufs) {
             return UPLOAD_ERROR;
         }
@@ -595,7 +595,7 @@ public class FileServiceImpl
         final String zipname = request.getParameter("zipId");
         final String account = (String) request.getSession().getAttribute("ACCOUNT");
         if (zipname != null && !zipname.equals("ERROR")) {
-            final String tfPath = config.getTemporaryfilePath();
+            final String tfPath = config.requireTmpFilePath();
             final File zip = new File(tfPath, zipname);
             String fname = "kiftd_" + ServerTimeUtil.accurateToDay() + "_\u6253\u5305\u4e0b\u8f7d.zip";
             if (zip.exists()) {
@@ -1259,11 +1259,11 @@ public class FileServiceImpl
         try {
             // 获取最大文件体积（以Byte为单位）
             long mufs = Long.parseLong(maxUploadFileSize);
-            long pMaxUploadSize = config.getUploadFileSize(account);
+            long pMaxUploadSize = config.requireUploadFileSize(account);
             if (pMaxUploadSize >= 0) {
                 if (mufs > pMaxUploadSize) {
                     cifr.setResult("fileOverSize");
-                    cifr.setMaxSize(formatMaxUploadFileSize(config.getUploadFileSize(account)));
+                    cifr.setMaxSize(formatMaxUploadFileSize(config.requireUploadFileSize(account)));
                     return gson.toJson(cifr);
                 }
             }
@@ -1331,7 +1331,7 @@ public class FileServiceImpl
             return UPLOAD_ERROR;
         }
         // 检查上传文件体积是否超限
-        long mufs = config.getUploadFileSize(account);
+        long mufs = config.requireUploadFileSize(account);
         if (mufs >= 0 && file.getSize() > mufs) {
             return UPLOAD_ERROR;
         }

@@ -56,7 +56,7 @@ public class Mvc extends ResourceHttpRequestHandler implements WebMvcConfigurer 
         registry.addResourceHandler("/**")
                 .addResourceLocations(
                         String.format("file:%s%swebContext%s",
-                                config.getPath(),
+                                config.requirePath(),
                                 File.separator,
                                 File.separator));
     }
@@ -70,7 +70,7 @@ public class Mvc extends ResourceHttpRequestHandler implements WebMvcConfigurer 
     public MultipartConfigElement multipartConfigElement() {
         final MultipartConfigFactory factory = new MultipartConfigFactory();
         factory.setMaxFileSize(-1L);
-        factory.setLocation(config.getTemporaryfilePath());
+        factory.setLocation(config.requireTmpFilePath());
         return factory.createMultipartConfig();
     }
 

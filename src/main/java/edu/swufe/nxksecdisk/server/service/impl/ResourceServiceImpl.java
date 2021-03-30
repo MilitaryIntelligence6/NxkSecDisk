@@ -111,7 +111,7 @@ public class ResourceServiceImpl implements ResourceService {
                                     synchronized (VideoTranscodeUtil.videoTranscodeThreads) {
                                         VideoTranscodeThread vtt = VideoTranscodeUtil.videoTranscodeThreads.get(fid);
                                         if (vtt != null) {// 针对需要转码的视频（在转码列表中存在）
-                                            File f = new File(config.getTemporaryfilePath(),
+                                            File f = new File(config.requireTmpFilePath(),
                                                     vtt.getOutputFileName());
                                             if (f.isFile() && vtt.getProgress().equals("FIN")) {
                                                 // 判断是否转码成功
@@ -237,7 +237,7 @@ public class ResourceServiceImpl implements ResourceService {
             else {
                 requestSize = Long.MAX_VALUE;
             }
-            byte[] buffer = new byte[config.getBuffSize()];
+            byte[] buffer = new byte[config.requireBuffSize()];
             response.setContentType(contentType);
             response.setHeader("Accept-Ranges", "bytes");
             response.setHeader("ETag", this.fileBlockUtil.getETag(resource));
@@ -572,7 +572,7 @@ public class ResourceServiceImpl implements ResourceService {
 
     @Override
     public void getNoticeContext(HttpServletRequest request, HttpServletResponse response) {
-        File noticeHTML = new File(config.getTemporaryfilePath(), NoticeUtil.NOTICE_OUTPUT_NAME);
+        File noticeHTML = new File(config.requireTmpFilePath(), NoticeUtil.NOTICE_OUTPUT_NAME);
         String contentType = "text/html";
         if (noticeHTML.isFile() && noticeHTML.canRead()) {
             sendResource(noticeHTML, NoticeUtil.NOTICE_FILE_NAME, contentType, request, response);

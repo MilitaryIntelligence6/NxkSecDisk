@@ -406,14 +406,14 @@ public class ServerUiModule extends DiskDynamicWindow {
         final ConfigReader config = ConfigReader.getInstance();
         if (startServer.start()) {
             println("启动完成。正在检查服务器状态...");
-            if (serverStatus.getServerStatus()) {
+            if (serverStatus.requireServerStatus()) {
                 println("KIFT服务器已经启动，可以正常访问了。");
             } else {
                 println("KIFT服务器未能成功启动，请检查设置或查看异常信息。");
             }
         } else {
-            if (config.getPropertiesStatus() != 0) {
-                switch (config.getPropertiesStatus()) {
+            if (config.requirePropertiesStatus() != 0) {
+                switch (config.requirePropertiesStatus()) {
                     case ConfigReader.INVALID_PORT: {
                         println("KIFT无法启动：端口设置无效。");
                         break;
@@ -464,7 +464,7 @@ public class ServerUiModule extends DiskDynamicWindow {
             serverStatusLab.setText(S_STOPPING);
             if (closeServer.close()) {
                 println("关闭完成。正在检查服务器状态...");
-                if (serverStatus.getServerStatus()) {
+                if (serverStatus.requireServerStatus()) {
                     println("KIFT服务器未能成功关闭，如有需要，可以强制关闭程序（不安全）。");
                 } else {
                     println("KIFT服务器已经关闭，停止所有访问。");
@@ -506,7 +506,7 @@ public class ServerUiModule extends DiskDynamicWindow {
     }
 
     private void runUpdateStatus() {
-        if (serverStatus.getServerStatus()) {
+        if (serverStatus.requireServerStatus()) {
             serverStatusLab.setText(S_START);
             start.setEnabled(false);
             stop.setEnabled(true);
@@ -523,9 +523,9 @@ public class ServerUiModule extends DiskDynamicWindow {
         if (filesViewer != null) {
             filesViewer.setEnabled(true);
         }
-        portStatusLab.setText(serverStatus.getPort() + "");
-        if (serverStatus.getLogLevel() != null) {
-            switch (serverStatus.getLogLevel()) {
+        portStatusLab.setText(serverStatus.requirePort() + "");
+        if (serverStatus.requireLogLevel() != null) {
+            switch (serverStatus.requireLogLevel()) {
                 case EVENT: {
                     logLevelLab.setText(L_ALL);
                     break;
@@ -544,11 +544,11 @@ public class ServerUiModule extends DiskDynamicWindow {
                 }
             }
         }
-        bufferSizeLab.setText(serverStatus.getBufferSize() / 1024 + " KB");
+        bufferSizeLab.setText(serverStatus.requireBufferSize() / 1024 + " KB");
     }
 
     private void runExit() {
-        if (serverStatus.getServerStatus()) {
+        if (serverStatus.requireServerStatus()) {
             closeServer.close();
         }
         System.exit(0);

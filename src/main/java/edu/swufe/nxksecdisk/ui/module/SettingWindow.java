@@ -232,7 +232,7 @@ public class SettingWindow extends DiskDynamicWindow {
         cancel.addActionListener(e -> getWindow().setVisible(false));
         update.addActionListener(e -> {
             // 仅在服务器停止时才可以进行修改
-            if (getServerStatus().getServerStatus()) {
+            if (getServerStatus().requireServerStatus()) {
                 startServerStatus();
             } else {
                 AppSystem.pool.execute(SettingWindow.this::runServerSetting);
@@ -371,20 +371,20 @@ public class SettingWindow extends DiskDynamicWindow {
     private void runServerStatus() {
         if (getServerStatus() != null) {
             bufferInput
-                    .setText(getServerStatus().getBufferSize() == 0 ?
-                            getServerStatus().getInitBufferSize()
-                            : String.format("%d", getServerStatus().getBufferSize() / 1024));
-            portInput.setText(getServerStatus().getPort() == 0 ?
-                    String.format("%s", getServerStatus().getInitProt())
-                    : String.format("%d", getServerStatus().getPort()));
-            if (getServerStatus().getFileSystemPath() != null) {
-                setChooserPath(new File(getServerStatus().getFileSystemPath()));
+                    .setText(getServerStatus().requireBufferSize() == 0 ?
+                            getServerStatus().requireInitBufferSize()
+                            : String.format("%d", getServerStatus().requireBufferSize() / 1024));
+            portInput.setText(getServerStatus().requirePort() == 0 ?
+                    String.format("%s", getServerStatus().requireInitPort())
+                    : String.format("%d", getServerStatus().requirePort()));
+            if (getServerStatus().requireFileSystemPath() != null) {
+                setChooserPath(new File(getServerStatus().requireFileSystemPath()));
             } else {
-                setChooserPath(new File(getServerStatus().getInitFileSystemPath()));
+                setChooserPath(new File(getServerStatus().requireInitFileSystemPath()));
             }
-            setExtendStores(getServerStatus().getExtendStores());
-            if (getServerStatus().getLogLevel() != null) {
-                switch (getServerStatus().getLogLevel()) {
+            setExtendStores(getServerStatus().requireExtendStores());
+            if (getServerStatus().requireLogLevel() != null) {
+                switch (getServerStatus().requireLogLevel()) {
                     case EVENT: {
                         logLevelInput.setSelectedIndex(0);
                         break;
@@ -402,7 +402,7 @@ public class SettingWindow extends DiskDynamicWindow {
                     }
                 }
             } else {
-                switch (getServerStatus().getInitLogLevel()) {
+                switch (getServerStatus().requireInitLogLevel()) {
                     case EVENT: {
                         logLevelInput.setSelectedIndex(0);
                         break;
@@ -420,7 +420,7 @@ public class SettingWindow extends DiskDynamicWindow {
                     }
                 }
             }
-            if (getServerStatus().getMustLogin()) {
+            if (getServerStatus().requireMustLogin()) {
                 mlInput.setSelectedIndex(0);
             } else {
                 mlInput.setSelectedIndex(1);
@@ -435,8 +435,8 @@ public class SettingWindow extends DiskDynamicWindow {
             } else {
                 showChainInput.setSelectedIndex(0);
             }
-            if (getServerStatus().getVCLevel() != null) {
-                switch (getServerStatus().getVCLevel()) {
+            if (getServerStatus().requireVcLevel() != null) {
+                switch (getServerStatus().requireVcLevel()) {
                     case STANDARD: {
                         vcInput.setSelectedIndex(0);
                         break;
@@ -454,7 +454,7 @@ public class SettingWindow extends DiskDynamicWindow {
                     }
                 }
             } else {
-                switch (getServerStatus().getInitVCLevel()) {
+                switch (getServerStatus().requireInitVcLevel()) {
                     case STANDARD: {
                         vcInput.setSelectedIndex(0);
                         break;

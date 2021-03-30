@@ -107,7 +107,7 @@ public class ConfigReader {
      */
     private String fileNodePath;
 
-    private String tfPath;
+    private String tmpFilePath;
 
     private String dbURL;
 
@@ -257,7 +257,7 @@ public class ConfigReader {
     /**
      * 扩展存储区最大数目
      */
-    private static final int MAX_EXTENDSTORES_NUM = 255;
+    private static final int MAX_EXTEND_STORES_NUM = 255;
 
     /**
      * 一些系统的特殊账户
@@ -310,6 +310,7 @@ public class ConfigReader {
         }
         catch (Exception e) {
             System.err.printf("错误：无法加载一个或多个配置文件（位于%s路径下），请尝试删除旧的配置文件并重新启动本应用或查看安装路径的权限（必须可读写）\n", this.confdir);
+            // 顺序问题, 先加载会出问题;
 //            AppSystem.out.printf("错误：无法加载一个或多个配置文件（位于%s路径下），请尝试删除旧的配置文件并重新启动本应用或查看安装路径的权限（必须可读写）。", this.confdir);
         }
     }
@@ -429,11 +430,11 @@ public class ConfigReader {
         }
     }
 
-    public int getBuffSize() {
+    public int requireBuffSize() {
         return this.bufferSize;
     }
 
-    public String getInitBuffSize() {
+    public String requireInitBuffSize() {
         if (this.serverp != null && serverp.getProperty("buff.size") != null) {
             return serverp.getProperty("buff.size");
         } else {
@@ -493,11 +494,11 @@ public class ConfigReader {
         return this.mustLogin != null && this.mustLogin.equals("N");
     }
 
-    public String getFileSystemPath() {
+    public String requireFileSystemPath() {
         return this.fileSystemPath;
     }
 
-    public String getInitFileSystemPath() {
+    public String requireInitFileSystemPath() {
         if (this.serverp != null && serverp.getProperty("FS.path") != null) {
             return serverp.getProperty("FS.path").equals("DEFAULT") ? DEFAULT_FILE_SYSTEM_PATH
                     : serverp.getProperty("FS.path");
@@ -506,7 +507,7 @@ public class ConfigReader {
         }
     }
 
-    public String getFileBlockPath() {
+    public String requireFileBlockPath() {
         return this.fileBlockPath;
     }
 
@@ -519,23 +520,23 @@ public class ConfigReader {
      * @return java.util.List<kohgylw.kiftd.server.pojo.ExtendStores> 所有扩展存储区对象的列表
      * @author 青阳龙野(kohgylw)
      */
-    public List<ExtendStores> getExtendStores() {
+    public List<ExtendStores> requireExtendStores() {
         return extendStores;
     }
 
-    public String getFileNodePath() {
+    public String requireFileNodePath() {
         return this.fileNodePath;
     }
 
-    public String getTemporaryfilePath() {
-        return this.tfPath;
+    public String requireTmpFilePath() {
+        return this.tmpFilePath;
     }
 
-    public String getPath() {
+    public String requirePath() {
         return this.path;
     }
 
-    public LogLevel getLogLevel() {
+    public LogLevel requireLogLevel() {
         if (this.log == null) {
             this.log = "";
         }
@@ -556,7 +557,7 @@ public class ConfigReader {
         }
     }
 
-    public LogLevel getInitLogLevel() {
+    public LogLevel requireInitLogLevel() {
         if (serverp != null && serverp.getProperty("log") != null) {
             switch (serverp.getProperty("log")) {
                 case "N": {
@@ -585,7 +586,7 @@ public class ConfigReader {
      * @return kohgylw.kiftd.server.enumeration.VCLevel 验证码等级
      * @author 青阳龙野(kohgylw)
      */
-    public VcLevel getVCLevel() {
+    public VcLevel requireVcLevel() {
         if (this.vc == null) {
             this.vc = "";
         }
@@ -606,28 +607,32 @@ public class ConfigReader {
         }
     }
 
-    public VcLevel getInitVCLevel() {
+    public VcLevel requireInitVcLevel() {
         if (serverp != null && serverp.getProperty("VC.level") != null) {
             switch (serverp.getProperty("VC.level")) {
-                case "STANDARD":
+                case "STANDARD": {
                     return VcLevel.STANDARD;
-                case "SIMP":
+                }
+                case "SIMP": {
                     return VcLevel.SIMPLIFIED;
-                case "CLOSE":
+                }
+                case "CLOSE": {
                     return VcLevel.CLOSE;
-                default:
+                }
+                default: {
                     return VcLevel.STANDARD;
+                }
             }
         } else {
             return VcLevel.STANDARD;
         }
     }
 
-    public int getPort() {
+    public int requirePort() {
         return this.port;
     }
 
-    public String getInitPort() {
+    public String requireInitPort() {
         if (this.serverp != null && serverp.getProperty("port") != null) {
             return serverp.getProperty("port");
         } else {
@@ -635,7 +640,7 @@ public class ConfigReader {
         }
     }
 
-    public int getPropertiesStatus() {
+    public int requirePropertiesStatus() {
         return this.propertiesStatus;
     }
 
@@ -672,6 +677,9 @@ public class ConfigReader {
                     loglevelCode = "N";
                     break;
                 }
+                default: {
+                    break;
+                }
             }
             this.serverp.setProperty("log", loglevelCode);
             switch (ss.getVc()) {
@@ -687,13 +695,17 @@ public class ConfigReader {
                     this.serverp.setProperty("VC.level", "SIMP");
                     break;
                 }
+                default: {
+                    break;
+                }
             }
             this.serverp.setProperty("port", ss.getPort() + "");
             this.serverp.setProperty("FS.path",
                     (ss.getFsPath() + File.separator).equals(this.DEFAULT_FILE_SYSTEM_PATH) ? "DEFAULT"
                             : ss.getFsPath());
-            for (short i = 1; i < MAX_EXTENDSTORES_NUM; i++) {
-                this.serverp.removeProperty("FS.extend." + i);// 清空旧的扩展存储区设置
+            for (short i = 1; i < MAX_EXTEND_STORES_NUM; i++) {
+                // 清空旧的扩展存储区设置;
+                this.serverp.removeProperty("FS.extend." + i);
             }
             for (ExtendStores es : ss.getExtendStores()) {
                 this.serverp.setProperty("FS.extend." + es.getIndex(), es.getPath().getAbsolutePath());
@@ -847,7 +859,7 @@ public class ConfigReader {
             fileSystemPath = fileSystemPath + File.separator;
         }
         extendStores.clear();
-        for (short i = 1; i < MAX_EXTENDSTORES_NUM + 1; i++) {
+        for (short i = 1; i < MAX_EXTEND_STORES_NUM + 1; i++) {
             if (serverp.getProperty("FS.extend." + i) != null) {
                 ExtendStores es = new ExtendStores();
                 es.setPath(new File(
@@ -888,10 +900,10 @@ public class ConfigReader {
             AppSystem.out.println("错误：无法创建文件节点存放区[" + this.fileNodePath + "]。");
             return CANT_CREATE_FILE_NODE_PATH;
         }
-        this.tfPath = this.fileSystemPath + "temporaryfiles" + File.separator;
-        final File tfFile = new File(this.tfPath);
+        this.tmpFilePath = this.fileSystemPath + "temporaryfiles" + File.separator;
+        final File tfFile = new File(this.tmpFilePath);
         if (!tfFile.isDirectory() && !tfFile.mkdirs()) {
-            AppSystem.out.println("错误：无法创建临时文件存放区[" + this.tfPath + "]。");
+            AppSystem.out.println("错误：无法创建临时文件存放区[" + this.tmpFilePath + "]。");
             return CANT_CREATE_TF_PATH;
         }
 
@@ -1240,13 +1252,13 @@ public class ConfigReader {
      * @return long 以byte为单位的最大阈值，若返回0则设置错误，若小于0则不限制。
      * @author 青阳龙野(kohgylw)
      */
-    public long getUploadFileSize(String account) {
+    public long requireUploadFileSize(String account) {
         String defaultMaxSizeP = accountp.getProperty("defaultMaxSize");
         if (account == null) {
-            return getMaxSizeByString(defaultMaxSizeP);
+            return requireMaxSizeByString(defaultMaxSizeP);
         } else {
             String accountMaxSizeP = accountp.getProperty(account + ".maxSize");
-            return accountMaxSizeP == null ? getMaxSizeByString(defaultMaxSizeP) : getMaxSizeByString(accountMaxSizeP);
+            return accountMaxSizeP == null ? requireMaxSizeByString(defaultMaxSizeP) : requireMaxSizeByString(accountMaxSizeP);
         }
     }
 
@@ -1272,7 +1284,7 @@ public class ConfigReader {
      * @return long 以Byte为单位计算的体积值，若为0则代表设置错误，若为负数则代表无限制
      * @author 青阳龙野(kohgylw)
      */
-    private long getMaxSizeByString(String in) {
+    private long requireMaxSizeByString(String in) {
         long r = 0L;
         // 首先，判断是否为null，若是，则直接返回-1。
         if (in == null || in.length() <= 0) {
@@ -1308,6 +1320,7 @@ public class ConfigReader {
             }
         }
         catch (Exception e) {
+            e.printStackTrace();
         }
         return r;
     }
@@ -1325,10 +1338,10 @@ public class ConfigReader {
     public long getDownloadMaxRate(String account) {
         String defaultMaxRateP = accountp.getProperty("defaultMaxRate");
         if (account == null) {
-            return getMaxRateByString(defaultMaxRateP);
+            return requireMaxRateByString(defaultMaxRateP);
         } else {
             String accountMaxRateP = accountp.getProperty(account + ".maxRate");
-            return accountMaxRateP == null ? getMaxRateByString(defaultMaxRateP) : getMaxRateByString(accountMaxRateP);
+            return accountMaxRateP == null ? requireMaxRateByString(defaultMaxRateP) : requireMaxRateByString(accountMaxRateP);
         }
     }
 
@@ -1352,7 +1365,7 @@ public class ConfigReader {
      * @return long 以KB/s为单位计算的下载速度，若为0则代表设置错误，若为负数则代表无限制
      * @author 青阳龙野(kohgylw)
      */
-    private long getMaxRateByString(String in) {
+    private long requireMaxRateByString(String in) {
         long r = 0L;
         // 首先，判断是否为null，若是，则直接返回-1。
         if (in == null || in.length() <= 0) {
@@ -1385,11 +1398,12 @@ public class ConfigReader {
             }
         }
         catch (Exception e) {
+            e.printStackTrace();
         }
         return r;
     }
 
-    public List<String> getAllAddedAuthFoldersId() {
+    public List<String> requireAllAddedAuthFoldersId() {
         List<String> foldersId = new ArrayList<>();
         for (Iterator<String> it = accountp.stringPropertieNames().iterator(); it.hasNext(); ) {
             String config = it.next();
@@ -1607,7 +1621,7 @@ public class ConfigReader {
      * @author 青阳龙野(kohgylw)
      */
     public int getMaxExtendstoresNum() {
-        return MAX_EXTENDSTORES_NUM;
+        return MAX_EXTEND_STORES_NUM;
     }
 
     /**

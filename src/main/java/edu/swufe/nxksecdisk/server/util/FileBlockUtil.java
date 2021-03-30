@@ -70,7 +70,7 @@ public class FileBlockUtil {
      * @author 青阳龙野(kohgylw)
      */
     public void initTempDir() {
-        final String tfPath = config.getTemporaryfilePath();
+        final String tfPath = config.requireTmpFilePath();
         final File f = new File(tfPath);
         if (f.isDirectory()) {
             try {
@@ -105,7 +105,7 @@ public class FileBlockUtil {
     public File saveToFileBlocks(final MultipartFile f) {
         // 如果存在扩展存储区，则优先在已有文件块数目最少的扩展存储区中存放文件（避免占用主文件系统）
         // 得到全部扩展存储区;
-        List<ExtendStores> ess = config.getExtendStores();
+        List<ExtendStores> ess = config.requireExtendStores();
         if (ess.size() > 0) {
             // 将所有扩展存储区按照已存储文件块的数目从小到大进行排序
             Collections.sort(ess, (o1, o2) -> {
@@ -152,7 +152,7 @@ public class FileBlockUtil {
         }
         // 如果不存在扩展存储区或者最大的扩展存储区无法存放目标文件，则尝试将其存放至主文件系统路径下
         try {
-            final File file = createNewBlock("file_", new File(config.getFileBlockPath()));
+            final File file = createNewBlock("file_", new File(config.requireFileBlockPath()));
             if (file != null) {
                 f.transferTo(file);// 执行存放，并肩文件命名为“file_{UUID}.block”的形式
                 return file;
@@ -250,11 +250,11 @@ public class FileBlockUtil {
             File file = null;
             if (f.getFilePath().startsWith("file_")) {// 存放于主文件系统中
                 // 直接从主文件系统的文件块存放区获得对应的文件块
-                file = new File(config.getFileBlockPath(), f.getFilePath());
+                file = new File(config.requireFileBlockPath(), f.getFilePath());
             } else {// 存放于扩展存储区
                 short index = Short.parseShort(f.getFilePath().substring(0, f.getFilePath().indexOf('_')));
                 // 根据编号查到对应的扩展存储区路径，进而获取对应的文件块
-                file = new File(config.getExtendStores().parallelStream()
+                file = new File(config.requireExtendStores().parallelStream()
                         .filter((e) -> e.getIndex() == index).findAny().get().getPath(), f.getFilePath());
             }
             if (file.isFile()) {
@@ -314,7 +314,7 @@ public class FileBlockUtil {
      */
     public String createZip(final List<String> idList, final List<String> fidList, String account) {
         final String zipname = "tf_" + UUID.randomUUID().toString() + ".zip";
-        final String tempPath = config.getTemporaryfilePath();
+        final String tempPath = config.requireTmpFilePath();
         final File f = new File(tempPath, zipname);
         try {
             final List<ZipEntrySource> zs = new ArrayList<>();
@@ -578,8 +578,8 @@ public class FileBlockUtil {
         checkNodes("root");
         // 检查是否存在未正确对应文件节点的文件块，若有则删除，从而确保文件块不出现遗留问题
         List<File> paths = new ArrayList<>();
-        paths.add(new File(config.getFileBlockPath()));
-        for (ExtendStores es : config.getExtendStores()) {
+        paths.add(new File(config.requireFileBlockPath()));
+        for (ExtendStores es : config.requireExtendStores()) {
             paths.add(es.getPath());
         }
         for (File path : paths) {
