@@ -1,9 +1,8 @@
 package edu.swufe.nxksecdisk.launcher;
 
 import com.formdev.flatlaf.FlatDarculaLaf;
-import com.formdev.flatlaf.FlatDarkLaf;
 import edu.swufe.nxksecdisk.config.DynamicConfig;
-import edu.swufe.nxksecdisk.constant.EnumLauncherMode;
+import edu.swufe.nxksecdisk.constant.EnumLaunchMode;
 import edu.swufe.nxksecdisk.server.app.DiskAppController;
 import edu.swufe.nxksecdisk.server.enumeration.LogLevel;
 import edu.swufe.nxksecdisk.server.enumeration.VcLevel;
@@ -41,7 +40,7 @@ public class UiLauncher {
      * 实例化图形界面并显示它，同时将图形界面的各个操作与服务器控制器对应起来;
      */
     private UiLauncher() {
-        DynamicConfig.setLauncherMode(EnumLauncherMode.UI);
+        DynamicConfig.setLauncherMode(EnumLaunchMode.UI);
         final ServerUiModule serverUi = ServerUiModule.getInstance();
         // 服务器控制层，用于连接UI与服务器内核;
         DiskAppController appController = new DiskAppController();

@@ -1,7 +1,5 @@
 package edu.swufe.nxksecdisk;
 
-import edu.swufe.nxksecdisk.config.DynamicConfig;
-import edu.swufe.nxksecdisk.constant.EnumLauncherMode;
 import edu.swufe.nxksecdisk.launcher.ConsoleLauncher;
 import edu.swufe.nxksecdisk.launcher.UiLauncher;
 

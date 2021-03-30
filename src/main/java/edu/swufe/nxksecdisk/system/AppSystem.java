@@ -28,7 +28,7 @@ public final class AppSystem {
                 return UiOutStream.getInstance();
             }
             default: {
-                throw new RuntimeException("unknown launcher mode");
+                throw new RuntimeException("unknown launch mode");
             }
         }
     }

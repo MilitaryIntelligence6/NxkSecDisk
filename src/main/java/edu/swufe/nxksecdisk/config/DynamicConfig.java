@@ -1,6 +1,6 @@
 package edu.swufe.nxksecdisk.config;
 
-import edu.swufe.nxksecdisk.constant.EnumLauncherMode;
+import edu.swufe.nxksecdisk.constant.EnumLaunchMode;
 
 /**
  * @author Military Intelligence 6 root
@@ -11,13 +11,13 @@ import edu.swufe.nxksecdisk.constant.EnumLauncherMode;
  */
 public final class DynamicConfig {
 
-    private static EnumLauncherMode launcherMode = EnumLauncherMode.CONSOLE;
+    private static EnumLaunchMode launcherMode = EnumLaunchMode.CONSOLE;
 
-    public static EnumLauncherMode getLauncherMode() {
+    public static EnumLaunchMode getLauncherMode() {
         return launcherMode;
     }
 
-    public static void setLauncherMode(EnumLauncherMode launcherMode) {
+    public static void setLauncherMode(EnumLaunchMode launcherMode) {
         DynamicConfig.launcherMode = launcherMode;
     }
 }

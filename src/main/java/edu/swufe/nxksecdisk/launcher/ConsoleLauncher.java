@@ -1,7 +1,7 @@
 package edu.swufe.nxksecdisk.launcher;
 
 import edu.swufe.nxksecdisk.config.DynamicConfig;
-import edu.swufe.nxksecdisk.constant.EnumLauncherMode;
+import edu.swufe.nxksecdisk.constant.EnumLaunchMode;
 import edu.swufe.nxksecdisk.server.app.DiskAppController;
 import edu.swufe.nxksecdisk.server.exception.FilesTotalOutOfLimitException;
 import edu.swufe.nxksecdisk.server.exception.FoldersTotalOutOfLimitException;
@@ -51,7 +51,7 @@ public class ConsoleLauncher {
     private final FileSystemManager fileSysManager = FileSystemManager.getInstance();
 
     private ConsoleLauncher() {
-        DynamicConfig.setLauncherMode(EnumLauncherMode.CONSOLE);
+        DynamicConfig.setLauncherMode(EnumLaunchMode.CONSOLE);
         appController = new DiskAppController();
         worker = Executors.newSingleThreadExecutor();
         commandTips = "kiftd:您可以输入以下指令以控制服务器：\r\n-start 启动服务器\r\n-stop 停止服务器\r\n-exit " +
