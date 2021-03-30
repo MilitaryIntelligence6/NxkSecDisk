@@ -301,7 +301,7 @@ public class FolderServiceImpl implements FolderService {
         }
         Folder f = new Folder();
         if (folderMapper.queryByParentId(parentId).parallelStream().anyMatch((e) -> e.getFolderName().equals(folderName))) {
-            f.setFolderName(FileNodeUtil.getNewFolderName(folderName, folderMapper.queryByParentId(parentId)));
+            f.setFolderName(FileNodeUtil.requireNewFolderName(folderName, folderMapper.queryByParentId(parentId)));
         }
         else {
             cnfbnr.setResult("error");

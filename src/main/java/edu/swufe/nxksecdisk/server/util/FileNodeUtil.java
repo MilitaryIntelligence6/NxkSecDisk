@@ -127,7 +127,7 @@ public class FileNodeUtil {
      * @return java.sql.Connection 文件节点数据库的链接，除非程序关闭，否则该链接不应关闭。
      * @author 青阳龙野(kohgylw)
      */
-    public static Connection getNodeDBConnection() {
+    public static Connection requireNodeDbConnection() {
         return conn;
     }
 
@@ -144,7 +144,7 @@ public class FileNodeUtil {
      * @return java.lang.String 新文件名
      * @author 青阳龙野(kohgylw)
      */
-    public static String getNewNodeName(String originalName, List<Node> nodes) {
+    public static String requireNewNodeName(String originalName, List<Node> nodes) {
         int i = 0;
         List<String> fileNames = Arrays
                 .asList(nodes.stream().parallel().map((t) -> t.getFileName()).toArray(String[]::new));
@@ -175,7 +175,7 @@ public class FileNodeUtil {
      * @return java.lang.String 新文件夹名
      * @author 青阳龙野(kohgylw)
      */
-    public static String getNewFolderName(String originalName, List<? extends Folder> folders) {
+    public static String requireNewFolderName(String originalName, List<? extends Folder> folders) {
         int i = 0;
         List<String> fileNames = Arrays
                 .asList(folders.stream().parallel().map((t) -> t.getFolderName()).toArray(String[]::new));
@@ -198,7 +198,7 @@ public class FileNodeUtil {
      * @return java.lang.String 新文件夹名
      * @author 青阳龙野(kohgylw)
      */
-    public static String getNewFolderName(Folder folder, File parentfolder) {
+    public static String requireNewFolderName(Folder folder, File parentfolder) {
         int i = 0;
         List<String> fileNames = Arrays.asList(Arrays.stream(parentfolder.listFiles()).parallel()
                 .filter((e) -> e.isDirectory()).map((t) -> t.getName()).toArray(String[]::new));
@@ -223,7 +223,7 @@ public class FileNodeUtil {
      * @return java.lang.String 新文件名
      * @author 青阳龙野(kohgylw)
      */
-    public static String getNewNodeName(Node n, File folder) {
+    public static String requireNewNodeName(Node n, File folder) {
         int i = 0;
         List<String> fileNames = Arrays.asList(Arrays.stream(folder.listFiles()).parallel().filter((e) -> e.isFile())
                 .map((t) -> t.getName()).toArray(String[]::new));

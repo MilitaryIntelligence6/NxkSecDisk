@@ -131,7 +131,7 @@ public class FileSystemManager {
     }
 
     private void initDb() {
-        Connection c = FileNodeUtil.getNodeDBConnection();
+        Connection c = FileNodeUtil.requireNodeDbConnection();
         try {
             selectFolderById = c.prepareStatement("SELECT * FROM FOLDER WHERE folder_id = ?");
             selectNodeById = c.prepareStatement("SELECT * FROM FILE WHERE file_id = ?");
@@ -564,7 +564,7 @@ public class FileSystemManager {
                         }
                     case BOTH:
                         // 保留两者（计数命名法 foo.bar -> foo (1).bar）
-                        newName = FileNodeUtil.getNewNodeName(name, nodes);
+                        newName = FileNodeUtil.requireNewNodeName(name, nodes);
                         break;
                     default:
                         // 意外情况，比如跳过，则直接视为操作完成。
@@ -645,7 +645,7 @@ public class FileSystemManager {
                                 folders.parallelStream().filter((e) -> e.getFolderName().equals(name)).findFirst().get();
                         break;
                     case BOTH:
-                        newName = FileNodeUtil.getNewFolderName(name, folders);
+                        newName = FileNodeUtil.requireNewFolderName(name, folders);
                         break;
                     default:
                         return;
@@ -857,7 +857,7 @@ public class FileSystemManager {
                                 .get();
                         break;
                     case BOTH:
-                        target = new File(path, new String(FileNodeUtil.getNewNodeName(node, path).getBytes()));
+                        target = new File(path, new String(FileNodeUtil.requireNewNodeName(node, path).getBytes()));
                         target.createNewFile();
                         break;
                     default:
@@ -916,7 +916,7 @@ public class FileSystemManager {
                                 .findFirst().get();
                         break;
                     case BOTH:
-                        target = new File(path, new String(FileNodeUtil.getNewFolderName(folder, path).getBytes()));
+                        target = new File(path, new String(FileNodeUtil.requireNewFolderName(folder, path).getBytes()));
                         target.mkdir();
                         break;
 

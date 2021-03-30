@@ -303,7 +303,7 @@ public class FileServiceImpl
                     // 保留两者，使用型如“xxxxx (n).xx”的形式命名新文件。其中n为计数，例如已经存在2个文件，则新文件的n记为2
                     case "both":
                         // 设置新文件名为标号形式
-                        fileName = FileNodeUtil.getNewNodeName(originalFileName, nodes);
+                        fileName = FileNodeUtil.requireNewNodeName(originalFileName, nodes);
                         break;
                     default:
                         // 其他声明，容错，暂无效果
@@ -810,7 +810,7 @@ public class FileServiceImpl
                             if (isCopy) {
                                 // 是，则创建一个新节点并与原节点引用相同的文件块
                                 Node copyNode = fileBlockUtil.insertNewNode(
-                                        FileNodeUtil.getNewNodeName(node.getFileName(),
+                                        FileNodeUtil.requireNewNodeName(node.getFileName(),
                                                 nodeMapper.queryByParentFolderId(locationpath)),
                                         account, node.getFilePath(), node.getFileSize(), locationpath);
                                 if (copyNode == null) {
@@ -820,7 +820,7 @@ public class FileServiceImpl
                                         fileBlockUtil.getNodePath(copyNode), isCopy);
                             } else {
                                 // 不是，则将原节点重新命名为原名+序号，再移动至目标文件夹下
-                                node.setFileName(FileNodeUtil.getNewNodeName(node.getFileName(),
+                                node.setFileName(FileNodeUtil.requireNewNodeName(node.getFileName(),
                                         nodeMapper.queryByParentFolderId(locationpath)));
                                 node.setFileParentFolder(locationpath);
                                 if (nodeMapper.update(node) <= 0) {
@@ -973,7 +973,7 @@ public class FileServiceImpl
                                 // 是，则以新名称生成对应的原文件夹副本在目标文件夹里面
                                 Folder newFolder = folderUtil.copyFolderByNewNameToPath(folder, account, targetFolder
                                         , FileNodeUtil
-                                                .getNewFolderName(folder.getFolderName(),
+                                                .requireNewFolderName(folder.getFolderName(),
                                                         folderMapper.queryByParentId(locationpath)));
                                 if (newFolder == null) {
                                     return "cannotMoveFiles";
@@ -984,7 +984,7 @@ public class FileServiceImpl
                             } else {
                                 // 不是，将原节点的名称改为计数名称，父文件夹改为目标文件夹
                                 folder.setFolderParent(locationpath);
-                                folder.setFolderName(FileNodeUtil.getNewFolderName(folder.getFolderName(),
+                                folder.setFolderName(FileNodeUtil.requireNewFolderName(folder.getFolderName(),
                                         folderMapper.queryByParentId(locationpath)));
                                 boolean needChangeChildsConstranint = false;
                                 if (folder.getFolderConstraint() < targetFolder.getFolderConstraint()) {
