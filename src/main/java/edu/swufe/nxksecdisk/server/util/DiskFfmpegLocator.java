@@ -99,8 +99,7 @@ public class DiskFfmpegLocator extends FFMPEGLocator {
                 // 没有？那将自定义的ffmpeg文件拷贝到临时目录中。
                 try {
                     Files.copy(customFFMPEGexef.toPath(), ffmpegFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                }
-                catch (IOException e) {
+                } catch (IOException e) {
                     AppSystem.out.println("警告：自定义的ffmpeg引擎可执行文件无法读取，视频播放的在线解码功能将不可用。");
                     logUtil.writeException(e);
                     enableFFmpeg = false;
@@ -108,8 +107,7 @@ public class DiskFfmpegLocator extends FFMPEGLocator {
                 }
                 // 已经有了？那么它应该准备好了
             }
-        }
-        else {
+        } else {
             // 否则，使用内置的ffmpeg文件。
             // 临时文件中是否已经拷贝好了ffmpeg可执行文件了？
             ffmpegFile = new File(dirFolder, "ffmpeg-" + arch + "-" + MY_EXE_VERSION + suffix);
@@ -118,8 +116,7 @@ public class DiskFfmpegLocator extends FFMPEGLocator {
                 // 如果抛出异常，那么直接结束构造
                 try {
                     copyFile("ffmpeg-" + arch + suffix, ffmpegFile);
-                }
-                catch (NullPointerException e) {
+                } catch (NullPointerException e) {
                     AppSystem.out.println("警告：未能找到适合此操作系统的ffmpeg引擎可执行文件，视频播放的在线解码功能将不可用。");
                     logUtil.writeException(e);
                     enableFFmpeg = false;
@@ -134,8 +131,7 @@ public class DiskFfmpegLocator extends FFMPEGLocator {
             if (!ffmpegFile.canExecute()) {
                 try {
                     Runtime.getRuntime().exec(new String[]{"/bin/chmod", "755", ffmpegFile.getAbsolutePath()});
-                }
-                catch (IOException e) {
+                } catch (IOException e) {
                     // 授予权限失败的话……好像也没啥好办法
                     logUtil.writeException(e);
                     enableFFmpeg = false;
@@ -157,8 +153,7 @@ public class DiskFfmpegLocator extends FFMPEGLocator {
             if (!copy(getClass().getResourceAsStream(resourceName), dest.getAbsolutePath())) {
                 throw new NullPointerException();
             }
-        }
-        catch (NullPointerException ex) {
+        } catch (NullPointerException ex) {
             throw ex;
         }
     }
@@ -168,8 +163,7 @@ public class DiskFfmpegLocator extends FFMPEGLocator {
         boolean success = true;
         try {
             Files.copy(source, Paths.get(destination), StandardCopyOption.REPLACE_EXISTING);
-        }
-        catch (IOException ex) {
+        } catch (IOException ex) {
             success = false;
         }
         return success;

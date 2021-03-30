@@ -70,8 +70,7 @@ public class RangeFileStreamWriter {
                     response.setStatus(status);// 304
                     return status;
                 }
-            }
-            else {
+            } else {
                 // 不是，则再检查Last-Modified
                 if (ifModifiedSince.trim().equals(lastModified)) {
                     status = HttpServletResponse.SC_NOT_MODIFIED;
@@ -105,8 +104,7 @@ public class RangeFileStreamWriter {
                     String.format("attachment; filename=\"%s\"; filename*=utf-8''%s",
                             EncodeUtil.getFileNameByUTF8(fname),
                             EncodeUtil.getFileNameByUTF8(fname)));
-        }
-        else {
+        } else {
             response.setHeader("Content-Disposition", "inline");
         }
         // 设置支持断点续传功能
@@ -128,8 +126,7 @@ public class RangeFileStreamWriter {
                 startOffset = Long.parseLong(rangeBytes.substring(0, rangeBytes.indexOf('-')).trim());
                 // 仅具备起始偏移量时，例如文件长为13，请求为5-，则响应体长度为8
                 contentLength = fileLength - startOffset;
-            }
-            else {
+            } else {
                 hasEnd = true;
                 startOffset = Long.parseLong(rangeBytes.substring(0, rangeBytes.indexOf('-')).trim());
                 endOffset = Long.parseLong(rangeBytes.substring(rangeBytes.indexOf('-') + 1).trim());
@@ -141,14 +138,12 @@ public class RangeFileStreamWriter {
             if (!hasEnd) {
                 contentRange = new StringBuffer("bytes ").append("" + startOffset).append("-")
                         .append("" + (fileLength - 1)).append("/").append("" + fileLength).toString();
-            }
-            else {
+            } else {
                 contentRange = new StringBuffer("bytes ").append(rangeBytes).append("/").append("" + fileLength)
                         .toString();
             }
             response.setHeader("Content-Range", contentRange);
-        }
-        else {
+        } else {
             // 从开始进行下载
             // 客户端要求全文下载;
             contentLength = fileLength;
@@ -169,8 +164,7 @@ public class RangeFileStreamWriter {
                 while ((n = raf.read(buf)) != -1) {
                     out.write(buf, 0, n);
                 }
-            }
-            else {
+            } else {
                 // 有结束偏移量时，将其从起始偏移量开始写至指定偏移量结束。
                 int n = 0;
                 // 写出量，用于确定结束位置;
@@ -184,19 +178,16 @@ public class RangeFileStreamWriter {
             out.flush();
             out.close();
             return status;
-        }
-        catch (IOException ex) {
+        } catch (IOException ex) {
             // 针对任何IO异常忽略，传输失败不处理
             status = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
             return status;
-        }
-        catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             e.printStackTrace();
             status = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
             try {
                 response.sendError(status);
-            }
-            catch (IOException e1) {
+            } catch (IOException e1) {
                 e1.printStackTrace();
             }
             return status;

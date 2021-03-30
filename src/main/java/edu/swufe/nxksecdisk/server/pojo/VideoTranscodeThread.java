@@ -90,8 +90,7 @@ public class VideoTranscodeThread {
                         }
                     });
             progress = "FIN";
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             AppSystem.out.printf("警告：在线转码功能出现意外错误。详细信息：%s", e.getMessage());
         }
     }

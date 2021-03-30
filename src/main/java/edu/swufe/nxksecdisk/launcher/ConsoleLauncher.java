@@ -235,13 +235,12 @@ public class ConsoleLauncher {
             if (currentFolder == null
                     || currentFolder.getCurrent() == null
                     || fileSysManager.selectFolderById(
-                            currentFolder
-                                    .getCurrent()
-                                    .getFolderId()) == null) {
+                    currentFolder
+                            .getCurrent()
+                            .getFolderId()) == null) {
                 getFolderView("root");
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             AppSystem.out.println("错误：无法打开文件系统，该文件系统可能正在被另一个kiftd占用。");
             return;
         }
@@ -289,8 +288,7 @@ public class ConsoleLauncher {
                     }
                 }
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             AppSystem.out.println("错误：读取命令时出现意外，已退出文件管理功能。");
         }
     }
@@ -316,8 +314,7 @@ public class ConsoleLauncher {
                 System.out.println("警告：文件夹列表长度超过最大限值，只能显示前" + Integer.MAX_VALUE + "行。");
             }
             currentFolder = fileSysManager.requireFolderView(folderId);
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             openFolderError();
             return;
         }
@@ -349,8 +346,7 @@ public class ConsoleLauncher {
                 return;
             }
             AppSystem.out.println("错误：该文件夹不存在或其不是一个文件夹（" + fname + "）。");
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             openFolderError();
         }
     }
@@ -379,8 +375,7 @@ public class ConsoleLauncher {
                     return fileSysManager.selectNodesByFolderId(parent).parallelStream()
                             .filter((e) -> e.getFileName().equals(fname)).findFirst().get();
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
             }
         }
         return null;
@@ -409,8 +404,7 @@ public class ConsoleLauncher {
                 if (index >= 1 && index <= currentFolder.getFolders().size()) {
                     return currentFolder.getFolders().get(index - 1).getFolderId();
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
             return null;
@@ -418,8 +412,7 @@ public class ConsoleLauncher {
         try {
             return currentFolder.getFolders().parallelStream().filter((e) -> e.getFolderName().equals(fname))
                     .findFirst().get().getFolderId();
-        }
-        catch (NoSuchElementException e) {
+        } catch (NoSuchElementException e) {
             e.printStackTrace();
         }
         return null;
@@ -450,8 +443,7 @@ public class ConsoleLauncher {
                 } else {
                     return currentFolder.getFiles().get(index - currentFolder.getFolders().size() - 1).getFileId();
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
             return null;
@@ -459,13 +451,11 @@ public class ConsoleLauncher {
         try {
             return currentFolder.getFolders().parallelStream().filter((e) -> e.getFolderName().equals(fname))
                     .findFirst().get().getFolderId();
-        }
-        catch (NoSuchElementException e) {
+        } catch (NoSuchElementException e) {
             try {
                 return currentFolder.getFiles().parallelStream().filter((m) -> m.getFileName().equals(fname))
                         .findFirst().get().getFileId();
-            }
-            catch (NoSuchElementException e2) {
+            } catch (NoSuchElementException e2) {
                 e2.printStackTrace();
             }
         }
@@ -540,8 +530,7 @@ public class ConsoleLauncher {
             } else {
                 AppSystem.out.println("错误：导入失败，可能导入全部文件。");
             }
-        }
-        catch (Exception e1) {
+        } catch (Exception e1) {
             AppSystem.out.println("错误：导入失败，出现意外错误。");
         }
     }
@@ -593,20 +582,17 @@ public class ConsoleLauncher {
             fileSysManager.importFrom(importFiles, targetFolder, type);
             pl.c = false;
             AppSystem.out.println("导入完成。");
-        }
-        catch (FilesTotalOutOfLimitException e1) {
+        } catch (FilesTotalOutOfLimitException e1) {
             if (pl != null) {
                 pl.c = false;
             }
             AppSystem.out.println("错误：导入失败，该文件夹内的文件数目已达上限，无法导入更多文件。");
-        }
-        catch (FoldersTotalOutOfLimitException e2) {
+        } catch (FoldersTotalOutOfLimitException e2) {
             if (pl != null) {
                 pl.c = false;
             }
             AppSystem.out.println("错误：导入失败，该文件夹内的文件夹数目已达上限，无法导入更多文件夹。");
-        }
-        catch (Exception e3) {
+        } catch (Exception e3) {
             if (pl != null) {
                 pl.c = false;
             }
@@ -688,8 +674,7 @@ public class ConsoleLauncher {
             } else {
                 AppSystem.out.println("错误：导出失败，可能导出全部文件。");
             }
-        }
-        catch (Exception e1) {
+        } catch (Exception e1) {
             AppSystem.out.println("错误：导出失败，出现意外错误。");
         }
     }
@@ -766,8 +751,7 @@ public class ConsoleLauncher {
                 fileSysManager.exportTo(foldersId, filesId, targetPath, type);
                 pl.c = false;
                 AppSystem.out.println("导出完成。");
-            }
-            catch (Exception e1) {
+            } catch (Exception e1) {
                 if (pl != null) {
                     pl.c = false;
                 }
@@ -787,8 +771,7 @@ public class ConsoleLauncher {
         ProgressListener pl = null;
         try {
             currentFolder = fileSysManager.requireFolderView(currentFolder.getCurrent().getFolderId());
-        }
-        catch (SQLException e2) {
+        } catch (SQLException e2) {
             openFolderError();
             return;
         }
@@ -826,8 +809,7 @@ public class ConsoleLauncher {
                 }
                 return;
             }
-        }
-        catch (Exception e1) {
+        } catch (Exception e1) {
             if (pl != null) {
                 pl.c = false;
             }
@@ -870,16 +852,14 @@ public class ConsoleLauncher {
         public void run() {
             try {
                 Thread.sleep(1000);
-            }
-            catch (InterruptedException e) {
+            } catch (InterruptedException e) {
             }
             while (c) {
                 System.out.println(FileSystemManager.message);
                 System.out.println("当前进度：" + FileSystemManager.per + "%");
                 try {
                     Thread.sleep(1000);
-                }
-                catch (InterruptedException e) {
+                } catch (InterruptedException e) {
                 }
             }
         }
@@ -898,8 +878,7 @@ public class ConsoleLauncher {
                 case "Y": {
                     try {
                         currentFolder = fileSysManager.requireFolderView("root");
-                    }
-                    catch (SQLException e1) {
+                    } catch (SQLException e1) {
                         AppSystem.out.println("错误：无法读取根目录，请尝试重新打开文件管理系统或重启kiftd。");
                     }
                     return;
@@ -967,8 +946,7 @@ public class ConsoleLauncher {
                     }
                 }
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             AppSystem.out.println("错误：读取命令时出现意外导致程序退出，请重启kiftd。");
         }
     }

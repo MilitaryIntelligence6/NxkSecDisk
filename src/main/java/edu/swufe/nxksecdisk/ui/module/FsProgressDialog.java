@@ -155,8 +155,7 @@ public class FsProgressDialog extends DiskDynamicWindow {
             message.setText(FileSystemManager.message);
             try {
                 Thread.sleep(16);
-            }
-            catch (InterruptedException e) {
+            } catch (InterruptedException e) {
                 listen = false;
             }
         }

@@ -97,8 +97,7 @@ public class ServerInitListener implements ServletContextListener {
             fileBlockUtil.checkFileBlocks();
             fileBlockUtil.initTempDir();
             AppSystem.out.println("校对完成。");
-        }
-        else {
+        } else {
             AppSystem.out.println("错误：文件系统节点信息校对失败，存储位置无法读写或不存在。");
         }
         // 3，解析公告信息（请确保该操作在校对文件块后进行）
@@ -143,15 +142,13 @@ public class ServerInitListener implements ServletContextListener {
                                     noticeUtil.loadNotice();// 更新公告文件
                                     break;
                                 }
-
                                 default: {
                                     break;
                                 }
                             }
                         }
                     }
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     AppSystem.out.println("错误：服务器文件自动更新失败，该功能已失效。某些文件将无法自动载入最新内容（请尝试重启程序以恢复该功能）。");
                 }
             };
@@ -181,8 +178,7 @@ public class ServerInitListener implements ServletContextListener {
                     }
                     try {
                         Thread.sleep(CYVLE_TIME);
-                    }
-                    catch (InterruptedException e) {
+                    } catch (InterruptedException e) {
                         continueCheck = false;
                         logUtil.writeException(e);
                     }

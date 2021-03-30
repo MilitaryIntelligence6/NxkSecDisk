@@ -38,8 +38,7 @@ public class RsaKeyUtil {
             this.privateKey = pair.getPrivate();
             this.publicKeyStr = new String(this.encoder.encode(this.publicKey.getEncoded()), StandardCharsets.UTF_8);
             this.privateKeyStr = new String(this.encoder.encode(this.privateKey.getEncoded()), StandardCharsets.UTF_8);
-        }
-        catch (NoSuchAlgorithmException e) {
+        } catch (NoSuchAlgorithmException e) {
             AppSystem.out.println(e.getMessage());
             AppSystem.out.println("错误：RSA密钥生成失败。");
         }

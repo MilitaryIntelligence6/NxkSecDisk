@@ -174,8 +174,7 @@ public class UiLauncher {
     public static void launch() {
         try {
             getInstance();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             // 提示：如果无法以图形界面启动，那么可能是由于资源引用失败或开发环境配置导致的，
             // 您可以根据此处捕获的异常对其进行调试。
             e.printStackTrace();
@@ -186,8 +185,7 @@ public class UiLauncher {
     private static void initSkin() {
         try {
             UIManager.setLookAndFeel(new FlatDarculaLaf());
-        }
-        catch (UnsupportedLookAndFeelException e) {
+        } catch (UnsupportedLookAndFeelException e) {
             e.printStackTrace();
         }
     }

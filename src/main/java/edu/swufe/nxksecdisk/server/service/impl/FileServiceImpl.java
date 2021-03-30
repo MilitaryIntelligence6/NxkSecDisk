@@ -142,8 +142,7 @@ public class FileServiceImpl
                     return gson.toJson(cufr);
                 }
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             return ERROR_PARAMETER;
         }
         // 开始文件命名冲突检查
@@ -167,8 +166,7 @@ public class FileServiceImpl
         if (pereFileNameList.size() > 0) {
             cufr.setCheckResult("hasExistsNames");
             cufr.setPereFileNameList(pereFileNameList);
-        }
-        else {
+        } else {
             cufr.setCheckResult("permitUpload");
             cufr.setPereFileNameList(new ArrayList<String>());
         }
@@ -191,12 +189,10 @@ public class FileServiceImpl
         if (size >= 1024 && size < 1048576) {
             result = (double) size / 1024;
             unit = "KB";
-        }
-        else if (size >= 1048576 && size < 1073741824) {
+        } else if (size >= 1048576 && size < 1073741824) {
             result = (double) size / 1048576;
             unit = "MB";
-        }
-        else if (size >= 1073741824) {
+        } else if (size >= 1073741824) {
             result = (double) size / 1073741824;
             unit = "GB";
         }
@@ -265,8 +261,7 @@ public class FileServiceImpl
                                     f.setFileCreationDate(ServerTimeUtil.accurateToDay());
                                     if (account != null) {
                                         f.setFileCreator(account);
-                                    }
-                                    else {
+                                    } else {
                                         f.setFileCreator("\u533f\u540d\u7528\u6237");
                                     }
                                     // 该节点对应的文件块是否独享？
@@ -284,8 +279,7 @@ public class FileServiceImpl
                                                 return UPLOAD_SUCCESS;
                                             }
                                         }
-                                    }
-                                    else {
+                                    } else {
                                         // 如果此文件块还被其他节点引用，那么为此节点新建一个文件块
                                         File block = fileBlockUtil.saveToFileBlocks(file);
                                         // 并将该节点的文件块索引更新为新的文件块
@@ -294,15 +288,13 @@ public class FileServiceImpl
                                             if (fileBlockUtil.isValidNode(f)) {
                                                 this.logUtil.writeUploadFileEvent(request, f, account);
                                                 return UPLOAD_SUCCESS;
-                                            }
-                                            else {
+                                            } else {
                                                 block.delete();
                                             }
                                         }
                                     }
                                     return UPLOAD_ERROR;
-                                }
-                                catch (Exception e) {
+                                } catch (Exception e) {
                                     return UPLOAD_ERROR;
                                 }
                             }
@@ -317,8 +309,7 @@ public class FileServiceImpl
                         // 其他声明，容错，暂无效果
                         return UPLOAD_ERROR;
                 }
-            }
-            else {
+            } else {
                 // 如果既有重复文件、同时又没声明如何操作，则直接上传失败。
                 return UPLOAD_ERROR;
             }
@@ -338,8 +329,7 @@ public class FileServiceImpl
             // 存入成功，则写入日志并返回成功提示
             this.logUtil.writeUploadFileEvent(request, newNode, account);
             return UPLOAD_SUCCESS;
-        }
-        else {
+        } else {
             // 存入失败则删除残余文件块，并返回失败提示
             block.delete();
             return UPLOAD_ERROR;
@@ -424,8 +414,7 @@ public class FileServiceImpl
         try {
             // 处理无法下载的资源
             response.sendError(404);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
         }
     }
 
@@ -539,8 +528,7 @@ public class FileServiceImpl
                 final List<Folder> l = this.folderUtil.getParentList(fid);
                 if (folderMapper.deleteById(fid) <= 0) {
                     return "cannotDeleteFile";
-                }
-                else {
+                } else {
                     folderUtil.deleteAllChildFolder(fid);
                     this.logUtil.writeDeleteFolderEvent(request, folder, l);
                 }
@@ -549,8 +537,7 @@ public class FileServiceImpl
                 ServerInitListener.needCheck = true;
             }
             return "deleteFileSuccess";
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             return ERROR_PARAMETER;
         }
     }
@@ -580,8 +567,7 @@ public class FileServiceImpl
                     // 返回生成的压缩包路径
                     return zipname;
                 }
-            }
-            catch (Exception ex) {
+            } catch (Exception ex) {
                 logUtil.writeException(ex);
             }
         }
@@ -649,8 +635,7 @@ public class FileServiceImpl
                     return "\u8d85\u8fc7" + packTime / 60L
                             + "\u5206\u949f\uff0c\u8017\u65f6\u8f83\u957f\uff0c\u5efa\u8bae\u76f4\u63a5\u4e0b\u8f7d";
                 }
-            }
-            catch (Exception ex) {
+            } catch (Exception ex) {
                 logUtil.writeException(ex);
             }
         }
@@ -674,8 +659,7 @@ public class FileServiceImpl
                 for (Folder cFolder : cFolders) {
                     countFolderFilesId(account, cFolder.getFolderId(), idList);
                 }
-            }
-            catch (Exception e2) {
+            } catch (Exception e2) {
                 // 超限？那就不再加了。
             }
         }
@@ -799,8 +783,7 @@ public class FileServiceImpl
                                     // 成功，记录日志
                                     this.logUtil.writeMoveFileEvent(account, ip, originPath,
                                             fileBlockUtil.getNodePath(copyNode), isCopy);
-                                }
-                                else {
+                                } else {
                                     // 否则，修改操作节点的父文件夹为目标文件夹
                                     node.setFileParentFolder(locationpath);
                                     if (this.nodeMapper.update(node) <= 0) {
@@ -812,8 +795,7 @@ public class FileServiceImpl
                                 }
                                 // 最后，尝试删除冲突节点的文件块。注意：该操作必须在复制节点插入后再执行！
                                 fileBlockUtil.deleteFromFileBlocks(n);
-                            }
-                            else {
+                            } else {
                                 // 如果原节点删除失败，则操作失败
                                 return "cannotMoveFiles";
                             }
@@ -836,8 +818,7 @@ public class FileServiceImpl
                                 }
                                 this.logUtil.writeMoveFileEvent(account, ip, originPath,
                                         fileBlockUtil.getNodePath(copyNode), isCopy);
-                            }
-                            else {
+                            } else {
                                 // 不是，则将原节点重新命名为原名+序号，再移动至目标文件夹下
                                 node.setFileName(FileNodeUtil.getNewNodeName(node.getFileName(),
                                         nodeMapper.queryByParentFolderId(locationpath)));
@@ -857,8 +838,7 @@ public class FileServiceImpl
                             // 其他处理方法为错误参数，必须中断操作以免损坏文件系统
                             return ERROR_PARAMETER;
                     }
-                }
-                else {
+                } else {
                     // 如果节点不存在冲突
                     // 那么移入会导致节点数目增加，也要先检查移动后是否会导致文件列表超过限额
                     if (nodeMapper.countByParentFolderId(locationpath) >= FileNodeUtil.MAXIMUM_NUM_OF_SINGLE_FOLDER) {
@@ -875,8 +855,7 @@ public class FileServiceImpl
                         // 成功后，记录日志
                         this.logUtil.writeMoveFileEvent(account, ip, originPath, fileBlockUtil.getNodePath(newNode),
                                 isCopy);
-                    }
-                    else {
+                    } else {
                         // 不是，移动原节点至目标文件夹内
                         node.setFileParentFolder(locationpath);
                         if (this.nodeMapper.update(node) <= 0) {
@@ -956,8 +935,7 @@ public class FileServiceImpl
                                                 isCopy);
                                         break;
                                     }
-                                }
-                                else {
+                                } else {
                                     // 不是，直接删除冲突文件夹的所有子文件夹
                                     folderUtil.deleteAllChildFolder(f.getFolderId());
                                     // 再将原文件夹移入目标文件夹内
@@ -995,16 +973,15 @@ public class FileServiceImpl
                                 // 是，则以新名称生成对应的原文件夹副本在目标文件夹里面
                                 Folder newFolder = folderUtil.copyFolderByNewNameToPath(folder, account, targetFolder
                                         , FileNodeUtil
-                                        .getNewFolderName(folder.getFolderName(),
-                                                folderMapper.queryByParentId(locationpath)));
+                                                .getNewFolderName(folder.getFolderName(),
+                                                        folderMapper.queryByParentId(locationpath)));
                                 if (newFolder == null) {
                                     return "cannotMoveFiles";
                                 }
                                 // 成功，记录日志
                                 this.logUtil.writeMoveFolderEvent(account, ip, originPath,
                                         folderUtil.getFolderPath(newFolder), isCopy);
-                            }
-                            else {
+                            } else {
                                 // 不是，将原节点的名称改为计数名称，父文件夹改为目标文件夹
                                 folder.setFolderParent(locationpath);
                                 folder.setFolderName(FileNodeUtil.getNewFolderName(folder.getFolderName(),
@@ -1039,8 +1016,7 @@ public class FileServiceImpl
                         }
                     }
                     // 冲突情况处理完成
-                }
-                else {
+                } else {
                     // 不存在冲突，直接移动或复制
                     // 仍然是先检查移动后是否会引发文件列表超限
                     if (folderMapper.countByParentId(locationpath) >= FileNodeUtil.MAXIMUM_NUM_OF_SINGLE_FOLDER) {
@@ -1056,8 +1032,7 @@ public class FileServiceImpl
                         // 操作成功，记录日志
                         this.logUtil.writeMoveFolderEvent(account, ip, originPath,
                                 folderUtil.getFolderPath(newFolder), isCopy);
-                    }
-                    else {
+                    } else {
                         // 否，直接将原文件夹移入目标文件夹内
                         folder.setFolderParent(locationpath);
                         // 确保移入后访问级别不越界
@@ -1087,8 +1062,7 @@ public class FileServiceImpl
             }
             // 上述操作全部成功而未中途退出的话，则证明移动任务顺利结束，返回成功提示信息
             return "moveFilesSuccess";
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             // 如果中途产生了异常，那么返回失败提示
             return ERROR_PARAMETER;
         }
@@ -1151,8 +1125,7 @@ public class FileServiceImpl
                     if (nodeMapper.queryByParentFolderId(locationpath).parallelStream()
                             .anyMatch((e) -> e.getFileName().equals(node.getFileName()))) {
                         repeNodes.add(node);// 与目标文件夹里的某个文件夹重名？重名列表加一
-                    }
-                    else {
+                    } else {
                         needMovefilesCount++;// 上述问题都没出现？合法文件加一
                     }
                 }
@@ -1187,8 +1160,7 @@ public class FileServiceImpl
                     if (folderMapper.queryByParentId(locationpath).parallelStream()
                             .anyMatch((e) -> e.getFolderName().equals(folder.getFolderName()))) {
                         repeFolders.add(folder);// 与目标文件夹里的某个文件夹重名？重名列表加一
-                    }
-                    else {
+                    } else {
                         needMoveFoldersCount++;// 上述问题都没出现？合法文件夹加一
                     }
                 }
@@ -1209,8 +1181,7 @@ public class FileServiceImpl
                     return "duplicationFileName:" + gson.toJson(repeMap);// 若有，则将冲突列表返回前端
                 }
                 return "confirmMoveFiles";
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 return ERROR_PARAMETER;
             }
         }
@@ -1267,8 +1238,7 @@ public class FileServiceImpl
                     return gson.toJson(cifr);
                 }
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             cifr.setResult(ERROR_PARAMETER);
             return gson.toJson(cifr);
         }
@@ -1280,18 +1250,15 @@ public class FileServiceImpl
             if (config.accessFolder(testFolder, account) && config
                     .authorized(account, AccountAuth.DELETE_FILE_OR_FOLDER, folderUtil.getAllFoldersId(folderId))) {
                 cifr.setResult("repeatFolder_coverOrBoth");
-            }
-            else {
+            } else {
                 cifr.setResult("repeatFolder_Both");
             }
             return gson.toJson(cifr);
-        }
-        catch (NoSuchElementException e) {
+        } catch (NoSuchElementException e) {
             if (folderMapper.countByParentId(folderId) >= FileNodeUtil.MAXIMUM_NUM_OF_SINGLE_FOLDER) {
                 // 检查目标文件夹内的文件夹数目是否超限
                 cifr.setResult(FOLDERS_TOTAL_OUT_OF_LIMIT);
-            }
-            else {
+            } else {
                 // 通过所有检查，允许上传
                 cifr.setResult("permitUpload");
             }
@@ -1346,12 +1313,10 @@ public class FileServiceImpl
                 if (ifc < pc) {
                     return UPLOAD_ERROR;
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 return UPLOAD_ERROR;
             }
-        }
-        else {
+        } else {
             return UPLOAD_ERROR;
         }
         // 计算相对路径的文件夹ID（即真正要保存的文件夹目标）
@@ -1369,8 +1334,7 @@ public class FileServiceImpl
             Folder newFolder;
             try {
                 newFolder = folderUtil.createNewFolder(folderId, account, pName, folderConstraint);
-            }
-            catch (FoldersTotalOutOfLimitException e1) {
+            } catch (FoldersTotalOutOfLimitException e1) {
                 return FOLDERS_TOTAL_OUT_OF_LIMIT;
             }
             if (newFolder == null) {
@@ -1380,12 +1344,10 @@ public class FileServiceImpl
                 Folder target = folderMapper.queryByParentIdAndFolderName(key);
                 if (target != null) {
                     folderId = target.getFolderId();// 向下迭代直至将父路径全部迭代完毕并找到最终路径
-                }
-                else {
+                } else {
                     return UPLOAD_ERROR;
                 }
-            }
-            else {
+            } else {
                 if (!folderUtil.isValidFolder(newFolder)) {
                     return UPLOAD_ERROR;
                 }
@@ -1413,8 +1375,7 @@ public class FileServiceImpl
             // 成功，则记录日志并返回成功提示
             this.logUtil.writeUploadFileEvent(request, newNode, account);
             return UPLOAD_SUCCESS;
-        }
-        else {
+        } else {
             // 失败，则清理残留文件块并返回失败提示
             block.delete();
             return UPLOAD_ERROR;

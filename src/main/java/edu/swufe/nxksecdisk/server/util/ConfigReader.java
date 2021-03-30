@@ -307,8 +307,7 @@ public class ConfigReader {
                 AppSystem.out.println("准备就绪。");
                 startAccountRealTimeUpdateListener();
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             System.err.printf("错误：无法加载一个或多个配置文件（位于%s路径下），请尝试删除旧的配置文件并重新启动本应用或查看安装路径的权限（必须可读写）\n", this.confdir);
             // 顺序问题, 先加载会出问题;
 //            AppSystem.out.printf("错误：无法加载一个或多个配置文件（位于%s路径下），请尝试删除旧的配置文件并重新启动本应用或查看安装路径的权限（必须可读写）。", this.confdir);
@@ -715,8 +714,7 @@ public class ConfigReader {
                     this.serverp.store(new FileOutputStream(this.confdir + SERVER_PROPERTIES_FILE), null);
                     AppSystem.out.println("配置更新完毕，准备就绪。");
                     return true;
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     AppSystem.out.println("错误：更新设置失败，无法存入设置文件。");
                 }
             }
@@ -757,8 +755,7 @@ public class ConfigReader {
                     AppSystem.out.println("错误：端口号配置不正确，必须使用1-65535之间的整数。");
                     return INVALID_PORT;
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 AppSystem.out.println("错误：端口号配置不正确，必须使用1-65535之间的整数。");
                 return INVALID_PORT;
             }
@@ -838,8 +835,7 @@ public class ConfigReader {
                     AppSystem.out.println("错误：缓冲区大小设置无效。");
                     return INVALID_BUFFER_SIZE;
                 }
-            }
-            catch (Exception e2) {
+            } catch (Exception e2) {
                 AppSystem.out.println("错误：缓冲区大小设置无效。");
                 return INVALID_BUFFER_SIZE;
             }
@@ -925,8 +921,7 @@ public class ConfigReader {
                 Class.forName(dbDriver).newInstance();
                 Connection testConn = DriverManager.getConnection(dbURL, dbUser, dbPwd);
                 testConn.close();
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 AppSystem.out.println(
                         "错误：无法连接至自定义数据库：" + dbURL + "（user=" + dbUser + ",password=" + dbPwd + "），请确重新配置MySQL数据库相关项。");
                 return CANT_CONNECT_DB;
@@ -968,8 +963,7 @@ public class ConfigReader {
                             AppSystem.out.println("错误：无法启用https支持，https访问端口号配置不正确。");
                             return HTTPS_SETTING_ERROR;
                         }
-                    }
-                    catch (Exception e) {
+                    } catch (Exception e) {
                         AppSystem.out.println("错误：无法启用https支持，https访问端口号配置不正确。");
                         return HTTPS_SETTING_ERROR;
                     }
@@ -1050,11 +1044,9 @@ public class ConfigReader {
             dsp.store(new FileOutputStream(this.confdir + SERVER_PROPERTIES_FILE),
                     "<This is the default kiftd server setting file. >");
             AppSystem.out.println("初始服务器配置文件生成完毕。");
-        }
-        catch (FileNotFoundException e) {
+        } catch (FileNotFoundException e) {
             AppSystem.out.println("错误：无法生成初始服务器配置文件，存储路径不存在。");
-        }
-        catch (IOException e2) {
+        } catch (IOException e2) {
             AppSystem.out.println("错误：无法生成初始服务器配置文件，写入失败。");
         }
     }
@@ -1069,11 +1061,9 @@ public class ConfigReader {
         try (FileOutputStream accountSettingOut = new FileOutputStream(this.confdir + ACCOUNT_PROPERTIES_FILE)) {
             dap.store(accountSettingOut, "<This is the default kiftd account setting file. >");
             AppSystem.out.println("初始账户配置文件生成完毕。");
-        }
-        catch (FileNotFoundException e) {
+        } catch (FileNotFoundException e) {
             AppSystem.out.println("错误：无法生成初始账户配置文件，存储路径不存在。");
-        }
-        catch (IOException e2) {
+        } catch (IOException e2) {
             AppSystem.out.println("错误：无法生成初始账户配置文件，写入失败。");
         }
     }
@@ -1258,7 +1248,8 @@ public class ConfigReader {
             return requireMaxSizeByString(defaultMaxSizeP);
         } else {
             String accountMaxSizeP = accountp.getProperty(account + ".maxSize");
-            return accountMaxSizeP == null ? requireMaxSizeByString(defaultMaxSizeP) : requireMaxSizeByString(accountMaxSizeP);
+            return accountMaxSizeP == null ? requireMaxSizeByString(defaultMaxSizeP) :
+                    requireMaxSizeByString(accountMaxSizeP);
         }
     }
 
@@ -1318,8 +1309,7 @@ public class ConfigReader {
             } else {
                 r = Integer.parseInt(in.trim());
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return r;
@@ -1341,7 +1331,8 @@ public class ConfigReader {
             return requireMaxRateByString(defaultMaxRateP);
         } else {
             String accountMaxRateP = accountp.getProperty(account + ".maxRate");
-            return accountMaxRateP == null ? requireMaxRateByString(defaultMaxRateP) : requireMaxRateByString(accountMaxRateP);
+            return accountMaxRateP == null ? requireMaxRateByString(defaultMaxRateP) :
+                    requireMaxRateByString(accountMaxRateP);
         }
     }
 
@@ -1396,8 +1387,7 @@ public class ConfigReader {
             } else {
                 r = Integer.parseInt(in.trim());
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return r;
@@ -1435,8 +1425,7 @@ public class ConfigReader {
             try (FileOutputStream accountSettingOut = new FileOutputStream(this.confdir + ACCOUNT_PROPERTIES_FILE)) {
                 accountp.store(accountSettingOut, null);
                 return true;
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 AppSystem.out.println("错误：更新账户配置文件时出现错误，请立即检查账户配置文件。");
                 return false;
             }
@@ -1502,8 +1491,7 @@ public class ConfigReader {
                             this.confdir + ACCOUNT_PROPERTIES_FILE)) {
                         accountp.store(accountSettingOut, null);
                         return true;
-                    }
-                    catch (Exception e) {
+                    } catch (Exception e) {
                         throw e;
                     }
                 }
@@ -1601,8 +1589,7 @@ public class ConfigReader {
                             this.confdir + ACCOUNT_PROPERTIES_FILE)) {
                         accountp.store(accountSettingOut, null);
                         return true;
-                    }
-                    catch (Exception e) {
+                    } catch (Exception e) {
                         throw e;
                     }
                 }
@@ -1686,16 +1673,14 @@ public class ConfigReader {
                                 initIPRules();
                                 initSignUpRules();
                                 AppSystem.out.println("账户配置更新完成，已加载最新配置。");
-                            }
-                            else {
+                            } else {
                                 accountp.clear();
                                 AppSystem.out.println("警告：账户配置文件已被删除或无法读取，账户信息已清空。");
                             }
                         }
                     }
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 AppSystem.out.println("错误：用户配置文件更改监听失败，该功能已失效，kiftd无法实时更新用户配置（可尝试重启程序以恢复该功能）。");
             }
         };

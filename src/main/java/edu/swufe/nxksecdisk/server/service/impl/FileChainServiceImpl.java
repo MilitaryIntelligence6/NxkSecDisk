@@ -84,13 +84,11 @@ public class FileChainServiceImpl
                             }
                         }
                         statusCode = 404;
-                    }
-                    catch (Exception e) {
+                    } catch (Exception e) {
                         logUtil.writeException(e);
                         statusCode = 500;
                     }
-                }
-                else {
+                } else {
                     statusCode = 404;
                 }
             }
@@ -98,8 +96,7 @@ public class FileChainServiceImpl
         try {
             // 处理无法下载的资源
             response.sendError(statusCode);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -128,13 +125,11 @@ public class FileChainServiceImpl
                                     if (propertiesMapper.insert(chainAESKey) > 0) {
                                         return cipher.encrypt(aesKey, fid);
                                     }
-                                }
-                                else {
+                                } else {
                                     // 如果已经有了，则直接用其加密
                                     return cipher.encrypt(keyProp.getPropertyValue(), fid);
                                 }
-                            }
-                            catch (Exception e) {
+                            } catch (Exception e) {
                                 logUtil.writeException(e);
                             }
                         }

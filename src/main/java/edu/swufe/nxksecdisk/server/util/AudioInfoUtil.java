@@ -99,8 +99,7 @@ public class AudioInfoUtil {
                     }
                 }
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -128,8 +127,7 @@ public class AudioInfoUtil {
     private String transformCharsetEncoding(final byte[] buf, final int offset, final int length) {
         try {
             return new String(buf, offset, length, txtCharsetGetter.getTxtCharset(buf, offset, length)).trim();
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             logUtil.writeException(ex);
         }
         return "";

@@ -62,8 +62,7 @@ public class LogUtil {
         File logFile = new File(logs);
         if (!logFile.exists()) {
             logFile.mkdir();
-        }
-        else {
+        } else {
             if (!logFile.isDirectory()) {
                 logFile.delete();
                 logFile.mkdir();
@@ -507,8 +506,7 @@ public class LogUtil {
             if (t.equals(logName) && writer != null) {
                 writer.write(finalContent);
                 writer.flush();
-            }
-            else {
+            } else {
                 File f = new File(logs, t + ".klog");
                 logName = t;
                 if (writer != null) {
@@ -518,8 +516,7 @@ public class LogUtil {
                 writer.write(finalContent);
                 writer.flush();
             }
-        }
-        catch (Exception e1) {
+        } catch (Exception e1) {
             AppSystem.out.println(String.format("KohgylwIFT:[Log]Cannt write to file,message:%s", e1.getMessage()));
         }
     }

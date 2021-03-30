@@ -156,8 +156,7 @@ public class FileSystemManager {
             countNodesByFolderId = c.prepareStatement("SELECT count(file_id) FROM FILE WHERE file_parent_folder = ?");
             countFoldersByParentFolderId = c
                     .prepareStatement("SELECT count(folder_id) FROM FOLDER WHERE folder_parent = ?");
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             AppSystem.out.println("错误：出现未知错误，文件系统解析失败，无法浏览文件。");
         }
     }
@@ -182,8 +181,7 @@ public class FileSystemManager {
             fv.setFiles(selectNodesByFolderId(folderId));
             fv.setFolders(getFoldersByParentId(folderId));
             return fv;
-        }
-        else {
+        } else {
             throw new SQLException();
         }
     }
@@ -257,8 +255,7 @@ public class FileSystemManager {
             if (f.isDirectory() && folders.parallelStream().anyMatch((e) -> e.getFolderName()
                     .equals(new String(f.getName().getBytes(Charset.forName("UTF-8")), Charset.forName("UTF-8"))))) {
                 result++;
-            }
-            else if (nodes.parallelStream().anyMatch((e) -> e.getFileName()
+            } else if (nodes.parallelStream().anyMatch((e) -> e.getFileName()
                     .equals(new String(f.getName().getBytes(Charset.forName("UTF-8")), Charset.forName("UTF-8"))))) {
                 result++;
             }
@@ -295,15 +292,13 @@ public class FileSystemManager {
                 if (f.isDirectory() && folders.parallelStream().anyMatch((e) -> e.getFolderName().equals(
                         new String(f.getName().getBytes(Charset.forName("UTF-8")), Charset.forName("UTF-8"))))) {
                     c++;
-                }
-                else if (nodes.parallelStream().anyMatch((e) -> e.getFileName().equals(
+                } else if (nodes.parallelStream().anyMatch((e) -> e.getFileName().equals(
                         new String(f.getName().getBytes(Charset.forName("UTF-8")), Charset.forName("UTF-8"))))) {
                     c++;
                 }
             }
             return c;
-        }
-        else {
+        } else {
             throw new IllegalArgumentException();
         }
     }
@@ -326,8 +321,7 @@ public class FileSystemManager {
         for (int i = 0; i < files.length && gono; i++) {
             if (files[i].isDirectory()) {
                 importFolderInto(files[i], folderId, type);
-            }
-            else {
+            } else {
                 importFileInto(files[i], folderId, type);
             }
         }
@@ -357,6 +351,7 @@ public class FileSystemManager {
 
     /**
      * 根据ID查询文件夹对象，无符合对象则返回null;
+     *
      * @param folderId
      * @return
      * @throws SQLException
@@ -372,6 +367,7 @@ public class FileSystemManager {
 
     /**
      * 根据ID查询文件节点对象，无符合对象则返回null;
+     *
      * @param nodeId
      * @return
      * @throws SQLException
@@ -387,6 +383,7 @@ public class FileSystemManager {
 
     /**
      * 查询指定文件夹内的所有文件节点，如无符合则返回空List;
+     *
      * @param folderId
      * @return
      * @throws SQLException
@@ -403,6 +400,7 @@ public class FileSystemManager {
 
     /**
      * 查询指定Block ID对应的所有文件节点，但不会包括指定ID的文件节点，如无符合则返回空List;
+     *
      * @param path
      * @param fileId
      * @return
@@ -421,6 +419,7 @@ public class FileSystemManager {
 
     /**
      * 插入一个新的文件节点并返回插入结果，0失败，1成功;
+     *
      * @param n
      * @return
      * @throws SQLException
@@ -439,6 +438,7 @@ public class FileSystemManager {
 
     /**
      * 插入一个新的文件夹节点，返回值同上;
+     *
      * @param f
      * @return
      * @throws SQLException
@@ -456,6 +456,7 @@ public class FileSystemManager {
 
     /**
      * 将SQL结果集封装为Node对象;
+     *
      * @param r
      * @return
      * @throws SQLException
@@ -474,6 +475,7 @@ public class FileSystemManager {
 
     /**
      * 将SQL结果集封装为Folder对象;
+     *
      * @param r
      * @return
      * @throws SQLException
@@ -491,6 +493,7 @@ public class FileSystemManager {
 
     /**
      * 将一个本地文件导入到文件系统中，注意，导入的必须是文件而不是文件夹;
+     *
      * @param f
      * @param folderId
      * @param type
@@ -516,7 +519,7 @@ public class FileSystemManager {
                         // 覆盖
                         Node node =
                                 nodes.parallelStream().filter((e) -> e.getFileName().equals(f.getName())).findFirst()
-                                .get();// 得到重名节点，覆盖它
+                                        .get();// 得到重名节点，覆盖它
                         // 首先，将必须要更新的信息刷入目标节点
                         node.setFileCreationDate(ServerTimeUtil.accurateToDay());
                         node.setFileCreator("SYS_IN");
@@ -532,18 +535,15 @@ public class FileSystemManager {
                                 transferFile(f, block);
                                 if (selectFolderById(folderId) != null && selectNodeById(node.getFileId()) != null) {
                                     return;// 如果该节点的父节点有效，并且过程中本节点也未丢失，则执行完毕
-                                }
-                                else {
+                                } else {
                                     deleteNodeById(node.getFileId());
                                     block.delete();
                                     throw new SQLException();// 否则覆盖失败，清理此节点和残留的文件块，并抛出异常
                                 }
-                            }
-                            else {
+                            } else {
                                 throw new SQLException();// 如果更新失败，则原节点不会有任何变化，直接抛出异常
                             }
-                        }
-                        else {
+                        } else {
                             // 如果该节点对应的文件块是与其他节点共享的，则要为其独立创建一个文件块，再更新节点的文件块信息
                             final File block = saveToFileBlocks(f);
                             if (block == null) {
@@ -553,14 +553,12 @@ public class FileSystemManager {
                             if (updateNode(node) > 0) {
                                 if (selectFolderById(folderId) != null && selectNodeById(node.getFileId()) != null) {
                                     return;// 如果检查没问题，则覆盖完成
-                                }
-                                else {
+                                } else {
                                     deleteNodeById(node.getFileId());
                                     block.delete();
                                     throw new SQLException();// 否则，也要删除此节点和残留文件块，并抛出异常
                                 }
-                            }
-                            else {
+                            } else {
                                 throw new SQLException();// 更新失败的话，则原节点不会有任何变化，直接抛出异常
                             }
                         }
@@ -605,8 +603,7 @@ public class FileSystemManager {
                         }
                     }
                     break;
-                }
-                catch (Exception e2) {
+                } catch (Exception e2) {
                     // 如果插入时出现异常，可能是由于主键重复或意外错误导致的，用新的主键再试
                     node.setFileId(UUID.randomUUID().toString());
                     i++;
@@ -626,6 +623,7 @@ public class FileSystemManager {
 
     /**
      * 将一个本地文件夹导入至文件系统，必须是文件夹而不是文件。它会自动将其中的文件和文件夹也一并导入;
+     *
      * @param f
      * @param folderId
      * @param type
@@ -666,8 +664,7 @@ public class FileSystemManager {
                 folder.setFolderParent(folderId);
                 if ("root".equals(parent.getFolderId())) {
                     folder.setFolderCreator("SYS_IN");
-                }
-                else {
+                } else {
                     folder.setFolderCreator(parent.getFolderCreator());
                 }
                 folder.setFolderCreationDate(ServerTimeUtil.accurateToDay());
@@ -679,8 +676,7 @@ public class FileSystemManager {
                             throw new SQLException();
                         }
                         break;
-                    }
-                    catch (Exception e2) {
+                    } catch (Exception e2) {
                         folder.setFolderId(UUID.randomUUID().toString());
                         i++;
                     }
@@ -688,8 +684,7 @@ public class FileSystemManager {
                         break;
                     }
                 }
-            }
-            else {
+            } else {
                 folder.setFolderCreationDate(ServerTimeUtil.accurateToDay());
                 if (updateFolder(folder) == 0 || selectFolderById(folderId) == null) {
                     deleteFolderById(folder.getFolderId());
@@ -701,20 +696,19 @@ public class FileSystemManager {
             for (int i = 0; i < childs.length && gono; i++) {
                 if (childs[i].isDirectory()) {
                     importFolderInto(childs[i], folder.getFolderId(), type);
-                }
-                else {
+                } else {
                     importFileInto(childs[i], folder.getFolderId(), type);
                 }
             }
             // 迭代执行直至将全部文件夹及文件导入完毕为止
-        }
-        else {
+        } else {
             throw new IllegalArgumentException();
         }
     }
 
     /**
      * 删除一个文件节点;
+     *
      * @param nodeId
      * @return
      * @throws SQLException
@@ -727,6 +721,7 @@ public class FileSystemManager {
 
     /**
      * 删除一个文件夹;
+     *
      * @param folderId
      * @return
      * @throws SQLException
@@ -739,6 +734,7 @@ public class FileSystemManager {
 
     /**
      * 修改节点;
+     *
      * @param n
      * @return
      * @throws SQLException
@@ -757,6 +753,7 @@ public class FileSystemManager {
 
     /**
      * 修改文件夹;
+     *
      * @param f
      * @return
      * @throws SQLException
@@ -774,6 +771,7 @@ public class FileSystemManager {
 
     /**
      * 删除一个文件夹;
+     *
      * @param folderId
      * @throws SQLException
      */
@@ -807,6 +805,7 @@ public class FileSystemManager {
 
     /**
      * 删除一个文件;
+     *
      * @param nodeId
      * @throws SQLException
      */
@@ -826,8 +825,7 @@ public class FileSystemManager {
                         per = 100;
                         return;
                     }
-                }
-                else {
+                } else {
                     per = 100;
                     return;
                 }
@@ -838,6 +836,7 @@ public class FileSystemManager {
 
     /**
      * 导出一个文件节点;
+     *
      * @param nodeId
      * @param path
      * @param type
@@ -896,6 +895,7 @@ public class FileSystemManager {
 
     /**
      * 导出一个文件夹;
+     *
      * @param folderId
      * @param path
      * @param type
@@ -970,8 +970,7 @@ public class FileSystemManager {
             if (f.getFilePath().startsWith("file_")) {// 存放于主文件系统中
                 // 直接从主文件系统的文件块存放区获得对应的文件块
                 file = new File(config.requireFileBlockPath(), f.getFilePath());
-            }
-            else {// 存放于扩展存储区
+            } else {// 存放于扩展存储区
                 short index = Short.parseShort(f.getFilePath().substring(0, f.getFilePath().indexOf('_')));
                 // 根据编号查到对应的扩展存储区路径，进而获取对应的文件块
                 file = new File(config.requireExtendStores().parallelStream()
@@ -980,8 +979,7 @@ public class FileSystemManager {
             if (file.isFile()) {
                 return file;
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             AppSystem.out.println("错误：文件数据读取失败。详细信息：" + e.getMessage());
         }
         return null;
@@ -997,15 +995,13 @@ public class FileSystemManager {
                 public int compare(ExtendStores o1, ExtendStores o2) {
                     try {
                         return o1.getPath().list().length - o2.getPath().list().length;
-                    }
-                    catch (Exception e) {
+                    } catch (Exception e) {
                         try {
                             // 如果文件太多以至于超出数组上限，则换用如下统计方法
                             long dValue = Files.list(o1.getPath().toPath()).count()
                                     - Files.list(o2.getPath().toPath()).count();
                             return dValue > 0L ? 1 : dValue == 0 ? 0 : -1;
-                        }
-                        catch (IOException e1) {
+                        } catch (IOException e1) {
                             return 0;
                         }
                     }
@@ -1020,12 +1016,10 @@ public class FileSystemManager {
                         if (file != null) {
                             transferFile(f, file);// 则执行存放，并将文件命名为“{存储区编号}_{UUID}.block”的形式
                             return file;
-                        }
-                        else {
+                        } else {
                             continue;
                         }
-                    }
-                    catch (Exception e) {
+                    } catch (Exception e) {
                         // 如果无法存入（由于体积过大或其他问题），那么继续尝试其他扩展存储区
                         e.printStackTrace();
                         AppSystem.out.println(e.getMessage());
@@ -1042,8 +1036,7 @@ public class FileSystemManager {
                 transferFile(f, target);
                 return target;
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             AppSystem.out.printf("错误：文件块生成失败，无法存入新的文件数据。详细信息：%s", e.getMessage());
         }
         return null;
@@ -1051,6 +1044,7 @@ public class FileSystemManager {
 
     /**
      * 生成创建一个在指定路径下名称（编号）绝对不重复的新文件块;
+     *
      * @param prefix
      * @param parent
      * @return
@@ -1065,12 +1059,10 @@ public class FileSystemManager {
             if (appendIndex >= 0 && appendIndex < Integer.MAX_VALUE) {
                 newBlock = new File(parent, newName + "_" + appendIndex + ".block");
                 appendIndex++;
-            }
-            else {
+            } else {
                 if (retryNum >= 5) {
                     return null;
-                }
-                else {
+                } else {
                     newName = prefix + UUID.randomUUID().toString().replace("-", "");
                     newBlock = new File(parent, newName + ".block");
                     retryNum++;

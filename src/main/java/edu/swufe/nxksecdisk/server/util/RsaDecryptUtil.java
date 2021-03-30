@@ -27,8 +27,7 @@ public class RsaDecryptUtil {
         try {
             RsaDecryptUtil.keyFactory = KeyFactory.getInstance("RSA");
             RsaDecryptUtil.cipher = Cipher.getInstance("RSA");
-        }
-        catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
             e.printStackTrace();
         }
     }
@@ -42,8 +41,7 @@ public class RsaDecryptUtil {
             RsaDecryptUtil.cipher.init(2, key);
             final byte[] f = RsaDecryptUtil.cipher.doFinal(s);
             return new String(f);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             AppSystem.out.println(e.getMessage());
             AppSystem.out.println("错误：RSA解密失败。");

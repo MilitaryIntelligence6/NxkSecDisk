@@ -101,8 +101,7 @@ public class ServerUiModule extends DiskDynamicWindow {
         try {
             getWindow().setIconImage(
                     ImageIO.read(this.getClass().getResourceAsStream("/icon/icon.png")));
-        }
-        catch (NullPointerException | IOException e) {
+        } catch (NullPointerException | IOException e) {
             e.printStackTrace();
         }
         if (SystemTray.isSupported()) {
@@ -115,8 +114,7 @@ public class ServerUiModule extends DiskDynamicWindow {
             }
             try {
                 trayIcon = new TrayIcon(ImageIO.read(this.getClass().getResourceAsStream(iconType)));
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 e.printStackTrace();
             }
             trayIcon.setToolTip("青阳网络文件系统-kiftd");
@@ -165,8 +163,7 @@ public class ServerUiModule extends DiskDynamicWindow {
             trayIcon.setPopupMenu(pMenu);
             try {
                 tray.add(trayIcon);
-            }
-            catch (AWTException e) {
+            } catch (AWTException e) {
                 e.printStackTrace();
             }
         } else {
@@ -392,8 +389,7 @@ public class ServerUiModule extends DiskDynamicWindow {
             int end = 0;
             try {
                 end = out.getLineEndOffset(100);
-            }
-            catch (Exception exc) {
+            } catch (Exception exc) {
                 exc.printStackTrace();
             }
             out.replaceRange("", 0, end);
@@ -494,8 +490,7 @@ public class ServerUiModule extends DiskDynamicWindow {
         try {
             fsViewer = FsViewer.getInstance();
             fsViewer.show();
-        }
-        catch (SQLException e1) {
+        } catch (SQLException e1) {
             e1.printStackTrace();
             AppSystem.out.println("错误：无法读取文件，文件系统可能已经损坏，您可以尝试重启应用。");
         }
@@ -558,8 +553,7 @@ public class ServerUiModule extends DiskDynamicWindow {
         try {
             fsViewer = FsViewer.getInstance();
             fsViewer.show();
-        }
-        catch (SQLException e1) {
+        } catch (SQLException e1) {
             e1.printStackTrace();
             JOptionPane.showMessageDialog(getWindow(), "错误：无法打开文件，文件系统可能已损坏，您可以尝试重启应用。", "错误",
                     JOptionPane.ERROR_MESSAGE);

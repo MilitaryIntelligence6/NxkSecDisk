@@ -99,8 +99,7 @@ public class FileNodeUtil {
                         state41.close();
                     }
                     state4.close();
-                }
-                else {
+                } else {
                     final Statement state4 = conn.createStatement();
                     state4.execute("CREATE INDEX IF NOT EXISTS file_index ON FILE (file_name)");
                     state4.close();
@@ -113,8 +112,7 @@ public class FileNodeUtil {
                 state5.close();
             }
             AppSystem.out.println("文件节点初始化完毕。");
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             AppSystem.out.println(e.getMessage());
             AppSystem.out.println("错误：文件节点初始化失败。");
         }
@@ -158,8 +156,7 @@ public class FileNodeUtil {
                         originalName.substring(0, originalName.lastIndexOf(".")),
                         i,
                         originalName.substring(originalName.lastIndexOf(".")));
-            }
-            else {
+            } else {
                 newName = String.format("%s (%d)",
                         originalName, i);
             }
@@ -236,8 +233,7 @@ public class FileNodeUtil {
             if (n.getFileName().indexOf(".") >= 0) {
                 newName = n.getFileName().substring(0, n.getFileName().lastIndexOf(".")) + " (" + i + ")"
                         + n.getFileName().substring(n.getFileName().lastIndexOf("."));
-            }
-            else {
+            } else {
                 newName = n.getFileName() + " (" + i + ")";
             }
         }

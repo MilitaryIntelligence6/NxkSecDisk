@@ -78,8 +78,7 @@ public class FileBlockUtil {
                 while (listFiles.hasNext()) {
                     listFiles.next().toFile().delete();
                 }
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 logUtil.writeException(e);
                 // FIXME 所有format换成printf;
                 AppSystem.out.println(String.format("错误：临时文件清理失败，请手动清理%s文件夹内的临时文件。", f.getAbsolutePath()));
@@ -112,15 +111,13 @@ public class FileBlockUtil {
                 try {
                     // 通常情况下，直接比较子文件列表长度即可
                     return o1.getPath().list().length - o2.getPath().list().length;
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     try {
                         // 如果文件太多以至于超出数组上限，则换用如下统计方法
                         long dValue = Files.list(o1.getPath().toPath()).count()
                                 - Files.list(o2.getPath().toPath()).count();
                         return dValue > 0L ? 1 : dValue == 0 ? 0 : -1;
-                    }
-                    catch (IOException e1) {
+                    } catch (IOException e1) {
                         return 0;
                     }
                 }
@@ -137,12 +134,10 @@ public class FileBlockUtil {
                         } else {
                             continue;// 如果本处无法生成新的文件块，那么在其他路径下继续尝试
                         }
-                    }
-                    catch (IOException e) {
+                    } catch (IOException e) {
                         // 如果无法存入（由于体积过大或其他问题），那么继续尝试其他扩展存储区
                         continue;
-                    }
-                    catch (Exception e) {
+                    } catch (Exception e) {
                         logUtil.writeException(e);
                         AppSystem.out.println(e.getMessage());
                         continue;
@@ -157,8 +152,7 @@ public class FileBlockUtil {
                 f.transferTo(file);// 执行存放，并肩文件命名为“file_{UUID}.block”的形式
                 return file;
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             logUtil.writeException(e);
             AppSystem.out.println("错误：文件块生成失败，无法存入新的文件数据。详细信息：" + e.getMessage());
         }
@@ -260,8 +254,7 @@ public class FileBlockUtil {
             if (file.isFile()) {
                 return file;
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             logUtil.writeException(e);
             AppSystem.out.println("错误：文件数据读取失败。详细信息：" + e.getMessage());
         }
@@ -380,15 +373,21 @@ public class FileBlockUtil {
             }
             ZipUtil.pack(zs.toArray(new ZipEntrySource[0]), f);
             return zipname;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             logUtil.writeException(e);
             AppSystem.out.println(e.getMessage());
             return null;
         }
     }
 
-    // 迭代生成ZIP文件夹单元，将一个文件夹内的文件和文件夹也进行打包
+    /**
+     * 迭代生成ZIP文件夹单元，将一个文件夹内的文件和文件夹也进行打包;
+     *
+     * @param f
+     * @param zs
+     * @param account
+     * @param parentPath
+     */
     private void addFoldersToZipEntrySourceArray(Folder f, List<ZipEntrySource> zs, String account, String parentPath) {
         if (f != null && config.accessFolder(f, account)) {
             String folderName = f.getFolderName();
@@ -512,8 +511,7 @@ public class FileBlockUtil {
                     }
                 }
                 break;
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 f2.setFileId(UUID.randomUUID().toString());
                 i++;
             }
@@ -544,9 +542,11 @@ public class FileBlockUtil {
             // 那么它就是一个无效的节点，应将插入操作撤销
             // 所谓撤销，也就是将该节点的数据立即删除（如果有）
             nodeMapper.deleteById(n.getFileId());
-            return false;// 返回“无效”的判定结果
+            // 返回“无效”的判定结果;
+            return false;
         } else {
-            return true;// 否则，该节点有效，返回结果
+            // 否则，该节点有效，返回结果;
+            return true;
         }
     }
 
@@ -594,8 +594,7 @@ public class FileBlockUtil {
                         }
                     }
                 }
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 AppSystem.out.println("警告：文件节点效验时发生意外错误，可能未能正确完成文件节点效验。错误信息：" + e.getMessage());
                 logUtil.writeException(e);
             }

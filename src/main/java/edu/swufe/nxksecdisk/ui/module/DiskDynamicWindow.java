@@ -84,11 +84,9 @@ public class DiskDynamicWindow {
                 // 如果上述条件均满足，则使用用户定义的比例替换程序计算的比例;
                 proportion = udpi;
             }
-        }
-        catch (FileNotFoundException e) {
+        } catch (FileNotFoundException e) {
             System.out.println("未发现 init.txt 配置，使用计算的缩放比");
-        }
-        catch (Exception e1) {
+        } catch (Exception e1) {
             e1.printStackTrace();
         }
         if (proportion < 1.0) {

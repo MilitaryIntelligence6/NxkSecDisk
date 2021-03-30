@@ -135,8 +135,7 @@ public class PathsTable extends JTable {
                     });
                     resizeColumns();
                     validate();
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     // TODO: handle exception
                 }
             }
