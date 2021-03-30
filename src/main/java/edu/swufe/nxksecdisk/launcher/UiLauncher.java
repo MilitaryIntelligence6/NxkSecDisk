@@ -171,8 +171,16 @@ public class UiLauncher {
      * @throws Exception
      * @author 青阳龙野(kohgylw)
      */
-    public static UiLauncher build() {
-        return getInstance();
+    public static void launch() {
+        try {
+            getInstance();
+        }
+        catch (Exception e) {
+            // 提示：如果无法以图形界面启动，那么可能是由于资源引用失败或开发环境配置导致的，
+            // 您可以根据此处捕获的异常对其进行调试。
+            e.printStackTrace();
+            throw new RuntimeException("错误！无法以图形界面模式启动kiftd，您的操作系统可能不支持图形界面。您可以尝试使用命令模式参数“-console”来启动并开始使用kiftd");
+        }
     }
 
     private static void initSkin() {

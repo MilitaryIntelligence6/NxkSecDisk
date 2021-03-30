@@ -37,21 +37,11 @@ public class Application {
      */
     public static void main(final String[] args) {
         if (args == null || args.length == 0) {
-            try {
-                // 以界面模式启动kiftd;
-                UiLauncher.build();
-            }
-            catch (Exception e) {
-                // 提示：如果无法以图形界面启动，那么可能是由于资源引用失败或开发环境配置导致的，
-                // 您可以根据此处捕获的异常对其进行调试。
-                e.printStackTrace();
-                System.out.println(
-                        "错误！无法以图形界面模式启动kiftd，您的操作系统可能不支持图形界面。您可以尝试使用命令模式参数“-console”来启动并开始使用kiftd。");
-            }
-        }
-        else {
+            // 以界面模式启动kiftd;
+            UiLauncher.launch();
+        } else {
             // 以控制台模式启动kiftd;
-            ConsoleLauncher.build(args);
+            ConsoleLauncher.launch(args);
         }
     }
 }

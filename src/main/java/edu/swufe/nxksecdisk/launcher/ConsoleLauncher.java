@@ -83,10 +83,8 @@ public class ConsoleLauncher {
      * @return kohgylw.kiftd.mc.ConsoleRunner 本启动器唯一实例
      * @author 青阳龙野(kohgylw)
      */
-    public static ConsoleLauncher build(final String[] args) {
-        getInstance();
-        instance.execute(args);
-        return instance;
+    public static void launch(final String[] args) {
+        getInstance().execute(args);
     }
 
     /**
