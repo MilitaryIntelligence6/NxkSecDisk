@@ -146,28 +146,45 @@ public class HomeController {
         return this.fileService.checkUploadFile(request, response);
     }
 
-    // 上传文件夹的前置检查流程
+    /**
+     * 上传文件夹的前置检查流程;
+     * @param request
+     * @return
+     */
     @RequestMapping(value = {"/checkImportFolder.ajax"}, produces = {CHARSET_BY_AJAX})
     @ResponseBody
     public String checkImportFolder(final HttpServletRequest request) {
         return this.fileService.checkImportFolder(request);
     }
 
-    // 执行文件夹上传操作
+    /**
+     * 执行文件夹上传操作;
+     * @param request
+     * @param file
+     * @return
+     */
     @RequestMapping(value = {"/doImportFolder.ajax"}, produces = {CHARSET_BY_AJAX})
     @ResponseBody
     public String doImportFolder(final HttpServletRequest request, final MultipartFile file) {
         return fileService.doImportFolder(request, file);
     }
 
-    // 上传文件夹时，若存在同名文件夹并选择覆盖，则应先执行该方法，执行成功后再上传新的文件夹
+    /**
+     * 上传文件夹时，若存在同名文件夹并选择覆盖，则应先执行该方法，执行成功后再上传新的文件夹;
+     * @param request
+     * @return
+     */
     @RequestMapping(value = {"/deleteFolderByName.ajax"}, produces = {CHARSET_BY_AJAX})
     @ResponseBody
     public String deleteFolderByName(final HttpServletRequest request) {
         return folderService.deleteFolderByName(request);
     }
 
-    // 上传文件夹时，若存在同名文件夹并选择保留两者，则应先执行该方法，执行成功后使用返回的新文件夹名进行上传
+    /**
+     * 上传文件夹时，若存在同名文件夹并选择保留两者，则应先执行该方法，执行成功后使用返回的新文件夹名进行上传;
+     * @param request
+     * @return
+     */
     @RequestMapping(value = {"/createNewFolderByName.ajax"}, produces = {CHARSET_BY_AJAX})
     @ResponseBody
     public String createNewFolderByName(final HttpServletRequest request) {
@@ -315,21 +332,33 @@ public class HomeController {
         return accountService.doPong(request);
     }
 
-    // 询问是否开启自由注册新账户功能
+    /**
+     * 询问是否开启自由注册新账户功能;
+     * @param request
+     * @return
+     */
     @RequestMapping(value = {"/askForAllowSignUpOrNot.ajax"}, produces = {CHARSET_BY_AJAX})
     @ResponseBody
     public String askForAllowSignUpOrNot(final HttpServletRequest request) {
         return accountService.isAllowSignUp();
     }
 
-    // 处理注册新账户请求
+    /**
+     * 处理注册新账户请求;
+     * @param request
+     * @return
+     */
     @RequestMapping(value = {"/doSigUp.ajax"}, produces = {CHARSET_BY_AJAX})
     @ResponseBody
     public String doSigUp(final HttpServletRequest request) {
         return accountService.doSignUp(request);
     }
 
-    // 获取永久资源链接的对应ckey
+    /**
+     * 获取永久资源链接的对应ckey;
+     * @param request
+     * @return
+     */
     @RequestMapping(value = {"/getFileChainKey.ajax"}, produces = {CHARSET_BY_AJAX})
     @ResponseBody
     public String getFileChainKey(final HttpServletRequest request) {
