@@ -19,6 +19,8 @@ public final class AppSystem {
 
     public static final LogUtil log = null;
 
+    private AppSystem() {}
+
     private static IOutputStream requireOutStream() {
         switch (DynamicConfig.getLauncherMode()) {
             case CONSOLE: {
