@@ -100,7 +100,7 @@ public class DiskAppController {
             AppSystem.out.println("正在终止服务器引擎...");
             try {
                 DiskAppController.run =
-                        (SpringApplication.exit(DiskAppController.context, new ExitCodeGenerator[0]) != 0);
+                        SpringApplication.exit(DiskAppController.context) != 0;
                 AppSystem.out.println("服务器引擎已终止。");
                 return !DiskAppController.run;
             }
