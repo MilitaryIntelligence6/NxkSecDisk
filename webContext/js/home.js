@@ -29,7 +29,7 @@ var viewer; // viewer对象，用于预览图片功能
 var viewerPageIndex; // 分页预览图片——已浏览图片页号
 var viewerTotal; // 分页预览图片——总页码数
 var pvl;// 预览图片列表的JSON格式对象
-var checkFilesTip = "提示：您还未选择任何文件，请先选中一些文件后再执行本操作：<br /><br /><kbd>单击</kbd>：选中某一文件<br /><br /><kbd><kbd>Shift</kbd>+<kbd>单击</kbd></kbd>：选中多个文件<br /><br /><kbd><kbd>Shift</kbd>+<kbd>双击</kbd></kbd>：选中连续的文件<br /><br /><kbd><kbd>Shitf</kbd>+<kbd>A</kbd></kbd>：选中/取消选中所有文件";// 选取文件提示
+var checkFilesTip = "提示：您还未选择任何文件，请先选中一些文件后再执行本操作：<br /><br /><kbd>单击</kbd>：选中某一文件<br /><br /><kbd><kbd>Ctrl</kbd>+<kbd>单击</kbd></kbd>：选中多个文件<br /><br /><kbd><kbd>Shift</kbd>+<kbd>单击</kbd></kbd>：选中连续的文件<br /><br /><kbd><kbd>Ctrl</kbd>+<kbd>A</kbd></kbd>：选中/取消选中所有文件";// 选取文件提示
 var winHeight;// 窗口高度
 var pingInt;// 定时应答器的定时装置
 var noticeInited = false;// 公告信息的md5标识
@@ -281,7 +281,7 @@ $(function() {
 		}
 	}
 	// 各种快捷键绑定
-	$(document).keypress(
+	$(document).keydown(
 			function(e) {
 				if ($('.modal.shown').length == 0
 						|| ($('.modal.shown').length == 1 && $('.modal.shown')
@@ -291,44 +291,53 @@ $(function() {
 					if (isShift(e)
 							&& document.activeElement.id != "sreachKeyWordIn") {// 在按住shift的情况下……
 						switch (keyCode) {
-						case 65:// shift+a 全选
-							checkallfile();
-							break;
 						case 78:// shift+n 新建文件夹
 							$('#createFolderButtonLi a').click();
 							break;
 						case 85:// shift+u 上传文件
 							$('#uploadFileButtonLi a').click();
 							break;
-						case 68:// shift+d 删除
-							$('#deleteSeelectFileButtonLi a').click();
-							break;
 						case 70:// shift+f 上传文件夹
 							$('#uploadFolderButtonLi a').click();
 							break;
-						case 67:// shift+c 复制
+						default:
+							return true;
+						}
+					} else if (isCtrl(e)
+							&& document.activeElement.id != "sreachKeyWordIn") {
+						switch (keyCode) {
+						case 67:// ctrl+c 复制
 							if (checkedMovefiles == undefined
 									|| checkedMovefiles.size == 0) {
 								$('#copyFileButtonLi a').click();
 							}
 							break;
-						case 88:// shift+x 剪切
+						case 65:// ctrl+a 全选
+							checkallfile();
+							break;
+						case 88:// ctrl+x 剪切
 							if (checkedMovefiles == undefined
 									|| checkedMovefiles.size == 0) {
 								$('#cutFileButtonLi a').click();
 							}
 							break;
-						case 86:// shift+v 粘贴
+						case 86:// ctrl+v 粘贴
 							if (checkedMovefiles !== undefined
 									&& checkedMovefiles.size > 0) {
 								$('#stickFileButtonLi a').click();
 							}
 							break;
+						case 68:// ctrl+d 删除
+							$('#deleteSeelectFileButtonLi a').click();
+							break;
 						default:
-							return true;
+							break;
 						}
-						return false;
+					} else if (keyCode == 116 || keyCode == 123) { // F5、F12
+																	// 允许使用
+						return true;
 					}
+					return false;
 				}
 			});
 	// 关闭移动提示框自动取消移动
@@ -991,8 +1000,7 @@ function showFolderTable(folderView) {
 function createFileRow(fi, aL, aD, aR, aO) {
 	fi.fileName = html2Escape(fi.fileName);
 	var fileRow = "<tr id=" + fi.fileId + " onclick='checkfile(event," + '"'
-			+ fi.fileId + '"' + ")' ondblclick='checkConsFile(event," + '"'
-			+ fi.fileId + '"' + ")' id='" + fi.fileId
+			+ fi.fileId + '"' + ")'  id='" + fi.fileId
 			+ "' class='filerow'><td>" + fi.fileName
 			+ "</td><td class='hidden-xs'>" + fi.fileCreationDate + "</td>";
 	if (fi.fileSize == "0") {
@@ -1150,10 +1158,6 @@ function createNewFolderRow(f, aD, aR, aO) {
 	var folderRow = "<tr id='"
 			+ f.folderId
 			+ "' onclick='checkfile(event,"
-			+ '"'
-			+ f.folderId
-			+ '"'
-			+ ")' ondblclick='checkConsFile(event,"
 			+ '"'
 			+ f.folderId
 			+ '"'
@@ -2053,23 +2057,28 @@ function isShift(event) {
 	}
 }
 
-// 选中某一行文件，如果使用Shift点击则为多选
+// 兼容Chrome、IE、FF的Ctrl判定
+function isCtrl(event) {
+	var e = window.event || event;
+	if (e.ctrlKey) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+// 选中某一行文件，如果使用Ctrl点击则为多选，如果为Shift+单击则为连续选，选中规则为：前有选前，后有选后，全有也选后。
 function checkfile(event, fileId) {
-	if (!isShift(event)) {
+	if (!isCtrl(event) && !isShift(event)) { // 没有按ctrl，正常选择
 		$(".filerow").removeClass("info");
 		$("#" + fileId).addClass("info");
-	} else {
+	} else if (isCtrl(event)) { // 按了ctrl，多选
 		if ($("#" + fileId).hasClass("info")) {
 			$("#" + fileId).removeClass("info");
 		} else {
 			$("#" + fileId).addClass("info");
 		}
-	}
-}
-
-// 连续选中若干行文件：Shift+双击，选中规则为：前有选前，后有选后，全有也选后。
-function checkConsFile(event, fileId) {
-	if (isShift(event)) {
+	} else { // 按了shift
 		var endRow = $("#" + fileId);
 		var endRowIndex = endRow.index();
 		var startRowIndex = $('.filerow.info:last').index();

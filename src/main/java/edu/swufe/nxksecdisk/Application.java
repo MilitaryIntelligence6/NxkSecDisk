@@ -35,6 +35,7 @@ public class Application {
      * @param args java.lang.String[] 接收控制台传入参数，例如“-console“
      * @author 青阳龙野(kohgylw)
      */
+	
     public static void main(final String[] args) {
         if (args == null || args.length == 0) {
             // 以界面模式启动kiftd;
