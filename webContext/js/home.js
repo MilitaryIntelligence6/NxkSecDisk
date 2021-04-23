@@ -2896,6 +2896,21 @@ function doSearchFile() {
 	}
 }
 
+function doSearchAllFile() {
+	var keyworld = $("#sreachKeyWordIn").val();
+	if (keyworld.length != 0) {
+		selectInCompletePath(keyworld);
+	} else {
+		if (folderView.keyWorld != null) {
+			showFolderView(locationpath);
+		} else {
+			screenedFoldrView = null;
+			showOriginFolderView();
+		}
+	}
+}
+
+
 // 在本级内搜索
 function selectInThisPath(keyworld) {
 	try {
@@ -2961,7 +2976,7 @@ function selectInCompletePath(keyworld) {
 				parentpath = folderView.folder.folderParent;
 				constraintLevel = folderView.folder.folderConstraint;
 				screenedFoldrView = null;
-				$("#sreachKeyWordIn").val("all:" + folderView.keyWorld);
+				$("#sreachKeyWordIn").val(folderView.keyWorld);
 				showParentList(folderView);
 				showAccountView(folderView);
 				showPublishTime(folderView);
