@@ -3857,7 +3857,3 @@ function html2Escape(sHtml) {
 	});
 }
 
-//  匿名用户没有搜索功能，登录用户拥有搜索功能
-function loginAccountSearcu(){
-	
-}
