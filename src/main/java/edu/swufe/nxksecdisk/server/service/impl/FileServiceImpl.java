@@ -262,7 +262,8 @@ public class FileServiceImpl
                                     if (account != null) {
                                         f.setFileCreator(account);
                                     } else {
-                                        f.setFileCreator("\u533f\u540d\u7528\u6237");
+                                    	// 匿名用户的UTF-8 \u533f\u540d\u7528\u6237
+                                        f.setFileCreator("\u5B66\u751F");
                                     }
                                     // 该节点对应的文件块是否独享？
                                     Map<String, String> map = new HashMap<>();
