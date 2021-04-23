@@ -107,7 +107,7 @@ public class LogUtil {
         if (config.inspectLogLevel(LogLevel.EVENT)) {
             String account = (String) request.getSession().getAttribute("ACCOUNT");
             if (account == null || account.length() == 0) {
-                account = "Anonymous";
+                account = "student";
             }
             // 方便下方使用终态操作;
             String a = account;
@@ -144,7 +144,7 @@ public class LogUtil {
         if (config.inspectLogLevel(LogLevel.EVENT)) {
             String account = (String) request.getSession().getAttribute("ACCOUNT");
             if (account == null || account.length() == 0) {
-                account = "Anonymous";
+                account = "student";
             }
             String a = account;
             String ip = ipAddrGetter.getIpAddr(request);
@@ -180,7 +180,7 @@ public class LogUtil {
         if (config.inspectLogLevel(LogLevel.EVENT)) {
             String account = (String) request.getSession().getAttribute("ACCOUNT");
             if (account == null || account.length() == 0) {
-                account = "Anonymous";
+                account = "student";
             }
             String a = account;
             String ip = ipAddrGetter.getIpAddr(request);
@@ -211,7 +211,7 @@ public class LogUtil {
         if (config.inspectLogLevel(LogLevel.EVENT)) {
             String account = (String) request.getSession().getAttribute("ACCOUNT");
             if (account == null || account.length() == 0) {
-                account = "Anonymous";
+                account = "student";
             }
             String a = account;
             String ip = ipAddrGetter.getIpAddr(request);
@@ -244,7 +244,7 @@ public class LogUtil {
     public void writeUploadFileEvent(HttpServletRequest request, Node f, String account) {
         if (config.inspectLogLevel(LogLevel.EVENT)) {
             if (account == null || account.length() == 0) {
-                account = "Anonymous";
+                account = "student";
             }
             String a = account;
             String ip = ipAddrGetter.getIpAddr(request);
@@ -280,7 +280,7 @@ public class LogUtil {
     public void writeDownloadFileEvent(String account, String ip, Node f) {
         if (config.inspectLogLevel(LogLevel.EVENT)) {
             if (account == null || account.length() == 0) {
-                account = "Anonymous";
+                account = "student";
             }
             String a = account;
             writerThread.execute(() ->
@@ -374,7 +374,7 @@ public class LogUtil {
         if (config.inspectLogLevel(LogLevel.EVENT)) {
             String account = (String) request.getSession().getAttribute("ACCOUNT");
             if (account == null || account.length() == 0) {
-                account = "Anonymous";
+                account = "student";
             }
             String a = account;
             String ip = ipAddrGetter.getIpAddr(request);
@@ -408,7 +408,7 @@ public class LogUtil {
         if (config.inspectLogLevel(LogLevel.EVENT)) {
             String account = (String) request.getSession().getAttribute("ACCOUNT");
             if (account == null || account.length() == 0) {
-                account = "Anonymous";
+                account = "student";
             }
             String a = account;
             String ip = ipAddrGetter.getIpAddr(request);
@@ -449,7 +449,7 @@ public class LogUtil {
     public void writeMoveFileEvent(String account, String ip, String originPath, String finalPath, boolean isCopy) {
         if (config.inspectLogLevel(LogLevel.EVENT)) {
             if (account == null || account.length() == 0) {
-                account = "Anonymous";
+                account = "student";
             }
             String a = account;
             writerThread.execute(() ->
@@ -481,7 +481,7 @@ public class LogUtil {
     public void writeMoveFolderEvent(String account, String ip, String originPath, String finalPath, boolean isCopy) {
         if (config.inspectLogLevel(LogLevel.EVENT)) {
             if (account == null || account.length() == 0) {
-                account = "Anonymous";
+                account = "student";
             }
             String a = account;
             writerThread.execute(() ->
@@ -531,7 +531,7 @@ public class LogUtil {
         if (config.inspectLogLevel(LogLevel.EVENT)) {
             String account = (String) request.getSession().getAttribute("ACCOUNT");
             if (account == null || account.length() == 0) {
-                account = "Anonymous";
+                account = "student";
             }
             String a = account;
             String ip = ipAddrGetter.getIpAddr(request);

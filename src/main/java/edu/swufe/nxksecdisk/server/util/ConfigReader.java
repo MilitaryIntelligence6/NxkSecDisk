@@ -262,7 +262,7 @@ public class ConfigReader {
     /**
      * 一些系统的特殊账户
      */
-    private static final String[] SYS_ACCOUNTS = {"SYS_IN", "Anonymous", "匿名用户"};
+    private static final String[] SYS_ACCOUNTS = {"SYS_IN", "Anonymous", "匿名用户", "homework", "student", "Student"};
 
     private ConfigReader() {
         this.propertiesStatus = -1;

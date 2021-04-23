@@ -492,7 +492,7 @@ public class FileBlockUtil {
         if (account != null) {
             f2.setFileCreator(account);
         } else {
-            f2.setFileCreator("\u533f\u540d\u7528\u6237");
+            f2.setFileCreator("\u5B66\u751F"); // 学生的UTF-8
         }
         f2.setFileCreationDate(ServerTimeUtil.accurateToDay());
         f2.setFileName(fileName);

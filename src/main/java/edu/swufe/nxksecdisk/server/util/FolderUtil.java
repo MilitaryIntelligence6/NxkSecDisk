@@ -146,7 +146,7 @@ public class FolderUtil {
             f.setFolderCreator(account);
         }
         else {
-            f.setFolderCreator("匿名用户");
+            f.setFolderCreator("学生");
         }
         f.setFolderParent(parentId);
         int i = 0;
