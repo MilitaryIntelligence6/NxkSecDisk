@@ -149,6 +149,9 @@ public class FolderViewServiceImpl implements FolderViewService {
         final ConfigReader cr = config;
         String fid = request.getParameter("fid");
         String keyWorld = request.getParameter("keyworld");
+        if (request.getParameter("account") == null) {
+        	return "BAN";
+        }
         if (fid == null || fid.length() == 0 || keyWorld == null) {
             return "ERROR";
         }

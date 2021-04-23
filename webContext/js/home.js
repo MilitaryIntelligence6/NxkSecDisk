@@ -2955,7 +2955,8 @@ function selectInCompletePath(keyworld) {
 		dataType : 'text',
 		data : {
 			fid : locationpath,
-			keyworld : keyworld
+			keyworld : keyworld,
+			account : account
 		},
 		url : 'homeController/sreachInCompletePath.ajax',
 		success : function(result) {
@@ -2972,7 +2973,10 @@ function selectInCompletePath(keyworld) {
 			} else if (result == "notAccess") {
 				document.cookie = "folder_id=" + escape("root");
 				window.location.href = "/";
-			} else {
+			} else if (result == "BAN") {
+				alert("提示：您不具备搜索权限，无法搜索文件。");
+			}
+			else {
 				folderView = eval("(" + result + ")");
 				locationpath = folderView.folder.folderId;
 				parentpath = folderView.folder.folderParent;

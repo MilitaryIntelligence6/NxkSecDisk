@@ -305,11 +305,12 @@ public class HomeController {
 
     /**
      * <h2>执行全局查询</h2>
-     * <p>该逻辑用于进行全局搜索，将会迭代搜索目标文件夹及其全部子文件夹以查找符合关键字的结果，并返回单独的搜索结果视图。</p>
+     * <p>该逻辑用于进行全局搜索，只有已经登录用户才能使用该功能，</p>
+     * <p>将会迭代搜索目标文件夹及其全部子文件夹以查找符合关键字的结果，并返回单独的搜索结果视图。</p>
      *
      * @param request javax.servlet.http.HttpServletRequest 请求对象
      * @return java.lang.String 搜索结果，详情请见具体实现
-     * @author 青阳龙野(kohgylw)
+     * @author nixiak
      */
     @RequestMapping(value = {"/sreachInCompletePath.ajax"}, produces = {CHARSET_BY_AJAX})
     @ResponseBody
