@@ -333,11 +333,7 @@ $(function() {
 						default:
 							break;
 						}
-					} else if (keyCode == 116 || keyCode == 123) { // F5、F12
-																	// 允许使用
-						return true;
-					}
-					return false;
+					} 
 				}
 			});
 	// 关闭移动提示框自动取消移动
