@@ -961,7 +961,7 @@ function showFolderTable(folderView) {
 	if (parentpath != null && parentpath != "null") {
 		$("#foldertable")
 				.append(
-						"<tr onclick='returnPF()'><td><button onclick='' class='btn btn-link btn-xs'>../</button></td><td class='hidden-xs'>--</td><td>--</td><td class='hidden-xs'>--</td><td>--</td></tr>");
+						"<tr onclick='returnPF()'><td><button onclick='' class='btn btn-link btn-xs'>返回上一级 <span class='glyphicon glyphicon-arrow-up'></span></button></td><td class='hidden-xs'>--</td><td>--</td><td class='hidden-xs'>--</td><td>--</td></tr>");
 	}
 	var authList = folderView.authList;
 	var aD = false;
