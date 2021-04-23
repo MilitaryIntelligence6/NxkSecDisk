@@ -788,8 +788,8 @@ function showParentList(folderView) {
 	} else {
 		$("#parentFolderList").html("<li class='disabled'><a>无</a></li>");
 	}
-	if (f.folderName.length > 6) {
-		$("#currentFolderName").text(f.folderName.substr(0, 6) + "...");
+	if (f.folderName.length > 35) {
+		$("#currentFolderName").text(f.folderName.substr(0, 35) + "...");
 	} else {
 		$("#currentFolderName").text(f.folderName);
 	}
