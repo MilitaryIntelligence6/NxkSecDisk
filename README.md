@@ -1,4 +1,4 @@
-## 欢迎访问kiftd源代码资源库！
+## 欢迎访问NxkSecDIsk源代码资源库！
 ### Welcome to visit source of kiftd!
 
 _当前版本：v1.0.35-RELEASE_

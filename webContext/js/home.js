@@ -333,7 +333,7 @@ $(function() {
 						default:
 							break;
 						}
-					} 
+					}
 				}
 			});
 	// 关闭移动提示框自动取消移动
@@ -814,7 +814,9 @@ function showAccountView(folderView) {
 	account = folderView.account;
 	if (folderView.account != null) {
 		// 说明已经登录，显示搜索框
-		$("#search").append("<div class='form-group'><input id='sreachKeyWordIn' type='text' class='form-control' placeholder='请输入文件名...'></div><button id='searchbtn' type='button' class='btn btn-default' onclick='doSearchFile()'>本级搜索</button><button id='searchbtn' type='button' class='btn btn-default' onclick='doSearchAllFile()'>全局搜索</button>")
+		$("#search")
+				.append(
+						"<div class='form-group'><input id='sreachKeyWordIn' type='text' class='form-control' placeholder='请输入文件名...'></div><button id='searchbtn' type='button' class='btn btn-default' onclick='doSearchFile()'>本级搜索</button><button id='searchallbtn' type='button' class='btn btn-default' onclick='doSearchAllFile()'>全局搜索</button>")
 		// 说明已经登录，显示注销按钮
 		$("#tb")
 				.append(
@@ -1094,6 +1096,15 @@ function createFileRow(fi, aL, aD, aR, aO) {
 					+ "<button onclick='pptView("
 					+ '"'
 					+ fi.fileId
+					+ '"'
+					+ ")' class='btn btn-link btn-xs'><span class='glyphicon glyphicon-eye-open'></span> 预览</button>";
+		case "ipynb":
+			fileRow = fileRow
+					+ "<button onclick='ipynbView("
+					+ '"'
+					+ fi.fileId
+					+ '","'
+					+ fi.fileName
 					+ '"'
 					+ ")' class='btn btn-link btn-xs'><span class='glyphicon glyphicon-eye-open'></span> 预览</button>";
 			break;
@@ -1962,6 +1973,35 @@ function showPicture(fileId) {
 		}
 	});
 }
+
+// 预览ipynb文件，使用的是第三方在线预览网站
+function ipynbView(fileId, fileName) {
+	$.ajax({
+				url : 'externalLinksController/getDownloadKey.ajax',
+				type : 'POST',
+				dataType : 'text',
+				data : {
+					fId : getDownloadFileId
+				},
+				
+				success : function(result) {
+					// 获取链接
+					var temp = window.location.host 
+					+ "/externalLinksController/downloadFileByKey/"
+					+ encodeURIComponent(fileName.replace(/\\/g, "_"));
+					var encoded = encodeURIComponent("?dkey=" + result);
+					url = "https://nbviewer.jupyter.org/url/" + temp + "/" + encoded;
+					window.open(url);
+					console.log(url);
+				},
+				error : function() {
+					$("#downloadHrefBox")
+							.html(
+									"<span class='text-muted'>获取失败，请检查网络状态或<a href='javascript:void(0);' onclick='getDownloadURL()'>点此</a>重新获取。</span>");
+				}
+			});
+}
+
 
 // 用于创建并显示小于2*limit+1长度的图片列表
 function createViewList() {
@@ -2912,7 +2952,6 @@ function doSearchAllFile() {
 	}
 }
 
-
 // 在本级内搜索
 function selectInThisPath(keyworld) {
 	try {
@@ -2975,8 +3014,7 @@ function selectInCompletePath(keyworld) {
 				window.location.href = "/";
 			} else if (result == "BAN") {
 				alert("提示：您不具备搜索权限，无法搜索文件。");
-			}
-			else {
+			} else {
 				folderView = eval("(" + result + ")");
 				locationpath = folderView.folder.folderId;
 				parentpath = folderView.folder.folderParent;
@@ -3023,8 +3061,7 @@ var getDownloadFileName;// 下载链接的文件名（便于下载工具识别�
 
 // 获取某一文件的下载链接
 function getDownloadURL() {
-	$
-			.ajax({
+	$.ajax({
 				url : 'externalLinksController/getDownloadKey.ajax',
 				type : 'POST',
 				dataType : 'text',
@@ -3763,6 +3800,7 @@ function showLoadingRemaininngBox() {
 	$("#loadingremaininngbox").addClass("show");
 	$("#loadingremaininngbox").removeClass("hidden");
 	$("#searchbtn").attr('disabled', 'disabled');
+	$("#searchallbtn").attr('disabled', 'disabled');
 }
 
 // 隐藏“正在加载文件列表”提示栏
@@ -3771,6 +3809,7 @@ function hiddenLoadingRemaininngBox() {
 	$("#loadingremaininngbox").removeClass("show");
 	$("#loadingremaininngbox").addClass("hidden");
 	$("#searchbtn").removeAttr('disabled');
+	$("#searchallbtn").removeAttr('disabled');
 }
 
 // 将加载的后续文件夹视图数据更新至页面上显示
@@ -3860,4 +3899,3 @@ function html2Escape(sHtml) {
 		}[c];
 	});
 }
-
