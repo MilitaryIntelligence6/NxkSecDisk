@@ -258,7 +258,7 @@ public class FileServiceImpl
                                 try {
                                     // 首先先将该节点中必须覆盖的信息更新
                                     f.setFileSize(fileBlockUtil.getFileSize(file));
-                                    f.setFileCreationDate(ServerTimeUtil.accurateToDay());
+                                    f.setFileCreationDate(ServerTimeUtil.accurateToMinute());
                                     if (account != null) {
                                         f.setFileCreator(account);
                                     } else {

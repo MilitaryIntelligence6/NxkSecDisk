@@ -314,7 +314,7 @@ $(function() {
 							break;
 						case 65:// ctrl+a 全选
 							checkallfile();
-							break;
+							return false;
 						case 88:// ctrl+x 剪切
 							if (checkedMovefiles == undefined
 									|| checkedMovefiles.size == 0) {
@@ -2456,9 +2456,9 @@ function sortbycd() {
 	setTimeout(function() {
 		folderView.fileList.sort(function(v1, v2) {
 			var v1DateStr = v1.fileCreationDate.replace("年", "-").replace("月",
-					"-").replace("日", "");
+					"-").replace("日", " ").replace("时", ":").replace("分", "");
 			var v2DateStr = v2.fileCreationDate.replace("年", "-").replace("月",
-					"-").replace("日", "");
+					"-").replace("日", " ").replace("时", ":").replace("分", "");
 			var res = ((new Date(Date.parse(v1DateStr)).getTime()) - (new Date(
 					Date.parse(v2DateStr)).getTime()));
 			return order * res;

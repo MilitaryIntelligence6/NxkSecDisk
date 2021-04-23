@@ -521,7 +521,7 @@ public class FileSystemManager {
                                 nodes.parallelStream().filter((e) -> e.getFileName().equals(f.getName())).findFirst()
                                         .get();// 得到重名节点，覆盖它
                         // 首先，将必须要更新的信息刷入目标节点
-                        node.setFileCreationDate(ServerTimeUtil.accurateToDay());
+                        node.setFileCreationDate(ServerTimeUtil.accurateToMinute());
                         node.setFileCreator("SYS_IN");
                         int mb = (int) (size / 1024L / 1024L);
                         node.setFileSize(mb + "");
@@ -581,7 +581,7 @@ public class FileSystemManager {
             node.setFileName(newName);
             node.setFileId(UUID.randomUUID().toString());
             node.setFileParentFolder(folderId);
-            node.setFileCreationDate(ServerTimeUtil.accurateToDay());
+            node.setFileCreationDate(ServerTimeUtil.accurateToMinute());
             node.setFileCreator("SYS_IN");
             int mb = (int) (size / 1024L / 1024L);
             node.setFileSize(mb + "");

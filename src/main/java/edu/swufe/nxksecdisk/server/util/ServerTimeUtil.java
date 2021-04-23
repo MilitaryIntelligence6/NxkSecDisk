@@ -28,7 +28,7 @@ public final class ServerTimeUtil {
     }
 
     public static String accurateToMinute() {
-        return accurateFormat("yyyy年MM月dd日 HH:mm");
+        return accurateFormat("yyyy年MM月dd日HH时mm分");
     }
 
     public static String accurateToDay() {

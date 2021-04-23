@@ -494,7 +494,7 @@ public class FileBlockUtil {
         } else {
             f2.setFileCreator("\u5B66\u751F"); // 学生的UTF-8
         }
-        f2.setFileCreationDate(ServerTimeUtil.accurateToDay());
+        f2.setFileCreationDate(ServerTimeUtil.accurateToMinute());
         f2.setFileName(fileName);
         f2.setFileParentFolder(fileParentFolder);
         f2.setFilePath(filePath);
