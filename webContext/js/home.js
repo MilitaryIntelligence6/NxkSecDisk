@@ -810,9 +810,11 @@ function showParentList(folderView) {
 
 // 显示用户视图，包括文件列表、登录信息、操作权限接口等
 function showAccountView(folderView) {
-	$("#tb,#tb2").html("");
+	$("#tb,#tb2,#search").html("");
 	account = folderView.account;
 	if (folderView.account != null) {
+		// 说明已经登录，显示搜索框
+		$("#search").append("<div class='form-group'><input id='sreachKeyWordIn' type='text' class='form-control' placeholder='请输入文件名...'></div><button id='searchbtn' type='button' class='btn btn-default' onclick='doSearchFile()'>本级搜索</button><button id='searchbtn' type='button' class='btn btn-default' onclick='doSearchAllFile()'>全局搜索</button>")
 		// 说明已经登录，显示注销按钮
 		$("#tb")
 				.append(
@@ -3853,4 +3855,9 @@ function html2Escape(sHtml) {
 			'\'' : '&#39;'
 		}[c];
 	});
+}
+
+//  匿名用户没有搜索功能，登录用户拥有搜索功能
+function loginAccountSearcu(){
+	
 }
