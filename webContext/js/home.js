@@ -1992,12 +1992,11 @@ function ipynbView(fileId, fileName) {
 					var encoded = encodeURIComponent("?dkey=" + result);
 					url = "https://nbviewer.jupyter.org/url/" + temp + "/" + encoded;
 					window.open(url);
-					console.log(url);
 				},
 				error : function() {
 					$("#downloadHrefBox")
 							.html(
-									"<span class='text-muted'>获取失败，请检查网络状态或<a href='javascript:void(0);' onclick='getDownloadURL()'>点此</a>重新获取。</span>");
+									"<span class='text-muted'>预览失败，请检查网络状态</span>");
 				}
 			});
 }
