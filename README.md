@@ -1,7 +1,10 @@
 ## 欢迎访问NxkSecDIsk源代码资源库！
 ### Welcome to visit source of NxkSecDisk!
 
+![](pictures/welcome.png)
+
 ### 简介
+
 NxkSecDisk是踩在了巨人的肩膀上，我们利用了Github上开源的网盘：kiftd 二次制作而成，在此非常感谢作者的无私奉献。如果您需要该版本，请转到以下位置进行浏览和下载：
 [kiftd-官方主页](https://kohgylw.gitee.io) 
 
@@ -29,8 +32,30 @@ NxkSecDisk是踩在了巨人的肩膀上，我们利用了Github上开源的网�
 >
 > 而另一名核心成员成天老想着干饭、干鸡腿、干鸭腿、乐山甜皮鸭、火锅、串串、麻辣香锅、宫保鸡丁、鱼香肉丝、麻婆豆腐、芝士蛋糕、奶油泡芙、芒果布丁、珍珠奶茶、红烧肉、煎带鱼、炸鸡翅、炸鸡腿、周黑鸭、三文鱼、北极贝、帝王蟹、冰淇凌、星冰乐、西米露、西瓜汁、鸡汤、烤鱼、海胆、薯条、汉堡、果冻、吐司
 
+### 作业文件夹功能展示 
+
+创建文件夹：
+
+![](pictures/createHomeworkFolder.png)
+
+
+
+禁止上传：
+
+![](pictures/banupload.png)
+
+文件夹细节：
+
+
+
+![](pictures/detail.png)
+
+![](pictures/detail2.png)
+
+
 
 ### 构建说明
+
 _下列条目为kiftd开发环境的基本信息，本网盘维持和原始一样的开发环境，如需对源代码进行查看及编译，推荐使用所列配置。_
 + JDK版本：1.8.0_131
 + 项目管理框架：Maven（m2e 1.8.0 for Eclipse）,Archetype：mavem-archetype-quickstart 1.1。
