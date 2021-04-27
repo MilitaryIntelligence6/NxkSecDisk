@@ -109,8 +109,8 @@ public class HomeController {
     }
 
     @RequestMapping({"/doLogout.ajax"})
-    public @ResponseBody
-    String doLogout(final HttpSession session) {
+    @ResponseBody
+    public String doLogout(final HttpSession session) {
         this.accountService.logout(session);
         return "SUCCESS";
     }
@@ -120,7 +120,13 @@ public class HomeController {
     public String newFolder(final HttpServletRequest request) {
         return this.folderService.newFolder(request);
     }
-
+    
+//    @RequestMapping({"/newHomeworkFolder.ajax"})
+//    @ResponseBody
+//    public String newHomeworkFolder(final HttpServletRequest request) {
+//        return this.folderService.newHomeworkFolder(request);
+//    }
+    
     @RequestMapping({"/deleteFolder.ajax"})
     @ResponseBody
     public String deleteFolder(final HttpServletRequest request) {

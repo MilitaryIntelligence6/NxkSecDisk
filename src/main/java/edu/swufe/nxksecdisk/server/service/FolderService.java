@@ -5,7 +5,7 @@ import javax.servlet.http.HttpServletRequest;
 public interface FolderService {
 
     String newFolder(final HttpServletRequest request);
-
+    
     String deleteFolder(final HttpServletRequest request);
 
     String renameFolder(final HttpServletRequest request);

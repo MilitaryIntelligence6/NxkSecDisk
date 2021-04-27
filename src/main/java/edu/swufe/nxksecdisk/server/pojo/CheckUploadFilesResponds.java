@@ -21,7 +21,17 @@ public class CheckUploadFilesResponds {
      */
     private String checkResult;
 
-    /**
+    @Override
+	public String toString() {
+		final int maxLen = 10;
+		return "CheckUploadFilesResponds [checkResult=" + checkResult + ", pereFileNameList="
+				+ (pereFileNameList != null ? pereFileNameList.subList(0, Math.min(pereFileNameList.size(), maxLen))
+						: null)
+				+ ", overSizeFile=" + overSizeFile + ", maxUploadFileSize=" + maxUploadFileSize + ", homeworkStartTime="
+				+ homeworkStartTime + ", homeworkEndTime=" + homeworkEndTime + "]";
+	}
+
+	/**
      * 重复列表
      */
     private List<String> pereFileNameList;
@@ -35,8 +45,34 @@ public class CheckUploadFilesResponds {
      * 最大上传体积
      */
     private String maxUploadFileSize;
+    
+    /**
+     * 最早上传时间
+     */
+    private String homeworkStartTime;
+    
+    /**
+     * 最晚上传时间
+     */
+    private String homeworkEndTime;
+    
+    public String getHomeworkStartTime() {
+		return homeworkStartTime;
+	}
 
-    public String getCheckResult() {
+	public void setHomeworkStartTime(String homeworkStartTime) {
+		this.homeworkStartTime = homeworkStartTime;
+	}
+
+	public String getHomeworkEndTime() {
+		return homeworkEndTime;
+	}
+
+	public void setHomeworkEndTime(String homeworkEndTime) {
+		this.homeworkEndTime = homeworkEndTime;
+	}
+
+	public String getCheckResult() {
         return checkResult;
     }
 

@@ -21,6 +21,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -69,7 +71,17 @@ public class FileServiceImpl
     private static final String UPLOAD_ERROR = "uploaderror";
 
     private static final String CONTENT_TYPE = "application/octet-stream";
-
+    
+    /**
+     * 超出作业文件夹截至时间
+     */
+    private static final String TOO_LATE = "tooLate";
+    
+    /**
+     * 在作业文件夹开始时间前
+     */
+    private static final String TOO_EARLY = "tooEarly";
+    
     @Resource
     private NodeMapper nodeMapper;
 
@@ -116,6 +128,28 @@ public class FileServiceImpl
         if (folder == null) {
             return ERROR_PARAMETER;
         }
+        CheckUploadFilesResponds cufr = new CheckUploadFilesResponds();
+        if (folder.getFolderHomework() == 1 && account == null) {
+        	String currentTime = ServerTimeUtil.accurateToSecond();
+        	SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        	Date current;
+			try {
+				current = format.parse(currentTime);
+				Date start = format.parse(folder.getFolderHomeworkStartTime());
+				Date end = format.parse(folder.getFolderHomeworkEndTime()); 
+				if (current.before(start)) {
+					cufr.setHomeworkStartTime(folder.getFolderHomeworkStartTime());
+					cufr.setCheckResult(TOO_EARLY);
+					return gson.toJson(cufr);
+				}else if (current.after(end)) {
+					cufr.setHomeworkEndTime(folder.getFolderHomeworkEndTime());
+					cufr.setCheckResult(TOO_LATE);
+					return gson.toJson(cufr);
+				}
+			} catch (ParseException e) {
+				logUtil.writeException(e);
+			}
+        }
         // 权限检查
         if (!config.authorized(account, AccountAuth.UPLOAD_FILES,
                 folderUtil.getAllFoldersId(folderId))
@@ -126,7 +160,6 @@ public class FileServiceImpl
         final List<String> namelistObj = gson.fromJson(nameList, new TypeToken<List<String>>() {
         }.getType());
         // 准备一个检查结果对象
-        CheckUploadFilesResponds cufr = new CheckUploadFilesResponds();
         // 开始文件上传体积限制检查
         try {
             // 获取最大文件体积（以Byte为单位）

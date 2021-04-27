@@ -43,11 +43,27 @@ public interface FolderMapper {
      * @author 青阳龙野(kohgylw)
      */
     List<Folder> queryByParentId(final String pid);
-
+    
     Folder queryByParentIdAndFolderName(final Map<String, String> map);
 
-    int insertNewFolder(final Folder f);
 
+    int insertNewFolder(final Folder f);
+    
+    /**
+     * <h2>新建作业文件夹</h2>
+     * <p>作业文件夹权限为公开，并且FOLDER_HOMEWORK设置为1，并且设置FOLDER_HOMEWORK_START_TIME和FOLDER_HOMEWORK_END_TIME </p>
+     * @param f
+     * @return
+     */
+    int insertNewHomeworkFolder(final Folder f);
+    
+    /**
+     * <h2>改变文件夹性质</h2>
+     * @param map
+     * @return
+     */
+    int updateHomeworkFolder(final Folder f);
+    
     int deleteById(final String folderId);
 
     int updateFolderNameById(final Map<String, String> map);

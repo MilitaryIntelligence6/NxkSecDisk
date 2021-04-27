@@ -9,6 +9,9 @@
 		<result column="folder_creator" jdbcType="VARCHAR" property="folderCreator" />
 		<result column="folder_parent" jdbcType="VARCHAR" property="folderParent" />
 		<result column="folder_constraint" jdbcType="INTEGER" property="folderConstraint" />
+		<result column="folder_homework" jdbcType="TINYINT" property="folderHomework" />
+		<result column="folder_homework_start_time" jdbcType="VARCHAR" property="folderHomeworkStartTime" />
+		<result column="folder_homework_end_time" jdbcType="VARCHAR" property="folderHomeworkEndTime" />
 	</resultMap>
 
 	<select id="queryById" parameterType="java.lang.String"
@@ -46,9 +49,9 @@
 
 	<insert id="insertNewFolder" parameterType="edu.swufe.nxksecdisk.server.model.Folder">
 		INSERT INTO FOLDER
-		VALUES(#{folderId,jdbcType=VARCHAR},#{folderName,jdbcType=VARCHAR},#{folderCreationDate,jdbcType=VARCHAR},#{folderCreator,jdbcType=VARCHAR},#{folderParent,jdbcType=VARCHAR},#{folderConstraint,jdbcType=INTEGER});
+		VALUES(#{folderId,jdbcType=VARCHAR},#{folderName,jdbcType=VARCHAR},#{folderCreationDate,jdbcType=VARCHAR},#{folderCreator,jdbcType=VARCHAR},#{folderParent,jdbcType=VARCHAR},#{folderConstraint,jdbcType=INTEGER},#{folderHomework,jdbcType=TINYINT},#{folderHomeworkStartTime,jdbcType=VARCHAR},#{folderHomeworkEndTime,jdbcType=VARCHAR});
 	</insert>
-
+	
 	<delete id="deleteById" parameterType="java.lang.String">
 		DELETE FROM FOLDER WHERE
 		folder_id=#{folderId,jdbcType=VARCHAR}
@@ -68,6 +71,16 @@
 		= #{folderId,jdbcType=VARCHAR}
 	</update>
 
+
+
+	<update id="updateHomeworkFolder" parameterType="edu.swufe.nxksecdisk.server.model.Folder">
+		UPDATE FOLDER SET 
+		folder_homework = #{folderHomework,jdbcType=TINYINT}, 
+		folder_homework_start_time = #{folderHomeworkStartTime,jdbcType=VARCHAR}, 
+		folder_homework_end_time =#{folderHomeworkEndTime,jdbcType=VARCHAR} WHERE folder_id =
+		#{folderId,jdbcType=VARCHAR}
+	</update>
+	
 	<update id="moveById" parameterType="java.util.Map">
 		UPDATE FOLDER SET
 		folder_parent = #{locationpath,jdbcType=VARCHAR} WHERE folder_id =

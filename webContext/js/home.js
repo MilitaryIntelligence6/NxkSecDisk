@@ -146,6 +146,9 @@ $(function() {
 												+ i + ")'>" + folderTypes[i]
 												+ "</a></li>");
 							}
+							$("#foldertypelist").append(
+									"<li><a onclick='changeNewHomeworkFolderType(0)'>"
+											+ "作业文件夹" + "</a></li>");
 						} else {
 							$("#foldertypelist").append(
 									"<li><a onclick='changeNewFolderType(0)'>"
@@ -190,6 +193,9 @@ $(function() {
 												+ i + ")'>" + folderTypes[i]
 												+ "</a></li>");
 							}
+							$("#editfoldertypelist").append(
+									"<li><a onclick='changeEditHomeworkFolderType(0)'>"
+											+ "作业文件夹" + "</a></li>");
 						} else {
 							$("#editfoldertypelist").append(
 									"<li><a onclick='changeEditFolderType(0)'>"
@@ -512,91 +518,122 @@ function showFolderView(fid, targetId) {
 	if (remainingLoadingRequest) {
 		remainingLoadingRequest.abort();
 	}
-	$.ajax({
-		type : 'POST',
-		dataType : 'text',
-		data : {
-			fid : fid
-		},
-		url : 'homeController/getFolderView.ajax',
-		success : function(result) {
-			endLoading();
-			switch (result) {
-			case "ERROR":
-				// 获取错误直接弹出提示框并将相关内容填为提示信息
-				doAlert();
-				$("#tb").html("<span class='graytext'>获取失败，请尝试刷新</span>");
-				$("#publishTime").html(
-						"<span class='graytext'>获取失败，请尝试刷新</span>");
-				$("#parentlistbox").html(
-						"<span class='graytext'>获取失败，请尝试刷新</span>");
-				break;
-			case "NOT_FOUND":
-			case "notAccess":
-				// 对于各种不能访问的情况，要先将记忆路径重置再跳转至根路径下
-				document.cookie = "folder_id=" + escape("root");
-			case "mustLogin":
-				// 如果服务器说必须登录，那么也跳转至根路径下（从而进入登录页面）
-				window.location.href = "/";
-				break;
-			default:
-				// 上述情况都不是，则返回的应该是文件夹视图数据，接下来对其进行解析
-				folderView = eval("(" + result + ")");
-				// 记录当前获取的文件夹视图的ID号，便于其他操作使用
-				locationpath = folderView.folder.folderId;
-				// 存储打开的文件夹路径至Cookie中，以便下次打开时直接显示
-				document.cookie = "folder_id=" + escape(locationpath);
-				// 记录上级目录ID，方便返回上一级
-				parentpath = folderView.folder.folderParent;
-				// 记录本文件夹的访问级别，便于在新建文件夹时判断应该从哪一个级别开始供用户选择
-				constraintLevel = folderView.folder.folderConstraint;
-				screenedFoldrView = null;
-				// 备份一份原始的文件夹视图数据，同时也记录下原始的查询偏移量
-				originFolderView = $.extend(true, {}, folderView);
-				totalFoldersOffset = folderView.foldersOffset;
-				totalFilesOffset = folderView.filesOffset;
-				// 搜索输入框重置
-				$("#sreachKeyWordIn").val("");
-				// 各项基于文件夹视图返回数据的解析操作……
-				showParentList(folderView);
-				showAccountView(folderView);
-				showPublishTime(folderView);
-				$("#sortByFN").removeClass();
-				$("#sortByCD").removeClass();
-				$("#sortByFS").removeClass();
-				$("#sortByCN").removeClass();
-				$("#sortByOR").removeClass();
-				showFolderTable(folderView);
-				// 更新文件夹信息至信息模态框
-				$("#fim_name").text(folderView.folder.folderName);
-				$("#fim_creator").text(folderView.folder.folderCreator);
-				$("#fim_folderCreationDate").text(
-						folderView.folder.folderCreationDate);
-				$("#fim_folderId").text(folderView.folder.folderId);
-				updateTheFolderInfo();
-				// 判断是否还需要加载后续数据
-				if (folderView.foldersOffset > folderView.selectStep
-						|| folderView.filesOffset > folderView.selectStep) {
-					// 如果文件夹偏移量或文件偏移量大于查询步进长度，则说明一定还有后续数据需要加载，那么继续加载后续数据
-					showLoadingRemaininngBox();
-					loadingRemainingFolderView(targetId);
-				} else {
-					// 否则，说明文件夹视图加载完成，进行定位工作即可
-					hiddenLoadingRemaininngBox();
-					doFixedRow(targetId);
+	$
+			.ajax({
+				type : 'POST',
+				dataType : 'text',
+				data : {
+					fid : fid
+				},
+				url : 'homeController/getFolderView.ajax',
+				success : function(result) {
+					endLoading();
+					switch (result) {
+					case "ERROR":
+						// 获取错误直接弹出提示框并将相关内容填为提示信息
+						doAlert();
+						$("#tb").html(
+								"<span class='graytext'>获取失败，请尝试刷新</span>");
+						$("#publishTime").html(
+								"<span class='graytext'>获取失败，请尝试刷新</span>");
+						$("#parentlistbox").html(
+								"<span class='graytext'>获取失败，请尝试刷新</span>");
+						break;
+					case "NOT_FOUND":
+					case "notAccess":
+						// 对于各种不能访问的情况，要先将记忆路径重置再跳转至根路径下
+						document.cookie = "folder_id=" + escape("root");
+					case "mustLogin":
+						// 如果服务器说必须登录，那么也跳转至根路径下（从而进入登录页面）
+						window.location.href = "/";
+						break;
+					default:
+						// 上述情况都不是，则返回的应该是文件夹视图数据，接下来对其进行解析
+						folderView = eval("(" + result + ")");
+						// 记录当前获取的文件夹视图的ID号，便于其他操作使用
+						locationpath = folderView.folder.folderId;
+						// 存储打开的文件夹路径至Cookie中，以便下次打开时直接显示
+						document.cookie = "folder_id=" + escape(locationpath);
+						// 记录上级目录ID，方便返回上一级
+						parentpath = folderView.folder.folderParent;
+						// 记录本文件夹的访问级别，便于在新建文件夹时判断应该从哪一个级别开始供用户选择
+						constraintLevel = folderView.folder.folderConstraint;
+						screenedFoldrView = null;
+						// 备份一份原始的文件夹视图数据，同时也记录下原始的查询偏移量
+						originFolderView = $.extend(true, {}, folderView);
+						totalFoldersOffset = folderView.foldersOffset;
+						totalFilesOffset = folderView.filesOffset;
+						// 搜索输入框重置
+						$("#sreachKeyWordIn").val("");
+						// 各项基于文件夹视图返回数据的解析操作……
+						showParentList(folderView);
+						showAccountView(folderView);
+						showPublishTime(folderView);
+						$("#sortByFN").removeClass();
+						$("#sortByCD").removeClass();
+						$("#sortByFS").removeClass();
+						$("#sortByCN").removeClass();
+						$("#sortByOR").removeClass();
+						showFolderTable(folderView);
+						// 更新文件夹信息至信息模态框
+						$("#fim_name").text(folderView.folder.folderName);
+						$("#fim_creator").text(folderView.folder.folderCreator);
+						$("#fim_folderCreationDate").text(
+								folderView.folder.folderCreationDate);
+						$("#fim_folderId").text(folderView.folder.folderId);
+						if (folderView.folder.folderHomework == 1) { // 更新文件夹模态框，以及自动弹出的时间模态框
+							$("#fim_folderStartTime_dt").attr("style",
+									"display: block");
+							$("#fim_folderStartTime").text(
+									folderView.folder.folderHomeworkStartTime);
+							$("#fim_folderEndTime_dt").attr("style",
+									"display: block");
+							$("#fim_folderEndTime").text(
+									folderView.folder.folderHomeworkEndTime);
+
+							$("#hftm_folderEndTime").text(
+									folderView.folder.folderHomeworkEndTime); // 补充自动弹出的时间模态框
+							$("#hftm_folderStartTime").text(
+									folderView.folder.folderHomeworkStartTime);
+							$("#hftm_name").text(folderView.folder.folderName);
+
+							$(function() {
+								$("#homeworkFolderTimeModal").modal({
+									keyboard : true
+								});
+							});
+						} else {
+							$("#fim_folderStartTime_dt").attr("style",
+									"display: none");
+							$("#fim_folderEndTime_dt").attr("style",
+									"display: none");
+						}
+
+						updateTheFolderInfo();
+						// 判断是否还需要加载后续数据
+						if (folderView.foldersOffset > folderView.selectStep
+								|| folderView.filesOffset > folderView.selectStep) {
+							// 如果文件夹偏移量或文件偏移量大于查询步进长度，则说明一定还有后续数据需要加载，那么继续加载后续数据
+							showLoadingRemaininngBox();
+							loadingRemainingFolderView(targetId);
+						} else {
+							// 否则，说明文件夹视图加载完成，进行定位工作即可
+							hiddenLoadingRemaininngBox();
+							doFixedRow(targetId);
+						}
+						break;
+					}
+				},
+				error : function(XMLHttpRequest, textStatus, errorThrown) {
+					endLoading();
+					doAlert();
+					$("#tb").html("<span class='graytext'>获取失败，请尝试刷新</span>");
+					$("#publishTime").html(
+							"<span class='graytext'>获取失败，请尝试刷新</span>");
+					$("#parentlistbox").html(
+							"<span class='graytext'>获取失败，请尝试刷新</span>");
 				}
-				break;
-			}
-		},
-		error : function(XMLHttpRequest, textStatus, errorThrown) {
-			endLoading();
-			doAlert();
-			$("#tb").html("<span class='graytext'>获取失败，请尝试刷新</span>");
-			$("#publishTime").html("<span class='graytext'>获取失败，请尝试刷新</span>");
-			$("#parentlistbox")
-					.html("<span class='graytext'>获取失败，请尝试刷新</span>");
-		}
-	});
+			});
 }
 
 // 开始文件视图加载动画
@@ -1172,7 +1209,17 @@ function createNewFolderRow(f, aD, aR, aO) {
 			+ '"'
 			+ ")' class='filerow' iskfolder='true' ><td><button onclick='entryFolder("
 			+ '"' + f.folderId + '"' + ")' class='btn btn-link btn-xs'>/"
-			+ f.folderName + "</button></td><td class='hidden-xs'>"
+			+ f.folderName + "</button>";
+	if (f.folderHomework == 1) { // 显示锁或者解锁的图标
+		if (f.isUploadByTime == 0) {
+			folderRow = folderRow
+					+ "<svg class='icon' aria-hidden='true'><use xlink:href='#icon-suo'></use></svg>";
+		} else if (f.isUploadByTime == 1) {
+			folderRow = folderRow
+					+ "<svg class='icon' aria-hidden='true'><use xlink:href='#icon-jiesuo'></use></svg>";
+		}
+	}
+	folderRow = folderRow + "</td><td class='hidden-xs'>"
 			+ f.folderCreationDate + "</td><td>--</td><td class='hidden-xs'>"
 			+ f.folderCreator + "</td><td>";
 	if (aD) {
@@ -1186,15 +1233,28 @@ function createNewFolderRow(f, aD, aR, aO) {
 				+ ")' class='btn btn-link btn-xs'><span class='glyphicon glyphicon-remove'></span> 删除</button>";
 	}
 	if (aR) {
-		folderRow = folderRow
-				+ "<button onclick='showRenameFolderModel("
-				+ '"'
-				+ f.folderId
-				+ '","'
-				+ replaceAllQuotationMarks(f.folderName)
-				+ '",'
-				+ f.folderConstraint
-				+ ")' class='btn btn-link btn-xs'><span class='glyphicon glyphicon-wrench'></span> 编辑</button>";
+		if (f.folderHomework == 1) {
+			folderRow = folderRow
+					+ '<button onclick=showEditHomeworkModel("'
+					+ f.folderId
+					+ '","'
+					+ replaceAllQuotationMarks(f.folderName)
+					+ '",0,"'
+					+ escape(f.folderHomeworkStartTime)
+					+ '","'
+					+ escape(f.folderHomeworkEndTime)
+					+ '") class="btn btn-link btn-xs"><span class="glyphicon glyphicon-wrench"></span> 编辑</button>';
+		} else {
+			folderRow = folderRow
+					+ "<button onclick='showRenameFolderModel("
+					+ '"'
+					+ f.folderId
+					+ '","'
+					+ replaceAllQuotationMarks(f.folderName)
+					+ '",'
+					+ f.folderConstraint
+					+ ")' class='btn btn-link btn-xs'><span class='glyphicon glyphicon-wrench'></span> 编辑</button>";
+		}
 	}
 	if (aO) {
 		folderRow = folderRow
@@ -1218,16 +1278,99 @@ var folderTypes = [ '公开的', '仅小组', '仅创建者' ];// 文件夹约�
 // 显示新建文件夹模态框
 function showNewFolderModel() {
 	$('#newFolderModal').modal('show');
+	$('#createNewHomeworkFolder').attr("style", "display: none");
+	$('#createNewHomeworkFolder input').val(""); // 时间输入框为空
+	$('#createfolder').attr("onclick", "createFolder()"); // 点击时间默认为创建普通文件夹
 }
 
 // 修改新建文件夹约束等级
 function changeNewFolderType(type) {
 	$("#newfoldertype").text(folderTypes[type]);
 	$("#foldername").attr("folderConstraintLevel", type + "");
+	$("#createfolder").attr("onclick", "createFolder()");
+	$('#createNewHomeworkFolder').attr("style", "display: none");
+}
+
+// 作业文件夹约束等级为0，也就是公开的文件夹,传入的type为0
+function changeNewHomeworkFolderType(type) {
+	$("#newfoldertype").text("作业文件夹");
+	$("#foldername").attr("folderConstraintLevel", type + "");
+	$("#createfolder").attr("onclick", "createHomeworkFolder()");
+	$('#createNewHomeworkFolder').attr("style", "display: block");
+}
+
+// 创建作业文件夹
+function createHomeworkFolder() {
+	var fn = $("#foldername").val();
+	var fc = $("#foldername").attr("folderConstraintLevel"); // 默认为0，也就是公共的文件夹
+	var ft = $("#inputTime").val();
+	var reg = new RegExp("[\/\|\\\\\*\\<\\>\\?\\:\\&\\$" + '"' + "]+", "g");
+	if (fn.length == 0) {
+		showFolderAlert("提示：文件夹名称不能为空。");
+	} else if (fn.length > 128) {
+		showFolderAlert("提示：文件夹名称太长。");
+	} else if (ft.length == 0) {
+		showFolderAlert("提示：作业文件夹日期不能为空");
+	} else if (!reg.test(fn) && fn.indexOf(".") != 0) {
+		$("#folderalert").removeClass("alert");
+		$("#folderalert").removeClass("alert-danger");
+		$("#foldernamebox").removeClass("has-error");
+		$("#folderalert").text("");
+		var startTime = ft.split("~")[0];
+		var endTime = ft.split("~")[1];
+		$.ajax({
+			type : "POST",
+			dataType : "text",
+			data : {
+				parentId : locationpath,
+				folderName : fn,
+				folderConstraint : fc,
+				folderHomeworkStartTime : startTime,
+				folderHomeworkEndTime : endTime,
+				folderHomework : "1"
+			},
+			url : "homeController/newFolder.ajax",
+			success : function(result) {
+				if (result == "mustLogin") {
+					window.location.href = "prv/login.html";
+				} else {
+					switch (result) {
+					case "noAuthorized":
+						showFolderAlert("提示：您的操作未被授权，创建文件夹失败。");
+						break;
+					case "errorParameter":
+						showFolderAlert("提示：参数不正确，创建文件夹失败。");
+						break;
+					case "cannotCreateFolder":
+						showFolderAlert("提示：出现意外错误，可能未能创建文件夹。");
+						break;
+					case "nameOccupied":
+						showFolderAlert("提示：该名称已被占用，请选取其他名称。");
+						break;
+					case "foldersTotalOutOfLimit":
+						showFolderAlert("提示：该文件夹内存储的文件夹数量已达上限，无法在其中创建更多文件夹。");
+						break;
+					case "createFolderSuccess":
+						$('#newFolderModal').modal('hide');
+						showFolderView(locationpath);
+						break;
+					default:
+						showFolderAlert("提示：出现意外错误，可能未能创建文件夹。");
+						break;
+					}
+				}
+			},
+			error : function() {
+				showFolderAlert("提示：出现意外错误，可能未能创建文件夹");
+			}
+		});
+	} else {
+		showFolderAlert("提示：文件夹名中不应含有：引号 / \\ * | < > & $ : ? 且不能以“.”开头。");
+	}
 }
 
 // 创建新的文件夹
-function createfolder() {
+function createFolder() {
 	var fn = $("#foldername").val();
 	var fc = $("#foldername").attr("folderConstraintLevel");
 	var reg = new RegExp("[\/\|\\\\\*\\<\\>\\?\\:\\&\\$" + '"' + "]+", "g");
@@ -1246,7 +1389,8 @@ function createfolder() {
 			data : {
 				parentId : locationpath,
 				folderName : fn,
-				folderConstraint : fc
+				folderConstraint : fc,
+				folderHomework : "0"
 			},
 			url : "homeController/newFolder.ajax",
 			success : function(result) {
@@ -1292,7 +1436,8 @@ function createfolder() {
 function showFolderAlert(txt) {
 	$("#folderalert").addClass("alert");
 	$("#folderalert").addClass("alert-danger");
-	$("#foldernamebox").addClass("has-error");
+	$("#createNewHomeworkFolder").addClass("has-error");
+	$("#inputTime").addClass("has-error");
 	$("#folderalert").text(txt);
 }
 
@@ -1360,8 +1505,24 @@ function deleteFolder(folderId) {
 	});
 }
 
+// 显示作业文件夹的编辑框，主要不同的是增加了日期功能
+function showEditHomeworkModel(folderId, folderName, type,
+		folderHomeworkStartTime, folderHomeworkEndTime) {
+	$("#EditHomeworkFolder").attr("style", "display: block");
+	var time = unescape(folderHomeworkStartTime) + "~"
+			+ unescape(folderHomeworkEndTime);
+	$("#changeinputTime").val(time);
+	$("#renameFolderBox").html(
+			"<button type='button' class='btn btn-primary' onclick='renameHomeworkFolder("
+					+ '"' + folderId + '"' + ")'>修改</button>");
+	$("#newfoldername").val(folderName);
+	changeEditHomeworkFolderType(type);
+	$("#renameFolderModal").modal('show');
+}
+
 // 显示重命名文件夹模态框
 function showRenameFolderModel(folderId, folderName, type) {
+	$("#EditHomeworkFolder").attr("style", "display: none");
 	$("#renameFolderBox").html(
 			"<button type='button' class='btn btn-primary' onclick='renameFolder("
 					+ '"' + folderId + '"' + ")'>修改</button>");
@@ -1372,8 +1533,83 @@ function showRenameFolderModel(folderId, folderName, type) {
 
 // 修改编辑文件夹的约束等级
 function changeEditFolderType(type) {
+	$("#EditHomeworkFolder").attr("style", "display: none");
 	$("#editfoldertype").text(folderTypes[type]);
 	$("#newfoldername").attr("folderConstraintLevel", type + "");
+	var id = $("#renameFolderBox button").attr("onclick").split('"')[1];
+	$("#renameFolderBox button").attr("onclick", 'renameFolder("' + id + '")'); // 改变提交按钮的点击事件
+}
+
+function changeEditHomeworkFolderType(type) {
+	if (type != 0) {
+		$("#EditHomeworkFolder").attr("style", "display: none");
+	} else {
+		$("#EditHomeworkFolder").attr("style", "display: block");
+	}
+	$("#editfoldertype").text("作业文件夹");
+	$("#newfoldername").attr("folderConstraintLevel", type + "");
+	var id = $("#renameFolderBox button").attr("onclick").split('"')[1];
+	$("#renameFolderBox button").attr("onclick",
+			'renameHomeworkFolder("' + id + '")'); // 改变提交按钮的点击事件，作业文件夹去往不同的事件
+
+}
+
+// 执行重命名文件夹
+function renameHomeworkFolder(folderId) {
+	var newName = $("#newfoldername").val();
+	var fc = $("#newfoldername").attr("folderConstraintLevel");
+	var time = $('#changeinputTime').val();
+	var startTime = time.split("~")[0];
+	var endTime = time.split("~")[1];
+	var reg = new RegExp("[\/\|\\\\\*\\<\\>\\?\\:\\&\\$" + '"' + "]+", "g");
+	if (newName.length == 0) {
+		showRFolderAlert("提示：文件夹名称不能为空。");
+	} else if (time.length == 0) {
+		showRFolderAlert("提示：作业文件夹时间不能为空。");
+	} else if (newName.length > 128) {
+		showRFolderAlert("提示：文件夹名称太长。");
+	} else if (!reg.test(newName) && newName.indexOf(".") != 0) {
+		$("#newfolderalert").removeClass("alert");
+		$("#newfolderalert").removeClass("alert-danger");
+		$("#folderrenamebox").removeClass("has-error");
+		$("#newfolderalert").text("");
+		$.ajax({
+			type : "POST",
+			dataType : "text",
+			data : {
+				folderId : folderId,
+				newName : newName,
+				folderConstraint : fc,
+				folderHomeworkStartTime : startTime,
+				folderHomeworkEndTime : endTime,
+				folderHomework : "1"
+			},
+			url : "homeController/renameFolder.ajax",
+			success : function(result) {
+				if (result == "mustLogin") {
+					window.location.href = "prv/login.html";
+				} else {
+					if (result == "noAuthorized") {
+						showRFolderAlert("提示：您的操作未被授权，编辑失败。");
+					} else if (result == "errorParameter") {
+						showRFolderAlert("提示：参数不正确，编辑失败，请刷新后重试。");
+					} else if (result == "nameOccupied") {
+						showRFolderAlert("提示：该名称已被占用，请选取其他名称。");
+					} else if (result == "renameFolderSuccess") {
+						$('#renameFolderModal').modal('hide');
+						showFolderView(locationpath);
+					} else {
+						showRFolderAlert("提示：出现意外错误，可能未能编辑文件夹，请刷新后重试。");
+					}
+				}
+			},
+			error : function() {
+				showRFolderAlert("提示：出现意外错误，可能未能编辑文件夹，请刷新后重试。");
+			}
+		});
+	} else {
+		showRFolderAlert("提示：文件夹名中不应含有：引号 / \\ * | < > & $ : ? 且不能以“.”开头。");
+	}
 }
 
 // 执行重命名文件夹
@@ -1538,6 +1774,12 @@ function checkUploadFile() {
 												+ "]的体积超过最大限制（"
 												+ resp.maxUploadFileSize
 												+ "），无法开始上传");
+									} else if (resp.checkResult == "tooEarly") {
+										showUploadFileAlert("提示：还未到达作业提交时间，请您耐心等待，开始时间为"
+												+ resp.homeworkStartTime + "。 ");
+									} else if (resp.checkResult == "tooLate") {
+										showUploadFileAlert("提示：您已经超出了作业提交时间，截至时间为"
+												+ resp.homeworkEndTime + "。 ");
 									} else if (resp.checkResult == "hasExistsNames") {
 										repeList = resp.pereFileNameList;
 										repeIndex = 0;
@@ -1977,30 +2219,28 @@ function showPicture(fileId) {
 // 预览ipynb文件，使用的是第三方在线预览网站
 function ipynbView(fileId, fileName) {
 	$.ajax({
-				url : 'externalLinksController/getDownloadKey.ajax',
-				type : 'POST',
-				dataType : 'text',
-				data : {
-					fId : getDownloadFileId
-				},
-				
-				success : function(result) {
-					// 获取链接
-					var temp = window.location.host 
+		url : 'externalLinksController/getDownloadKey.ajax',
+		type : 'POST',
+		dataType : 'text',
+		data : {
+			fId : getDownloadFileId
+		},
+
+		success : function(result) {
+			// 获取链接
+			var temp = window.location.host
 					+ "/externalLinksController/downloadFileByKey/"
 					+ encodeURIComponent(fileName.replace(/\\/g, "_"));
-					var encoded = encodeURIComponent("?dkey=" + result);
-					url = "https://nbviewer.jupyter.org/url/" + temp + "/" + encoded;
-					window.open(url);
-				},
-				error : function() {
-					$("#downloadHrefBox")
-							.html(
-									"<span class='text-muted'>预览失败，请检查网络状态</span>");
-				}
-			});
+			var encoded = encodeURIComponent("?dkey=" + result);
+			url = "https://nbviewer.jupyter.org/url/" + temp + "/" + encoded;
+			window.open(url);
+		},
+		error : function() {
+			$("#downloadHrefBox").html(
+					"<span class='text-muted'>预览失败，请检查网络状态</span>");
+		}
+	});
 }
-
 
 // 用于创建并显示小于2*limit+1长度的图片列表
 function createViewList() {
@@ -3060,7 +3300,8 @@ var getDownloadFileName;// 下载链接的文件名（便于下载工具识别�
 
 // 获取某一文件的下载链接
 function getDownloadURL() {
-	$.ajax({
+	$
+			.ajax({
 				url : 'externalLinksController/getDownloadKey.ajax',
 				type : 'POST',
 				dataType : 'text',

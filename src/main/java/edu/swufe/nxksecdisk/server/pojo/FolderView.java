@@ -40,13 +40,14 @@ public class FolderView {
     private boolean enableDownloadZip;
 
     private boolean enableFfmpeg;
-
+    
     /**
      * 文件夹列表查询偏移量;
      */
     private long foldersOffset;
 
-    /**
+
+	/**
      * 文件列表查询偏移量;
      */
     private long filesOffset;

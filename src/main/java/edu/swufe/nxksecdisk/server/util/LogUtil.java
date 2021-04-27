@@ -171,6 +171,46 @@ public class LogUtil {
     }
 
     /**
+     * 以格式化记录重命名文件夹日志
+     * <p>
+     * 写入重命名文件夹信息
+     * </p>
+     */
+    public void writeChangeTimeFolderEvent(HttpServletRequest request,
+                                       Folder f,
+                                       String newTime,
+                                       String newConstraint) {
+        if (config.inspectLogLevel(LogLevel.EVENT)) {
+            String account = (String) request.getSession().getAttribute("ACCOUNT");
+            if (account == null || account.length() == 0) {
+                account = "student";
+            }
+            String a = account;
+            String ip = ipAddrGetter.getIpAddr(request);
+            writerThread.execute(() ->
+            {
+                List<Folder> l = folderUtil.getParentList(f.getFolderId());
+                StringBuilder pl = new StringBuilder();
+                for (Folder i : l) {
+                    pl.append(i.getFolderName()).append("/");
+                }
+                String content = String.format(
+                        ">IP [%s]\r\n>ACCOUNT [%s]\r\n>OPERATE [Edit folder]\r\n>PATH [%s]\r\n>NAME [%s]\r\n>NEW_TIME->[%s]," +
+                                "CONSTRAINT [%d]->[%s]",
+                        ip,
+                        a,
+                        pl.toString(),
+                        f.getFolderName(),
+                        newTime,
+                        f.getFolderConstraint(),
+                        newConstraint);
+                writeToLog("Event", content);
+            });
+        }
+    }
+    
+    
+    /**
      * 以格式化记录删除文件夹日志
      * <p>
      * 写入删除文件夹信息
@@ -270,6 +310,7 @@ public class LogUtil {
             });
         }
     }
+    
 
     /**
      * 以格式化记录下载文件日志

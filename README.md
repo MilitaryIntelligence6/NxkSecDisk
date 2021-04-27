@@ -1,23 +1,37 @@
 ## 欢迎访问NxkSecDIsk源代码资源库！
-### Welcome to visit source of kiftd!
-
-_当前版本：v1.0.35-RELEASE_
+### Welcome to visit source of NxkSecDisk!
 
 ### 简介
-_kiftd——一款便捷、开源、功能完善的个人&团队&小型团队网盘服务器系统。_
+NxkSecDisk是踩在了巨人的肩膀上，我们利用了Github上开源的网盘：kiftd 二次制作而成，在此非常感谢作者的无私奉献。如果您需要该版本，请转到以下位置进行浏览和下载：
+[kiftd-官方主页](https://kohgylw.gitee.io) 
 
-------
-![主界面展示](https://github.com/KOHGYLW/kiftd-showPicture/blob/master/kiftd-mainpage.png?raw=true)
-------
+**我们进行二次开发的目的，是为了使网盘更好的适应上交作业的需求。我们全程使用Github协助开发，主要的改进点为以下几点：**
 
-kiftd能够帮助您快速搭建起一个面向家庭、团队或组织的网盘系统，它操作简单、高效且功能多样。这里是kiftd的源代码资源库，您可以在这里获得kiftd的源代码，并对其进行下载、阅读与重构。
+1. 用户可以在指定文件夹下获得指定权限。
+2. 优化了一些前端样式。
+3. 添加了全选、多选、连选等快捷键。
+4. 搜索功能分为全局搜索、本级搜索，并且未登录用户不能获得搜索权限。
+5. 在线预览.ipynb文件。
+6. 增加作业文件夹选项，包含了开始、截至日期。
+7. 增加点击绽放小球。
+8. 增加点击绽放四级单词，让学生在上交作业的时候，还能顺手背单词。
 
-注：如果您仅仅希望得到一份拿来即用的软件，kiftd也提供了一个完整的、解压即用的编译版。您可以根据其说明在3分钟内快速安装并开始使用。如果您需要该版本，请转到以下位置进行浏览和下载：
-[kiftd-官方主页](https://kohgylw.gitee.io)
+**后续考虑的增加的功能为：**
+
+	1. 作业文件夹内上传文件时，需要用户手动输入学号+姓名+备注，以此作为文件名。
+	2. 根据文件夹内文件的“学号+姓名”，导出该“学号+姓名”在每一周是否已经提交。
+	3. 作业文件夹内增加分数选项，并且匿名用户无法查看该分数。
+	4. 增加后台管理面板。
+
+**但估计本学期都不会再有改动**
+
+> 因为一名核心成员已经坐上前往上海的飞机，前去阿里巴巴某事业部任职，他并非计算机专业，是靠着自学拿下了offer，没有强烈的热爱，是不可能坚持下来的。
+>
+> 而另一名核心成员成天老想着干饭、干鸡腿、干鸭腿、乐山甜皮鸭、火锅、串串、麻辣香锅、宫保鸡丁、鱼香肉丝、麻婆豆腐、芝士蛋糕、奶油泡芙、芒果布丁、珍珠奶茶、红烧肉、煎带鱼、炸鸡翅、炸鸡腿、周黑鸭、三文鱼、北极贝、帝王蟹、冰淇凌、星冰乐、西米露、西瓜汁、鸡汤、烤鱼、海胆、薯条、汉堡、果冻、吐司
 
 
 ### 构建说明
-_下列条目为kiftd开发环境的基本信息，如需对源代码进行查看及编译，推荐使用所列配置。_
+_下列条目为kiftd开发环境的基本信息，本网盘维持和原始一样的开发环境，如需对源代码进行查看及编译，推荐使用所列配置。_
 + JDK版本：1.8.0_131
 + 项目管理框架：Maven（m2e 1.8.0 for Eclipse）,Archetype：mavem-archetype-quickstart 1.1。
 + 编码格式：UTF-8
@@ -32,7 +46,29 @@ _下列条目为kiftd开发环境的基本信息，如需对源代码进行查�
 
 _提示：源代码路径下包含了一些程序运行所需的非源代码资源（例如程序图标等），某些集成式开发环境（例如IDEA）在编译过程中可能会自动忽略非源代码资源。您需要设置并保证这些资源也能够被正确打包至最终的jar程序内，否则将会导致编译出的程序无法顺利运行。_
 
+### 如何更新 ###
+
+若您的kiftd网盘已经在运行，您想保留原有的文件，请复制原kiftd网盘里filesystem里的所有文件夹，覆盖NxkSecDisk里filesystem的所有文件夹。然后百度安装h2数据库，这并不大，只有30m左右。用h2页面端进入NxkSecDisk/filesystem下的kift数据库，账号密码分别为：
+
+```java
+账号：root
+密码：301537gY
+```
+
+然后使用以下语句，每次一行更新数据库表结构：
+
+```sql
+ALTER TABLE FOLDER add column folder_homework TINYINT(1) DEFAULT 0
+ALTER TABLE FOLDER add column folder_homework_start_time VARCHAR(128) DEFAULT NULL
+ALTER TABLE FOLDER add column folder_homework_end_time VARCHAR(128) DEFAULT NULL
+```
+
+成功后，即可享受作业文件夹功能。
+
 ### 程序基本结构说明
+
+我们仅仅做了包重命名的工作，您可以参考kiftd网盘的程序基本结构。
+
 + 源代码资源文件夹：/src/main/java/
 + 入口类：kohgylw.kiftd.Application
 + web界面请求处理包：kohgylw.kiftd.server.controller、kohgylw.kiftd.server.filter
@@ -50,27 +86,4 @@ _提示：源代码路径下包含了一些程序运行所需的非源代码资�
 + 日志文件夹：/logs/
 + 编译输出文件夹：/target/
 + maven配置文件：/pom.xml
-
-### 常见问题&解决方案
-+ 更换更高版本的Spring Boot后无法启动项目
-> 如果您需要将kiftd所用的Spring Boot版本替换至更高（尤其是Spring Boot 2.0.4及以上版本），请重写源代码`kohgylw.kiftd.server.configation.MVC`类中的`afterPropertiesSet()`方法，并将其方法体留空。否则可能导致项目启动错误（特别鸣谢：用户 songdragon）。
-
-+ 启动源代码项目时出现“Error creating bean with name org.mybatis.spring.mapper.MapperScannerConfigurer”
-> 如遇该问题，请尝试将pom.xml文件中引入的`mybatis`资源和`mybatis-spring`资源移除并重新添加`mybatis-spring-boot-starter`资源，从而避免默认整合方式可能导致的Spring Boot框架插件兼容性问题（特别鸣谢：用户 michael）。
-
-### 使用许可（下载该源代码资源即视为接受以下许可）
-当前版本的kiftd使用自带的许可文件进行分发。您应该先阅读该文件（获取方式：前往kiftd发行版主页下载一份kiftd发行版并在其中获得，详见 https://github.com/KOHGYLW/kiftd ），并在同意其中的所有条款后再下载该源代码。其大致内容如下：
-
-+ 您可以免费获得该源代码的原版拷贝。
-+ 您可以自由地对该源代码进行分发、重构并运用于任何领域。
-+ 作者对于使用该源代码造成的任何后果均无需负责。
-+ 作者对该源代码具有版权。
-
-### 关于该源代码...
-该源代码为目前发布的kiftd解压即用版的原始编译来源，二者保持一致性（有时源码版本可能会略微超前），作者将在今后对其逐步进行整理以便于用户阅读，由此带来的不便敬请谅解。
-
-### 联系作者？
-如有任何需要（例如对该资源有疑问、意见或建议），请发件联系作者： kohgylw@163.com （青阳龙野），随时恭候您的来信！
-
-青阳龙野@kohgylw by 2020年07月06日
 
