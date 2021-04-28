@@ -1238,7 +1238,7 @@ function createNewFolderRow(f, aD, aR, aO) {
 					+ '<button onclick=showEditHomeworkModel("'
 					+ f.folderId
 					+ '","'
-					+ replaceAllQuotationMarks(f.folderName)
+					+ replaceAllQuotationMarks(escape(f.folderName))
 					+ '",0,"'
 					+ escape(f.folderHomeworkStartTime)
 					+ '","'
@@ -1515,7 +1515,7 @@ function showEditHomeworkModel(folderId, folderName, type,
 	$("#renameFolderBox").html(
 			"<button type='button' class='btn btn-primary' onclick='renameHomeworkFolder("
 					+ '"' + folderId + '"' + ")'>修改</button>");
-	$("#newfoldername").val(folderName);
+	$("#newfoldername").val(unescape(folderName));
 	changeEditHomeworkFolderType(type);
 	$("#renameFolderModal").modal('show');
 }

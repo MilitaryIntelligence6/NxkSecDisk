@@ -156,7 +156,7 @@ public class FileSystemManager {
             countNodesByFolderId = c.prepareStatement("SELECT count(file_id) FROM FILE WHERE file_parent_folder = ?");
             countFoldersByParentFolderId = c
                     .prepareStatement("SELECT count(folder_id) FROM FOLDER WHERE folder_parent = ?");
-        } catch (SQLException e) {
+        } catch (Exception e) {
             AppSystem.out.println("错误：出现未知错误，文件系统解析失败，无法浏览文件。");
         }
     }
