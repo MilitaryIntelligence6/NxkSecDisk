@@ -2220,6 +2220,7 @@ function showPicture(fileId) {
 
 // 预览ipynb文件，使用的是第三方在线预览网站
 function ipynbView(fileId, fileName) {
+	getDownloadFileId = fileId;
 	$.ajax({
 		url : 'externalLinksController/getDownloadKey.ajax',
 		type : 'POST',
