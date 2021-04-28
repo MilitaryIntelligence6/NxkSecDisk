@@ -7,9 +7,6 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author Military Intelligence 6 root
  * @version 1.0.0
- * @ClassName ThreadPoolConfig
- * @Description TODO
- * @CreateTime 2021年03月28日 20:16:00
  */
 public  final class PoolConfig {
 

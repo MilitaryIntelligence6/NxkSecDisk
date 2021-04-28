@@ -5,9 +5,6 @@ import edu.swufe.nxksecdisk.constant.EnumLaunchMode;
 /**
  * @author Military Intelligence 6 root
  * @version 1.0.0
- * @ClassName DynamicConfig
- * @Description TODO
- * @CreateTime 2021年03月28日 13:00:00
  */
 public final class DynamicConfig {
 

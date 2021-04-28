@@ -80,7 +80,6 @@ public class ConsoleLauncher {
      * </p>
      *
      * @param args java.lang.String[] 启动参数
-     * @return kohgylw.kiftd.mc.ConsoleRunner 本启动器唯一实例
      * @author 青阳龙野(kohgylw)
      */
     public static void launch(final String[] args) {

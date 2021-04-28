@@ -5,9 +5,6 @@ import java.util.concurrent.*;
 /**
  * @author Military Intelligence 6 root
  * @version 1.0.0
- * @ClassName ThreadPool
- * @Description TODO
- * @CreateTime 2021年03月28日 20:02:00
  */
 public final class ThreadPool extends ThreadPoolExecutor {
 

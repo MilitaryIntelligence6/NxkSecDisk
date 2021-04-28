@@ -335,7 +335,7 @@ public class FileSystemManager {
      * </p>
      *
      * @param folderId java.lang.String 需要查询的父文件夹ID
-     * @return java.util.List<kohgylw.kiftd.server.model.Folder> 文件夹对象列表，如果没有结果则长度为0
+     * @return java.util.List 文件夹对象列表，如果没有结果则长度为0
      * @throws SQLException 查询失败
      * @author 青阳龙野(kohgylw)
      */

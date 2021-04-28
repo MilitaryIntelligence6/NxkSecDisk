@@ -200,7 +200,7 @@ public class DiskProperties {
      * 该方法用于获得目前存在的所有配置项，并以List的形式返回。
      * </p>
      *
-     * @return java.util.List<java.lang.String> 所有的配置项
+     * @return java.util.List 所有的配置项
      * @author 青阳龙野(kohgylw)
      */
     public Set<String> stringPropertieNames() {

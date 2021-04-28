@@ -9,7 +9,7 @@ import edu.swufe.nxksecdisk.launcher.UiLauncher;
  * 该类为程序主类，内部的main方法为kiftd程序的唯一入口。您可以从这里开始逐步了解kiftd的整个设计。
  * 如果需反馈问题，欢迎随时与作者联系：kohgylw@163.com，您的反馈将是kiftd不断完善的最佳动力。
  * </p>
- * <h4>许可声明：</h4>
+ * <h3>许可声明：</h3>
  * <p>
  * 使用该源代码（包括但不限于：分发、修改、编译）代表您接受以下条款：
  * </p>

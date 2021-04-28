@@ -3,9 +3,6 @@ package edu.swufe.nxksecdisk.system;
 /**
  * @author Military Intelligence 6 root
  * @version 1.0.0
- * @ClassName StdOutStream
- * @Description TODO
- * @CreateTime 2021年03月28日 13:05:00
  */
 final class StdOutStream implements IOutputStream {
 

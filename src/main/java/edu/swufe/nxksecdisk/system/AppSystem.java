@@ -7,9 +7,6 @@ import edu.swufe.nxksecdisk.thread.ThreadPool;
 /**
  * @author Military Intelligence 6 root
  * @version 1.0.0
- * @ClassName Logger
- * @Description TODO
- * @CreateTime 2021年03月27日 22:22:00
  */
 public final class AppSystem {
 

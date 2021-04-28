@@ -167,8 +167,7 @@ public class UiLauncher {
      * 该方法将返回本启动器的唯一实例。
      * </p>
      *
-     * @return kohgylw.kiftd.mc.UIRunner 本启动器唯一实例
-     * @throws Exception
+     * @throws RuntimeException
      * @author 青阳龙野(kohgylw)
      */
     public static void launch() {

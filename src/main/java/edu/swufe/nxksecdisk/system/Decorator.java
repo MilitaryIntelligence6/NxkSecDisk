@@ -5,9 +5,6 @@ import edu.swufe.nxksecdisk.server.util.ServerTimeUtil;
 /**
  * @author Military Intelligence 6 root
  * @version 1.0.0
- * @ClassName Decorator
- * @Description TODO
- * @CreateTime 2021年03月27日 18:35:00
  */
 public final class Decorator {
 

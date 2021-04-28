@@ -52,15 +52,17 @@ public interface FolderMapper {
     /**
      * <h2>新建作业文件夹</h2>
      * <p>作业文件夹权限为公开，并且FOLDER_HOMEWORK设置为1，并且设置FOLDER_HOMEWORK_START_TIME和FOLDER_HOMEWORK_END_TIME </p>
-     * @param f
-     * @return
+     * @param f kohgylw.kiftd.server.model.Folder 更新的文件夹，必须完整非空
+     * @return int 影响条目
+     * @author nixiak
      */
     int insertNewHomeworkFolder(final Folder f);
     
     /**
      * <h2>改变文件夹性质</h2>
-     * @param map
-     * @return
+     * @param f kohgylw.kiftd.server.model.Folder 更新的文件夹，必须完整非空
+     * @return int 影响条目
+     * @author nixiak
      */
     int updateHomeworkFolder(final Folder f);
     

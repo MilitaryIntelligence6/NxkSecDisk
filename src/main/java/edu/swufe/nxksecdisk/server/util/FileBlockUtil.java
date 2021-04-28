@@ -298,8 +298,8 @@ public class FileBlockUtil {
      * 该功能用于创建ZIP压缩文件，线程阻塞。如果压缩目标中存在同名情况，则使用“{文件名} (n).{后缀}”或“{文件夹名} n”的形式重命名。
      * </p>
      *
-     * @param idList  java.util.List<String> 要压缩的文件节点目标ID列表
-     * @param fidList java.util.List<String> 要压缩的文件夹目标ID列表，迭代压缩
+     * @param idList  java.util.List 要压缩的文件节点目标ID列表
+     * @param fidList java.util.List 要压缩的文件夹目标ID列表，迭代压缩
      * @param account java.lang.String 用户ID，用于判断压缩文件夹是否有效
      * @return java.lang.String
      * 压缩后产生的文件名称，命名规则为“tf_{UUID}.zip”，存放于文件系统中的temporaryfiles目录下

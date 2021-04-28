@@ -531,7 +531,7 @@ public class ConfigReader {
 	 * 得到全部扩展存储区列表，以便进行文件块的存取操作。
 	 * </p>
 	 *
-	 * @return java.util.List<kohgylw.kiftd.server.pojo.ExtendStores> 所有扩展存储区对象的列表
+	 * @return java.util.List 所有扩展存储区对象的列表,里面装的是edu.swufe.nxksecdisk.server.pojo.ExtendStores
 	 * @author 青阳龙野(kohgylw)
 	 */
 	public List<ExtendStores> requireExtendStores() {

@@ -16,7 +16,6 @@ import java.util.Random;
  *
  * @author 青阳龙野(kohgylw)
  * @version 1.0
- * @see kohgylw.verification_code.factory.VerificationCode
  */
 public class VerificationCodeFactory {
 
