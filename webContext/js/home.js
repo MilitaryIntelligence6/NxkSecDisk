@@ -607,6 +607,8 @@ function showFolderView(fid, targetId) {
 									"display: none");
 							$("#fim_folderEndTime_dt").attr("style",
 									"display: none");
+							$("#fim_folderStartTime").text("");
+							$("#fim_folderEndTime").text("");
 						}
 
 						updateTheFolderInfo();
