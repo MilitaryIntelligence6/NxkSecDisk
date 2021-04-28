@@ -21,10 +21,10 @@ NxkSecDisk是踩在了巨人的肩膀上，我们利用了Github上开源的网�
 
 **后续考虑的增加的功能为：**
 
-	1. 作业文件夹内上传文件时，需要用户手动输入学号+姓名+备注，以此作为文件名。
-	2. 根据文件夹内文件的“学号+姓名”，导出该“学号+姓名”在每一周是否已经提交。
-	3. 作业文件夹内增加分数选项，并且匿名用户无法查看该分数。
-	4. 增加后台管理面板。
+> 1. 作业文件夹内上传文件时，需要用户手动输入学号+姓名+备注，以此作为文件名。(容易)
+> 2. 根据文件夹内文件的“学号+姓名”，导出该“学号+姓名”在每一周是否已经提交。（复杂）
+> 3. 作业文件夹内增加分数选项，并且匿名用户无法查看该分数。（容易）
+> 4. 增加后台管理面板。（中等）
 
 **但估计本学期都不会再有改动**
 
@@ -62,33 +62,42 @@ _下列条目为kiftd开发环境的基本信息，本网盘维持和原始一�
 + 编码格式：UTF-8
 + 项目资源及配置：Spring Boot+MyBatis+H2 DB，详见pom.xml文档。
 
-### 快速开始
-+ 使用Eclipse(javaEE)以项目方式导入本资源文件夹，并设置构建路径中的JDK版本。
-+ 使用Maven选项更新项目，并确保pom文件中引入的所有外部资源能够正确引入至本地。
-+ 打开kohgylw.kiftd.mc.MC类，进行测试运行。
-+ 右键项目，执行Run with选项中的Maven install操作以在target文件夹内编译生成jar程序。
-+ 将生成的jar程序拷贝到项目主目录下（即与libs等文件夹同级）并开始使用。
+### 如何开始
 
-_提示：源代码路径下包含了一些程序运行所需的非源代码资源（例如程序图标等），某些集成式开发环境（例如IDEA）在编译过程中可能会自动忽略非源代码资源。您需要设置并保证这些资源也能够被正确打包至最终的jar程序内，否则将会导致编译出的程序无法顺利运行。_
+- **仅仅想查看该网盘源码及其功能**
+  - 使用Eclipse(javaEE)以项目方式导入本资源文件夹，并设置构建路径中的JDK版本。
+  - 使用Maven选项更新项目，并确保pom文件中引入的所有外部资源能够正确引入至本地。
+  - 打开edu.swufe.nxksecdisk.Application类，进行测试运行。
 
-### 如何更新 ###
+- **想将其部署至云服务器**
 
-若您的kiftd网盘已经在运行，您想保留原有的文件，请复制原kiftd网盘里filesystem里的所有文件夹，覆盖NxkSecDisk里filesystem的所有文件夹。然后百度安装h2数据库，这并不大，只有30m左右。用h2页面端进入NxkSecDisk/filesystem下的kift数据库，账号密码分别为：
+  - 使用Eclipse(javaEE)以项目方式导入本资源文件夹，并设置构建路径中的JDK版本。
+  - 使用Maven选项更新项目，并确保pom文件中引入的所有外部资源能够正确引入至本地。
+  - 右键项目，执行Run with选项中的Maven install操作以在target文件夹内编译生成jar程序。
+  - 将生成的jar程序拷贝到项目主目录下（即与libs等文件夹同级）并开始使用。
 
-```java
-账号：root
-密码：301537gY
-```
+  _提示：源代码路径下包含了一些程序运行所需的非源代码资源（例如程序图标等），某些集成式开发环境（例如IDEA）在编译过程中可能会自动忽略非源代码资源。您需要设置并保证这些资源也能够被正确打包至最终的jar程序内，否则将会导致编译出的程序无法顺利运行。_
 
-然后使用以下语句，每次一行更新数据库表结构：
+- **想对原有的kiftd网盘进行更新**
 
-```sql
-ALTER TABLE FOLDER add column folder_homework TINYINT(1) DEFAULT 0
-ALTER TABLE FOLDER add column folder_homework_start_time VARCHAR(128) DEFAULT NULL
-ALTER TABLE FOLDER add column folder_homework_end_time VARCHAR(128) DEFAULT NULL
-```
+  - 请复制原kiftd网盘里filesystem里的所有文件夹，覆盖NxkSecDisk里filesystem的所有文件夹。
 
-成功后，即可享受作业文件夹功能。
+  - 百度安装h2数据库，这并不大，只有30m左右。
+
+  - 用h2页面端进入NxkSecDisk/filesystem下的kift数据库，账号密码分别为：
+
+    > 账号：root
+    > 密码：301537gY
+
+  - 然后使用以下语句，每次一行更新数据库表结构：
+
+    ```sql
+    ALTER TABLE FOLDER add column folder_homework TINYINT(1) DEFAULT 0
+    ALTER TABLE FOLDER add column folder_homework_start_time VARCHAR(128) DEFAULT NULL
+    ALTER TABLE FOLDER add column folder_homework_end_time VARCHAR(128) DEFAULT NULL
+    ```
+
+  - 成功后，即可享受作业文件夹功能，根据需求选择上文的**仅仅想查看该网盘源码及其功能、想将其部署至云服务器**进行下一个步骤。
 
 ### 程序基本结构说明
 
