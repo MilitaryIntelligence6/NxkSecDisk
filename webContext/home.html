@@ -36,12 +36,11 @@
 		<div class="row">
 			<div class="col-md-12">
 				<div class="titlebox">
-					<span class="titletext"> <!-- 主标题，如需修改请替换后方标签内的文字 -->
-						<b>
+					<span class="titletext"> <!-- 主标题，如需修改请替换后方标签内的文字 --> <b>
 							数据分析Python中、英 <small> <!-- 副标题，如需修改请替换后方标签内的文字 --> <span
 								class="graytext">swufe</span>
-							</small>
-						</b>
+						</small>
+					</b>
 					</span> <span id="tb" class="rightbtn hidden-xs"></span>
 					<button class="btn btn-link rightbtn hidden-xs"
 						onclick="refreshFolderView()">
@@ -914,6 +913,10 @@
 			class="glyphicon glyphicon-hourglass" aria-hidden="true"></span>
 	</div>
 	<!-- end 加载余下部分的提示 -->
+	<!-- 天气PAI -->
+	<div id="he-plugin-simple"></div>
+	<!-- end 天气PAI -->
+
 </body>
 <!-- jquery基本框架 -->
 <script type="text/javascript" src="js/jquery-1.12.4.min.js"></script>
@@ -927,7 +930,7 @@
 <!-- 音乐播放器 -->
 <script type="text/javascript" src="js/APlayer.min.js"></script>
 <!-- 页面操作定义 -->
-<script type="text/javascript" src="js/home.js"></script>  
+<script type="text/javascript" src="js/home.js"></script>
 <!--<script type="text/javascript" src="js/home.min.js"></script>-->
 <!-- 引入时间弹窗 -->
 <script type="text/javascript" src="layDate-v5.2.1\laydate\laydate.js"></script>
@@ -938,6 +941,36 @@
 <script type="text/javascript" src="js/cet4.js"></script>
 <!-- 绽放小球 -->
 <script type="text/javascript" src="js/beautiful_ball.js"></script>
+<!-- 天气PAI -->
+<script>
+WIDGET = {
+  "CONFIG": {
+    "modules": "01234",
+    "background": "5",
+    "tmpColor": "434343",
+    "tmpSize": "25",
+    "cityColor": "434343",
+    "citySize": "25",
+    "aqiColor": "6FDB48",
+    "aqiSize": "25",
+    "weatherIconSize": "30",
+    "alertIconSize": "30",
+    "padding": "10px 10px 10px 10px",
+    "shadow": "0",
+    "language": "auto",
+    "borderRadius": "5",
+    "fixed": "true",
+    "vertical": "center",
+    "horizontal": "center",
+    "city": "CN101270101",
+    "left": "740",
+    "top": "0",
+    "key": "3741edf9ca3443d08e21c290e4f6a7b6"
+  }
+}
+</script>
+<script
+	src="https://widget.qweather.net/simple/static/js/he-simple-common.js?v=2.0"></script>
 <script>
 	//引入时间弹窗
 	laydate.render({
@@ -951,6 +984,7 @@
 		range : '~'
 	});
 </script>
+<!-- 阿里图标 -->
 <style type="text/css">
 .icon {
 	width: 1em;
