@@ -6,7 +6,7 @@
 ### 简介
 
 NxkSecDisk是踩在了巨人的肩膀上，我们利用了Github上开源的网盘：kiftd 二次制作而成，在此非常感谢作者的无私奉献。如果您需要该版本，请转到以下位置进行浏览和下载：
-[kiftd-官方主页](https://kohgylw.gitee.io) 
+[kiftd-官方主页](https://kohgylw.gitee.io) ，[kiftd-GitHub主页](https://github.com/KOHGYLW/kiftd)
 
 **我们进行二次开发的目的，是为了使网盘更好的适应上交作业的需求。我们全程使用Github协助开发，主要的改进点为以下几点：**
 
